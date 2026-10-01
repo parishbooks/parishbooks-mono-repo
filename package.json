@@ -6,9 +6,14 @@
   "private": true,
   "dependencies": {
     "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^12.0.1",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@thallesp/nestjs-better-auth": "^2.8.0",
     "axios": "^1.6.0",
+    "better-auth": "^1.7.7",
+    "inquirer": "^14.2.2",
+    "pg": "^8.23.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.0"
   },
@@ -43,6 +48,7 @@
     "webpack-dev-server": "^5.2.1"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "e2e/*"
   ]
 }

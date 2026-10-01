@@ -4,7 +4,7 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/parishbooks-svc-e2e"
+      "path": "./e2e/parishbooks-svc-e2e"
     },
     {
       "path": "./apps/parishbooks-svc"

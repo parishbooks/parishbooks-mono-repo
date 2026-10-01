@@ -8,17 +8,17 @@
     ],
     "targets": {
       "e2e": {
-        "executor": "@nx/jest:jest",
+        "executor": "nx:run-commands",
         "outputs": [
-          "{projectRoot}/test-output/jest/coverage"
+          "{projectRoot}/test-output/vitest/coverage"
         ],
         "dependsOn": [
           "@parishbooks/parishbooks-svc:build",
           "@parishbooks/parishbooks-svc:serve"
         ],
         "options": {
-          "jestConfig": "apps/parishbooks-svc-e2e/jest.config.cts",
-          "passWithNoTests": true
+          "cwd": "e2e/parishbooks-svc-e2e",
+          "command": "vitest run"
         }
       }
     }
