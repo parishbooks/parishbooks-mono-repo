@@ -5,19 +5,11 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, PasswordToggle, Submit } from '@/components/auth/shared';
-import { emailSchema, requiredPasswordSchema } from '@/components/auth/schemas';
 import { signIn } from '@/lib/actions/auth';
-
-const signInSchema = z.object({
-    email: emailSchema,
-    password: requiredPasswordSchema,
-});
-
-type SignInFormValues = z.infer<typeof signInSchema>;
+import { signInDtoSchema, type SignInDto } from '@/lib/zod';
 
 export function SignInForm() {
     const searchParams = useSearchParams();
@@ -28,12 +20,12 @@ export function SignInForm() {
     const reset = searchParams.get('reset') === '1';
     const next = searchParams.get('next');
 
-    const form = useForm<SignInFormValues>({
-        resolver: zodResolver(signInSchema),
+    const form = useForm<SignInDto>({
+        resolver: zodResolver(signInDtoSchema),
         defaultValues: { email: '', password: '' },
     });
 
-    async function onSubmit(values: SignInFormValues) {
+    async function onSubmit(values: SignInDto) {
         setFormError(null);
         const result = await signIn(values.email, values.password, undefined, next);
         if (!result.success) setFormError(result.error);

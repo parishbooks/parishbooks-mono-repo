@@ -3,26 +3,19 @@
 import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@parishbooks/design-system/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
 import { Back, Submit } from '@/components/auth/shared';
-import { otpSchema } from '@/components/auth/schemas';
 import { sendEmailOtp, verifyEmailOtp } from '@/lib/actions/auth';
-
-const verifyEmailSchema = z.object({
-    otp: otpSchema,
-});
-
-type VerifyEmailFormValues = z.infer<typeof verifyEmailSchema>;
+import { verifyEmailDtoSchema, type VerifyEmailDto } from '@/lib/zod';
 
 export function VerifyEmailForm({ email }: { email: string }) {
     const [formError, setFormError] = useState<string | null>(null);
     const [resendMessage, setResendMessage] = useState<string | null>(null);
     const [isResending, setIsResending] = useState(false);
 
-    const form = useForm<VerifyEmailFormValues>({
-        resolver: zodResolver(verifyEmailSchema),
+    const form = useForm<VerifyEmailDto>({
+        resolver: zodResolver(verifyEmailDtoSchema),
         defaultValues: { otp: '' },
     });
 
@@ -45,7 +38,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
         else setResendMessage('A new code was sent to your email.');
     }
 
-    async function onSubmit(values: VerifyEmailFormValues) {
+    async function onSubmit(values: VerifyEmailDto) {
         if (!email) {
             setFormError('Missing email. Start again from sign up.');
             return;

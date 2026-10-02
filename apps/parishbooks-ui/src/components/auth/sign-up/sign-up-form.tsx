@@ -6,21 +6,20 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, PasswordToggle, Submit } from '@/components/auth/shared';
-import { signUpSchema } from '@/components/auth/schemas';
-import { type SignUpValues } from '@/components/auth/types';
 import { signUp } from '@/lib/actions/auth';
+import { signUpDtoSchema, type SignUpDto } from '@/lib/zod';
 import { redirect } from 'next/navigation';
 
 export function SignUpForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const form = useForm<SignUpValues>({
-        resolver: zodResolver(signUpSchema),
+    const form = useForm<SignUpDto>({
+        resolver: zodResolver(signUpDtoSchema),
         defaultValues: { name: '', email: '', password: '' },
     });
 
-    async function onSubmit(values: SignUpValues) {
+    async function onSubmit(values: SignUpDto) {
         setFormError(null);
         await signUp({ name: values.name, email: values.email, password: values.password });
         redirect('/');

@@ -4,29 +4,22 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, Back, Submit } from '@/components/auth/shared';
-import { emailSchema } from '@/components/auth/schemas';
 import { forgotPassword } from '@/lib/actions/auth';
-
-const forgotPasswordSchema = z.object({
-    email: emailSchema,
-});
-
-type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+import { forgotPasswordDtoSchema, type ForgotPasswordDto } from '@/lib/zod';
 
 export function ForgotPasswordForm() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const form = useForm<ForgotPasswordFormValues>({
-        resolver: zodResolver(forgotPasswordSchema),
+    const form = useForm<ForgotPasswordDto>({
+        resolver: zodResolver(forgotPasswordDtoSchema),
         defaultValues: { email: '' },
     });
 
-    async function onSubmit(values: ForgotPasswordFormValues) {
+    async function onSubmit(values: ForgotPasswordDto) {
         setFormError(null);
         const result = await forgotPassword(values.email);
         if (!result.success) {

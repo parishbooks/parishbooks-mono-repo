@@ -1,8 +1,9 @@
 'use server';
-import { type SignUpValues } from '@/components/auth/types';
 import { authClient } from '@/lib/auth-client';
+import { setAccessToken } from '@/lib/session';
+import { SignInDto, type SignUpDto } from '@/lib/zod';
 
-export const signUp = async ({ email, password, name }: SignUpValues) => {
+export const signUp = async ({ email, password, name }: SignUpDto) => {
     const response = await authClient.signUp.email({ email, password, name });
     if (response.error) throw new Error(response.error.message);
     return response.data;
@@ -14,9 +15,16 @@ export const googleSignIn = async () => {
     return { success: true as const, data: { url: response.data.url } };
 };
 
-const notImplemented = { success: false as const, error: 'Not implemented.' };
+export const signIn = async ({ email, password }: SignInDto) => {
+    const response = await authClient.signIn.email({ email, password });
+    if (response.error) throw new Error(response.error.message);
+    const accessToken = response.data.token;
+    console.log('accessToken', accessToken);
+    if (accessToken) await setAccessToken(accessToken);
+    return response.data;
+};
 
-export const signIn = async (_email: string, _password: string, _callbackURL?: string, _next?: string | null) => notImplemented;
+const notImplemented = { success: false as const, error: 'Not implemented.' };
 
 export const forgotPassword = async (_email: string) => notImplemented;
 

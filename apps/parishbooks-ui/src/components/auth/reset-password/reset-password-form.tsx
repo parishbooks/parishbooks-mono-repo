@@ -3,34 +3,21 @@
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, Back, Submit } from '@/components/auth/shared';
-import { newPasswordSchema } from '@/components/auth/schemas';
 import { resetPassword } from '@/lib/actions/auth';
-
-const resetPasswordSchema = z
-    .object({
-        password: newPasswordSchema,
-        confirmPassword: z.string().min(1, 'Please confirm your password.'),
-    })
-    .refine((values) => values.password === values.confirmPassword, {
-        message: 'Passwords do not match.',
-        path: ['confirmPassword'],
-    });
-
-type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
+import { resetPasswordDtoSchema, type ResetPasswordDto } from '@/lib/zod';
 
 export function ResetPasswordForm({ token }: { token: string | undefined }) {
     const [formError, setFormError] = useState<string | null>(null);
 
-    const form = useForm<ResetPasswordFormValues>({
-        resolver: zodResolver(resetPasswordSchema),
+    const form = useForm<ResetPasswordDto>({
+        resolver: zodResolver(resetPasswordDtoSchema),
         defaultValues: { password: '', confirmPassword: '' },
     });
 
-    async function onSubmit(values: ResetPasswordFormValues) {
+    async function onSubmit(values: ResetPasswordDto) {
         setFormError(null);
         if (!token) {
             setFormError('This reset link is invalid or missing a token. Request a new link from forgot password.');

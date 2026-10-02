@@ -3,23 +3,16 @@
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@parishbooks/design-system/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
 import { Back, Submit } from '@/components/auth/shared';
-import { otpSchema } from '@/components/auth/schemas';
-
-const verifyPhoneSchema = z.object({
-    otp: otpSchema,
-});
-
-type VerifyPhoneFormValues = z.infer<typeof verifyPhoneSchema>;
+import { verifyPhoneDtoSchema, type VerifyPhoneDto } from '@/lib/zod';
 
 export function VerifyPhoneForm() {
     const router = useRouter();
 
-    const form = useForm<VerifyPhoneFormValues>({
-        resolver: zodResolver(verifyPhoneSchema),
+    const form = useForm<VerifyPhoneDto>({
+        resolver: zodResolver(verifyPhoneDtoSchema),
         defaultValues: { otp: '' },
     });
 
