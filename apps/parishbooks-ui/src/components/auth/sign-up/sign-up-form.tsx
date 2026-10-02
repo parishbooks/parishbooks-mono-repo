@@ -3,34 +3,27 @@
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, PasswordToggle, Submit } from '@/components/auth/shared';
-import { emailSchema, newPasswordSchema } from '@/components/auth/schemas';
+import { signUpSchema } from '@/components/auth/schemas';
+import { type SignUpValues } from '@/components/auth/types';
 import { signUp } from '@/lib/actions/auth';
-
-const signUpSchema = z.object({
-    name: z.string().min(1, 'Full name is required.'),
-    email: emailSchema,
-    password: newPasswordSchema,
-});
-
-type SignUpFormValues = z.infer<typeof signUpSchema>;
+import { redirect } from 'next/navigation';
 
 export function SignUpForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const form = useForm<SignUpFormValues>({
+    const form = useForm<SignUpValues>({
         resolver: zodResolver(signUpSchema),
         defaultValues: { name: '', email: '', password: '' },
     });
 
-    async function onSubmit(values: SignUpFormValues) {
+    async function onSubmit(values: SignUpValues) {
         setFormError(null);
-        const result = await signUp(values.name, values.email, values.password);
-        if (!result.success) setFormError(result.error);
+        await signUp({ name: values.name, email: values.email, password: values.password });
+        redirect('/');
     }
 
     return (

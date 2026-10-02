@@ -4,3 +4,8 @@ export const emailSchema = z.string().min(1, 'Email is required.').email('Enter 
 export const requiredPasswordSchema = z.string().min(1, 'Password is required.');
 export const newPasswordSchema = z.string().min(1, 'Password is required.').min(8, 'Use at least 8 characters.');
 export const otpSchema = z.string().min(6, 'Enter the 6-digit code.');
+export const signUpSchema = z.object({
+    name: z.string().min(1, 'Full name is required.'),
+    email: emailSchema,
+    password: newPasswordSchema,
+});

@@ -1,58 +1,29 @@
 'use server';
+import { type SignUpValues } from '@/components/auth/types';
+import { authClient } from '@/lib/auth-client';
 
-import { redirect } from 'next/navigation';
-import { deleteAccessToken, deleteRefreshToken } from '@/lib/session';
+export const signUp = async ({ email, password, name }: SignUpValues) => {
+    const response = await authClient.signUp.email({ email, password, name });
+    if (response.error) throw new Error(response.error.message);
+    return response.data;
+};
 
-export type ActionResult<T = void> = { success: true; data: T } | { success: false; error: string };
+export const googleSignIn = async () => {
+    const response = await authClient.signIn.social({ provider: 'google', callbackURL: '/', disableRedirect: true });
+    if (response.error || !response.data?.url) return { success: false as const, error: response.error?.message ?? 'Google sign-in failed.' };
+    return { success: true as const, data: { url: response.data.url } };
+};
 
-const notConfigured = 'Authentication API is not connected yet. Wire server actions to IAM when ready.';
+const notImplemented = { success: false as const, error: 'Not implemented.' };
 
-export async function signIn(_email: string, _password: string, _rememberMe?: boolean, next?: string | null): Promise<ActionResult> {
-    return { success: false, error: notConfigured };
-}
+export const signIn = async (_email: string, _password: string, _callbackURL?: string, _next?: string | null) => notImplemented;
 
-export async function signUp(_name: string, _email: string, _password: string): Promise<ActionResult> {
-    return { success: false, error: notConfigured };
-}
+export const forgotPassword = async (_email: string) => notImplemented;
 
-export async function googleSignIn(_callbackURL?: string): Promise<ActionResult<{ url: string }>> {
-    return { success: false, error: notConfigured };
-}
+export const resetPassword = async (_token: string, _password: string) => notImplemented;
 
-export async function signOut(): Promise<ActionResult> {
-    await deleteAccessToken();
-    await deleteRefreshToken();
-    redirect('/sign-in');
-}
+export const sendEmailOtp = async (_email: string) => notImplemented;
 
-export async function getSession(): Promise<ActionResult<never>> {
-    return { success: false, error: notConfigured };
-}
+export const verifyEmailOtp = async (_email: string, _otp: string) => notImplemented;
 
-export async function refreshAccessToken(): Promise<ActionResult<{ token: string }>> {
-    return { success: false, error: notConfigured };
-}
-
-export async function sendEmailOtp(_email: string): Promise<ActionResult<{ status: boolean }>> {
-    return { success: false, error: notConfigured };
-}
-
-export async function verifyEmailOtp(_email: string, _otp: string): Promise<ActionResult> {
-    return { success: false, error: notConfigured };
-}
-
-export async function forgotPassword(_email: string): Promise<ActionResult<{ message: string }>> {
-    return { success: false, error: notConfigured };
-}
-
-export async function resetPassword(_token: string, _newPassword: string): Promise<ActionResult> {
-    return { success: false, error: notConfigured };
-}
-
-export async function changePassword(_currentPassword: string, _newPassword: string, _revokeOtherSessions?: boolean): Promise<ActionResult> {
-    return { success: false, error: notConfigured };
-}
-
-export async function updateProfile(_input: { name?: string; image?: string }): Promise<ActionResult<{ status: boolean }>> {
-    return { success: false, error: notConfigured };
-}
+export const signOut = async () => undefined;
