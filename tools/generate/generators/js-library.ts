@@ -11,6 +11,7 @@ export function generateJsLibrary(workspaceRoot: string, name: string): number {
     '@nx/js:library',
     `--directory=${directory}`,
     `--importPath=${importPath}`,
+    '--bundler=tsc',
     '--linter=eslint',
     `--name=${nxProjectName}`,
     '--unitTestRunner=vitest',

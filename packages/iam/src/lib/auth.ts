@@ -11,4 +11,10 @@ export const auth = defineAuth({
     baseURL: process.env.APP_SVC_URL || process.env.IAM_BASE_URL || '',
     databaseUrl: process.env.DATABASE_URL || '',
     trustedOrigins: [process.env.APP_UI_URL || 'http://localhost:3000'],
+    smtpHost: process.env.SMTP_HOST || '',
+    smtpPort: Number(process.env.SMTP_PORT || '465'),
+    smtpSecure: process.env.SMTP_SECURE !== 'false',
+    smtpUser: process.env.SMTP_USER || '',
+    smtpPass: process.env.SMTP_PASS || '',
+    smtpFrom: process.env.SMTP_FROM || process.env.SMTP_USER || '',
 });

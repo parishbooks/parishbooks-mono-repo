@@ -11,6 +11,7 @@ export function generateNestLibrary(workspaceRoot: string, name: string): number
     '@nx/nest:library',
     `--directory=${directory}`,
     `--importPath=${importPath}`,
+    '--buildable',
     '--linter=eslint',
     `--name=${nxProjectName}`,
     '--unitTestRunner=vitest',

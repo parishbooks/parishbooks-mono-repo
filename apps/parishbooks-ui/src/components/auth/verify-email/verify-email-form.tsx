@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { redirect } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@parishbooks/design-system/ui/form';
@@ -18,14 +19,6 @@ export function VerifyEmailForm({ email }: { email: string }) {
         resolver: zodResolver(verifyEmailDtoSchema),
         defaultValues: { otp: '' },
     });
-
-    useEffect(() => {
-        if (!email) return;
-        void (async () => {
-            const result = await sendEmailOtp(email);
-            if (!result.success) setFormError(result.error);
-        })();
-    }, [email]);
 
     async function onResend() {
         if (!email) return;
@@ -45,7 +38,11 @@ export function VerifyEmailForm({ email }: { email: string }) {
         }
         setFormError(null);
         const result = await verifyEmailOtp(email, values.otp);
-        if (!result.success) setFormError(result.error);
+        if (!result.success) {
+            setFormError(result.error);
+            return;
+        }
+        redirect(result.data.destination);
     }
 
     if (!email) {

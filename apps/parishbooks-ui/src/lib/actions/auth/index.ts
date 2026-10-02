@@ -1,6 +1,7 @@
 'use server';
 import { headers } from 'next/headers';
 import { authClient } from '@/lib/auth-client';
+import { resolvePostLoginPath } from '@/lib/auth/post-login-destination';
 import { setAccessToken } from '@/lib/session';
 import { type SignInDto, type SignUpDto } from '@/lib/zod';
 
@@ -50,8 +51,33 @@ export const forgotPassword = async (_email: string) => notImplemented;
 
 export const resetPassword = async (_token: string, _password: string) => notImplemented;
 
-export const sendEmailOtp = async (_email: string) => notImplemented;
+export const sendEmailOtp = async (email: string) => {
+    const response = await authClient.emailOtp.sendVerificationOtp(
+        { email, type: 'email-verification' },
+        { headers: await authRequestHeaders() },
+    );
+    if (response.error) return { success: false as const, error: response.error.message };
+    return { success: true as const };
+};
 
-export const verifyEmailOtp = async (_email: string, _otp: string) => notImplemented;
+export const verifyEmailOtp = async (email: string, otp: string) => {
+    const response = await authClient.emailOtp.verifyEmail({ email, otp }, { headers: await authRequestHeaders() });
+    if (response.error) return { success: false as const, error: response.error.message };
+
+    const token = response.data?.token;
+    if (token) await setAccessToken(token);
+
+    const user = response.data?.user;
+    const destination = resolvePostLoginPath({
+        user: {
+            email: user?.email ?? email,
+            emailVerified: user?.emailVerified ?? true,
+        },
+        session: { activeOrganizationId: null },
+        organizations: [],
+    });
+
+    return { success: true as const, data: { destination } };
+};
 
 export const signOut = async () => undefined;

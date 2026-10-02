@@ -42,7 +42,7 @@
             "path": "../../packages/iam"
         },
         {
-            "path": "../../packages/communications/tsconfig.lib.json"
+            "path": "../../packages/communications"
         }
     ]
 }

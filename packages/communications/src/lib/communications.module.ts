@@ -8,6 +8,7 @@ export class CommunicationsModule {
     static forRootAsync(): DynamicModule {
         return {
             module: CommunicationsModule,
+            global: true,
             imports: [ConfigModule],
             providers: [
                 {
