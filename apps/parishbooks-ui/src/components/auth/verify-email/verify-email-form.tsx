@@ -1,16 +1,30 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@parishbooks/design-system/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
 import { Back, Submit } from '@/components/auth/shared';
+import { otpSchema } from '@/components/auth/schemas';
 import { sendEmailOtp, verifyEmailOtp } from '@/lib/actions/auth';
 
+const verifyEmailSchema = z.object({
+    otp: otpSchema,
+});
+
+type VerifyEmailFormValues = z.infer<typeof verifyEmailSchema>;
+
 export function VerifyEmailForm({ email }: { email: string }) {
-    const [otp, setOtp] = useState('');
     const [formError, setFormError] = useState<string | null>(null);
     const [resendMessage, setResendMessage] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [isResending, setIsResending] = useState(false);
+
+    const form = useForm<VerifyEmailFormValues>({
+        resolver: zodResolver(verifyEmailSchema),
+        defaultValues: { otp: '' },
+    });
 
     useEffect(() => {
         if (!email) return;
@@ -31,20 +45,13 @@ export function VerifyEmailForm({ email }: { email: string }) {
         else setResendMessage('A new code was sent to your email.');
     }
 
-    async function onSubmit(event: React.FormEvent) {
-        event.preventDefault();
+    async function onSubmit(values: VerifyEmailFormValues) {
         if (!email) {
             setFormError('Missing email. Start again from sign up.');
             return;
         }
-        if (otp.length < 6) {
-            setFormError('Enter the 6-digit code from your email.');
-            return;
-        }
         setFormError(null);
-        setIsSubmitting(true);
-        const result = await verifyEmailOtp(email, otp);
-        setIsSubmitting(false);
+        const result = await verifyEmailOtp(email, values.otp);
         if (!result.success) setFormError(result.error);
     }
 
@@ -59,34 +66,47 @@ export function VerifyEmailForm({ email }: { email: string }) {
 
     return (
         <>
-            <form onSubmit={onSubmit} className="flex flex-col items-center gap-6">
-                {formError ? (
-                    <p className="w-full rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-                        {formError}
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center gap-6">
+                    {formError ? (
+                        <p className="w-full rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
+                            {formError}
+                        </p>
+                    ) : null}
+                    {resendMessage ? (
+                        <p className="w-full rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-foreground" role="status">
+                            {resendMessage}
+                        </p>
+                    ) : null}
+                    <FormField
+                        control={form.control}
+                        name="otp"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col items-center">
+                                <FormControl>
+                                    <InputOTP maxLength={6} aria-label="Email verification code" {...field}>
+                                        <InputOTPGroup>
+                                            {[0, 1, 2, 3, 4, 5].map((i) => (
+                                                <InputOTPSlot key={i} index={i} />
+                                            ))}
+                                        </InputOTPGroup>
+                                    </InputOTP>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <p className="text-center text-sm text-muted-foreground">
+                        Didn&rsquo;t get a code?{' '}
+                        <button type="button" className="font-semibold text-primary hover:underline" onClick={onResend} disabled={isResending}>
+                            {isResending ? 'Sending…' : 'Resend code'}
+                        </button>
                     </p>
-                ) : null}
-                {resendMessage ? (
-                    <p className="w-full rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-foreground" role="status">
-                        {resendMessage}
-                    </p>
-                ) : null}
-                <InputOTP maxLength={6} value={otp} onChange={setOtp} aria-label="Email verification code">
-                    <InputOTPGroup>
-                        {[0, 1, 2, 3, 4, 5].map((i) => (
-                            <InputOTPSlot key={i} index={i} />
-                        ))}
-                    </InputOTPGroup>
-                </InputOTP>
-                <p className="text-center text-sm text-muted-foreground">
-                    Didn&rsquo;t get a code?{' '}
-                    <button type="button" className="font-semibold text-primary hover:underline" onClick={onResend} disabled={isResending}>
-                        {isResending ? 'Sending…' : 'Resend code'}
-                    </button>
-                </p>
-                <Submit type="submit" submitted={isSubmitting}>
-                    Verify email
-                </Submit>
-            </form>
+                    <Submit type="submit" submitted={form.formState.isSubmitting}>
+                        Verify email
+                    </Submit>
+                </form>
+            </Form>
             <Back href="/sign-up" />
         </>
     );

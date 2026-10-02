@@ -3,11 +3,13 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
+        "@hookform/resolvers": "^5.9.1",
         "@parishbooks/design-system": "workspace:*",
         "@parishbooks/site-ui": "workspace:*",
         "next": "~16.1.6",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "react-hook-form": "^7.88.0"
+        "react-hook-form": "^7.88.0",
+        "zod": "^4.6.5"
     }
 }

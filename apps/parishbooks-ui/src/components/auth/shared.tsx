@@ -1,11 +1,9 @@
 'use client';
 
-import type { ComponentProps, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@parishbooks/design-system/ui/button';
-import { Input } from '@parishbooks/design-system/ui/input';
-import { Label } from '@parishbooks/design-system/ui/label';
 
 export function Testimonial() {
     return (
@@ -53,29 +51,7 @@ export function Shell({
     );
 }
 
-export function FormField({
-    label,
-    id,
-    right,
-    error,
-    ...inputProps
-}: {
-    label: string;
-    id: string;
-    right?: ReactNode;
-    error?: string;
-} & Omit<ComponentProps<typeof Input>, 'id'>) {
-    return (
-        <div className="flex flex-col gap-2.5">
-            <Label htmlFor={id}>{label}</Label>
-            <div className="relative">
-                <Input id={id} aria-invalid={error ? true : undefined} className={`h-14 rounded-xl px-4 text-base ${right ? 'pr-12' : ''}`} {...inputProps} />
-                {right}
-            </div>
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        </div>
-    );
-}
+export const authInputClassName = 'h-14 rounded-xl px-4 text-base';
 
 export function Submit({
     children,

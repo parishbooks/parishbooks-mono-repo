@@ -1,26 +1,34 @@
 'use client';
 
 import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Back, FormField, Submit } from '@/components/auth/shared';
+import { z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
+import { Input } from '@parishbooks/design-system/ui/input';
+import { authInputClassName, Back, Submit } from '@/components/auth/shared';
+import { newPasswordSchema } from '@/components/auth/schemas';
 import { resetPassword } from '@/lib/actions/auth';
 
-interface ResetPasswordFormValues {
-    password: string;
-    confirmPassword: string;
-}
+const resetPasswordSchema = z
+    .object({
+        password: newPasswordSchema,
+        confirmPassword: z.string().min(1, 'Please confirm your password.'),
+    })
+    .refine((values) => values.password === values.confirmPassword, {
+        message: 'Passwords do not match.',
+        path: ['confirmPassword'],
+    });
+
+type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPasswordForm({ token }: { token: string | undefined }) {
     const [formError, setFormError] = useState<string | null>(null);
 
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors, isSubmitting },
-    } = useForm<ResetPasswordFormValues>();
-
-    const password = watch('password');
+    const form = useForm<ResetPasswordFormValues>({
+        resolver: zodResolver(resetPasswordSchema),
+        defaultValues: { password: '', confirmPassword: '' },
+    });
 
     async function onSubmit(values: ResetPasswordFormValues) {
         setFormError(null);
@@ -45,40 +53,56 @@ export function ResetPasswordForm({ token }: { token: string | undefined }) {
 
     return (
         <>
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
-                {formError ? (
-                    <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-                        {formError}
-                    </p>
-                ) : null}
-                <FormField
-                    label="New password"
-                    id="new-password"
-                    type="password"
-                    autoComplete="new-password"
-                    placeholder="At least 8 characters"
-                    error={errors.password?.message}
-                    {...register('password', {
-                        required: 'Password is required.',
-                        minLength: { value: 8, message: 'Use at least 8 characters.' },
-                    })}
-                />
-                <FormField
-                    label="Confirm password"
-                    id="confirm-password"
-                    type="password"
-                    autoComplete="new-password"
-                    placeholder="Repeat your password"
-                    error={errors.confirmPassword?.message}
-                    {...register('confirmPassword', {
-                        required: 'Please confirm your password.',
-                        validate: (value) => value === password || 'Passwords do not match.',
-                    })}
-                />
-                <Submit type="submit" submitted={isSubmitting}>
-                    Update password
-                </Submit>
-            </form>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+                    {formError ? (
+                        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
+                            {formError}
+                        </p>
+                    ) : null}
+                    <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>New password</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="password"
+                                        autoComplete="new-password"
+                                        placeholder="At least 8 characters"
+                                        className={authInputClassName}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Confirm password</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="password"
+                                        autoComplete="new-password"
+                                        placeholder="Repeat your password"
+                                        className={authInputClassName}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <Submit type="submit" submitted={form.formState.isSubmitting}>
+                        Update password
+                    </Submit>
+                </form>
+            </Form>
             <Back href="/forgot-password" />
         </>
     );

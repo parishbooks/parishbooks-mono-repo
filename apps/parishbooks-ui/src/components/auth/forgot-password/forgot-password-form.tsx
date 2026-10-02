@@ -2,23 +2,27 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Back, FormField, Submit } from '@/components/auth/shared';
+import { z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
+import { Input } from '@parishbooks/design-system/ui/input';
+import { authInputClassName, Back, Submit } from '@/components/auth/shared';
+import { emailSchema } from '@/components/auth/schemas';
 import { forgotPassword } from '@/lib/actions/auth';
 
-interface ForgotPasswordFormValues {
-    email: string;
-}
+const forgotPasswordSchema = z.object({
+    email: emailSchema,
+});
+
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordForm() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-    } = useForm<ForgotPasswordFormValues>({
+    const form = useForm<ForgotPasswordFormValues>({
+        resolver: zodResolver(forgotPasswordSchema),
         defaultValues: { email: '' },
     });
 
@@ -47,28 +51,31 @@ export function ForgotPasswordForm() {
 
     return (
         <>
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
-                {formError ? (
-                    <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-                        {formError}
-                    </p>
-                ) : null}
-                <FormField
-                    label="Email address"
-                    id="forgot-email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="you@example.com"
-                    error={errors.email?.message}
-                    {...register('email', {
-                        required: 'Email is required.',
-                        pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email address.' },
-                    })}
-                />
-                <Submit type="submit" submitted={isSubmitting}>
-                    Send reset link
-                </Submit>
-            </form>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
+                    {formError ? (
+                        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
+                            {formError}
+                        </p>
+                    ) : null}
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email address</FormLabel>
+                                <FormControl>
+                                    <Input type="email" autoComplete="email" placeholder="you@example.com" className={authInputClassName} {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <Submit type="submit" submitted={form.formState.isSubmitting}>
+                        Send reset link
+                    </Submit>
+                </form>
+            </Form>
             <Back href="/sign-in" />
         </>
     );
