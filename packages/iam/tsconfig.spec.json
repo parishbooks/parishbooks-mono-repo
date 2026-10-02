@@ -22,12 +22,6 @@
         "src/**/*.spec.js",
         "src/**/*.test.jsx",
         "src/**/*.spec.jsx",
-        "src/**/*.d.ts",
-        "src/lib/config/auth.config.ts"
-    ],
-    "references": [
-        {
-            "path": "./tsconfig.lib.json"
-        }
+        "src/**/*.d.ts"
     ]
 }

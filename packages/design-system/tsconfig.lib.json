@@ -2,18 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "types": [
-      "node",
-      "@nx/react/typings/cssmodule.d.ts",
-      "@nx/react/typings/image.d.ts"
-    ],
+    "types": ["node"],
+    "lib": ["dom", "dom.iterable", "es2022"],
     "rootDir": "src",
     "jsx": "react-jsx",
-    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
-    "composite": false,
-    "declaration": false,
-    "declarationMap": false,
-    "emitDeclarationOnly": false
+    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo"
   },
   "exclude": [
     "out-tsc",

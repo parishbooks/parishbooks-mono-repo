@@ -1,17 +1,21 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "outDir": "dist",
         "types": ["node"],
-        "rootDir": "src",
-        "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "target": "es2021",
         "composite": false,
         "declaration": false,
         "declarationMap": false,
-        "emitDeclarationOnly": false
+        "emitDeclarationOnly": false,
+        "noEmit": true,
+        "paths": {
+            "@parishbooks/iam": ["../../packages/iam/src/index.ts"],
+            "@parishbooks/iam/*": ["../../packages/iam/src/*"],
+            "@parishbooks/communications": ["../../packages/communications/src/index.ts"],
+            "@parishbooks/communications/*": ["../../packages/communications/src/*"]
+        }
     },
     "include": ["src/**/*.ts"],
     "exclude": [
@@ -32,10 +36,5 @@
         "eslint.config.js",
         "eslint.config.cjs",
         "eslint.config.mjs"
-    ],
-    "references": [
-        {
-            "path": "../../packages/iam"
-        }
     ]
 }

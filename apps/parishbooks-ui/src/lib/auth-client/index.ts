@@ -5,7 +5,10 @@ import path from 'path';
 
 config({ path: path.join(import.meta.dirname, '../../../../.env') });
 
-const baseURL = process.env.APP_SVC_URL ?? process.env.IAM_BASE_URL ?? `http://localhost:${process.env.APP_SVC_PORT ?? '8000'}`;
+const appServiceURL = process.env.APP_SVC_URL;
+const iamBaseUrl = process.env.IAM_BASE_URL;
+const port = process.env.APP_SVC_PORT ?? '8000';
+const baseURL = appServiceURL ?? iamBaseUrl ?? `http://localhost:${port}`;
 
 export const authClient = createAuthClient({
     baseURL,

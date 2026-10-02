@@ -23,6 +23,9 @@
         },
         {
             "path": "./packages/site-ui"
+        },
+        {
+            "path": "./packages/communications"
         }
     ]
 }

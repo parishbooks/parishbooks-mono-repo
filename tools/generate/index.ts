@@ -1,4 +1,5 @@
 import { generateJsLibrary } from './generators/js-library';
+import { generateNestLibrary } from './generators/nest-library';
 import { toKebabCase } from './lib/to-kebab-case';
 import { workspaceRootFromImportMeta } from './lib/workspace-root';
 import { promptGeneratorKind } from './prompts/generator-kind';
@@ -8,11 +9,6 @@ async function main() {
   const workspaceRoot = workspaceRootFromImportMeta(import.meta);
 
   const kind = await promptGeneratorKind();
-  if (kind !== 'js-library') {
-    console.error(`Unknown generator: ${kind}`);
-    process.exit(1);
-  }
-
   const libraryNameRaw = await promptLibraryName();
   const name = toKebabCase(libraryNameRaw);
   if (!name) {
@@ -22,7 +18,14 @@ async function main() {
 
   if (name !== libraryNameRaw.trim()) console.log(`Using kebab-case name: ${name}`);
 
-  const exitCode = generateJsLibrary(workspaceRoot, name);
+  let exitCode = 1;
+  if (kind === 'js-library') exitCode = generateJsLibrary(workspaceRoot, name);
+  else if (kind === 'nest-library') exitCode = generateNestLibrary(workspaceRoot, name);
+  else {
+    console.error(`Unknown generator: ${kind}`);
+    process.exit(1);
+  }
+
   process.exit(exitCode);
 }
 
