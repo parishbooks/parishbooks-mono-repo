@@ -46,3 +46,8 @@ Thumbs.db
 
 vitest.config.*.timestamp*
 .nx/polygraph
+
+# Next.js
+.next
+out
+test-output

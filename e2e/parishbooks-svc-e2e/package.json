@@ -1,26 +1,26 @@
 {
-  "name": "@parishbooks/parishbooks-svc-e2e",
-  "version": "0.0.1",
-  "private": true,
-  "nx": {
-    "implicitDependencies": [
-      "@parishbooks/parishbooks-svc"
-    ],
-    "targets": {
-      "e2e": {
-        "executor": "nx:run-commands",
-        "outputs": [
-          "{projectRoot}/test-output/vitest/coverage"
+    "name": "@parishbooks/parishbooks-svc-e2e",
+    "version": "0.0.1",
+    "private": true,
+    "nx": {
+        "implicitDependencies": [
+            "@parishbooks/parishbooks-svc"
         ],
-        "dependsOn": [
-          "@parishbooks/parishbooks-svc:build",
-          "@parishbooks/parishbooks-svc:serve"
-        ],
-        "options": {
-          "cwd": "e2e/parishbooks-svc-e2e",
-          "command": "vitest run"
+        "targets": {
+            "e2e": {
+                "executor": "nx:run-commands",
+                "outputs": [
+                    "{projectRoot}/test-output/vitest/coverage"
+                ],
+                "dependsOn": [
+                    "@parishbooks/parishbooks-svc:build",
+                    "@parishbooks/parishbooks-svc:serve"
+                ],
+                "options": {
+                    "cwd": "e2e/parishbooks-svc-e2e",
+                    "command": "vitest run"
+                }
+            }
         }
-      }
     }
-  }
 }

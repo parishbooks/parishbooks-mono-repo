@@ -1,0 +1,20 @@
+{
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "name": "@parishbooks/parishbooks-ui",
+    "projectType": "application",
+    "tags": ["type:app"],
+    "sourceRoot": "apps/parishbooks-ui/src",
+    "targets": {
+        "serve": {
+            "continuous": true,
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "apps/parishbooks-ui",
+                "command": "next dev",
+                "env": {
+                    "PORT": "{env.APP_UI_PORT}"
+                }
+            }
+        }
+    }
+}

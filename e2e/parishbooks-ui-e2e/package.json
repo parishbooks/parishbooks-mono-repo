@@ -1,0 +1,10 @@
+{
+    "name": "@parishbooks/parishbooks-ui-e2e",
+    "version": "0.0.1",
+    "private": true,
+    "nx": {
+        "implicitDependencies": [
+            "@parishbooks/parishbooks-ui"
+        ]
+    }
+}

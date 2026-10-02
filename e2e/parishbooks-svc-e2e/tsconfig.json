@@ -1,15 +1,15 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "out-tsc/@parishbooks/parishbooks-svc-e2e",
-    "esModuleInterop": true,
-    "noUnusedLocals": false,
-    "noImplicitAny": false
-  },
-  "include": [],
-  "references": [
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ]
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "out-tsc/@parishbooks/parishbooks-svc-e2e",
+        "esModuleInterop": true,
+        "noUnusedLocals": false,
+        "noImplicitAny": false
+    },
+    "include": [],
+    "references": [
+        {
+            "path": "./tsconfig.spec.json"
+        }
+    ]
 }

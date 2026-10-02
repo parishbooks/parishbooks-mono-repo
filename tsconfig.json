@@ -1,13 +1,22 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compileOnSave": false,
-  "files": [],
-  "references": [
-    {
-      "path": "./e2e/parishbooks-svc-e2e"
-    },
-    {
-      "path": "./apps/parishbooks-svc"
-    }
-  ]
+    "extends": "./tsconfig.base.json",
+    "compileOnSave": false,
+    "files": [],
+    "references": [
+        {
+            "path": "./e2e/parishbooks-svc-e2e"
+        },
+        {
+            "path": "./apps/parishbooks-svc"
+        },
+        {
+            "path": "./e2e/parishbooks-ui-e2e"
+        },
+        {
+            "path": "./apps/parishbooks-ui"
+        },
+        {
+            "path": "./packages/iam"
+        }
+    ]
 }
