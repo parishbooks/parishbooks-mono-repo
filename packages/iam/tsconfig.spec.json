@@ -2,6 +2,10 @@
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         "outDir": "./out-tsc/vitest",
+        "composite": false,
+        "declaration": false,
+        "declarationMap": false,
+        "emitDeclarationOnly": false,
         "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"],
         "forceConsistentCasingInFileNames": true
     },
