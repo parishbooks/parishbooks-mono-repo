@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import nodemailer, { type Transporter } from 'nodemailer';
-import type { SendEmailOptions } from './email.types';
-import { smtpConfigFromEnv, type SmtpConfig } from './smtp-env';
+import type { SendEmailOptions, SmtpConfig } from './email.types';
 
 @Injectable()
 export class EmailService {
@@ -9,10 +8,14 @@ export class EmailService {
     private readonly transporter: Transporter;
     private readonly from: string;
 
-    constructor() {
-        const config = smtpConfigFromEnv();
+    constructor(config: SmtpConfig) {
         this.from = config.from;
-        this.transporter = this.createTransporter(config);
+        this.transporter = nodemailer.createTransport({
+            host: config.host,
+            port: config.port,
+            secure: config.secure,
+            auth: { user: config.user, pass: config.pass },
+        });
     }
 
     async send(options: SendEmailOptions) {
@@ -25,14 +28,5 @@ export class EmailService {
         });
         this.logger.log(`Email sent to ${Array.isArray(options.to) ? options.to.join(', ') : options.to} (${info.messageId})`);
         return info;
-    }
-
-    private createTransporter(config: SmtpConfig): Transporter {
-        return nodemailer.createTransport({
-            host: config.host,
-            port: config.port,
-            secure: config.secure,
-            auth: { user: config.user, pass: config.pass },
-        });
     }
 }

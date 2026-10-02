@@ -21,8 +21,13 @@ export function SignUpForm() {
 
     async function onSubmit(values: SignUpDto) {
         setFormError(null);
-        await signUp({ name: values.name, email: values.email, password: values.password });
-        redirect('/');
+        try {
+            await signUp(values);
+        } catch (error) {
+            setFormError(error instanceof Error ? error.message : 'Sign up failed.');
+            return;
+        }
+        redirect(`/verify-email?email=${encodeURIComponent(values.email)}`);
     }
 
     return (

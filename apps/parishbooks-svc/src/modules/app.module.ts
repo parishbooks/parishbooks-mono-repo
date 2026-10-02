@@ -4,6 +4,6 @@ import { CommunicationsModule } from '@parishbooks/communications';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-    imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, CommunicationsModule],
+    imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, CommunicationsModule.forRootAsync()],
 })
 export class AppModule {}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { redirect, useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
@@ -27,8 +27,14 @@ export function SignInForm() {
 
     async function onSubmit(values: SignInDto) {
         setFormError(null);
-        const result = await signIn(values.email, values.password, undefined, next);
-        if (!result.success) setFormError(result.error);
+        try {
+            await signIn(values);
+        } catch (error) {
+            setFormError(error instanceof Error ? error.message : 'Sign in failed.');
+            return;
+        }
+        const destination = next?.startsWith('/') && !next.startsWith('//') ? next : '/';
+        redirect(destination);
     }
 
     return (

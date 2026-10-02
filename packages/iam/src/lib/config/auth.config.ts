@@ -8,7 +8,8 @@ import { EmailOtpPlugin } from '../plugins/email-otp.plugin';
 import { JwtPlugin } from '../plugins/jwt.plugin';
 import { bearer } from 'better-auth/plugins';
 import { Pool } from 'pg';
-import { AUTH_BASE_PATH } from './auth-env';
+
+export const AUTH_BASE_PATH = '/iam';
 
 const getDatabaseConfig = (config: AuthConfig) => {
     return {

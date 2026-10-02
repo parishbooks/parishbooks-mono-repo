@@ -1,17 +1,16 @@
 import { createAuthClient } from 'better-auth/client';
 import { emailOTPClient, organizationClient } from 'better-auth/client/plugins';
 import { config } from 'dotenv';
-import path from 'path';
+import path from 'node:path';
 
-config({ path: path.join(import.meta.dirname, '../../../../.env') });
+config({ path: path.resolve(process.cwd(), '.env') });
 
-const appServiceURL = process.env.APP_SVC_URL;
-const iamBaseUrl = process.env.IAM_BASE_URL;
-const port = process.env.APP_SVC_PORT ?? '8000';
-const baseURL = appServiceURL ?? iamBaseUrl ?? `http://localhost:${port}`;
+const baseURL = process.env.APP_SVC_URL ?? process.env.IAM_BASE_URL ?? `http://localhost:${process.env.APP_SVC_PORT ?? '8000'}`;
+const uiOrigin = process.env.APP_UI_URL ?? `http://localhost:${process.env.APP_UI_PORT ?? '3000'}`;
 
 export const authClient = createAuthClient({
     baseURL,
     basePath: '/iam',
+    fetchOptions: { headers: { origin: uiOrigin } },
     plugins: [organizationClient(), emailOTPClient()],
 });
