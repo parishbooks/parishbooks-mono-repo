@@ -3,8 +3,11 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
+        "@parishbooks/design-system": "workspace:*",
+        "@parishbooks/site-ui": "workspace:*",
         "next": "~16.1.6",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "react-dom": "^19.0.0",
+        "react-hook-form": "^7.88.0"
     }
 }

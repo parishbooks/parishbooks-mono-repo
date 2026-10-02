@@ -6,10 +6,7 @@
             "request": "launch",
             "name": "Debug @parishbooks/parishbooks-svc with Nx",
             "runtimeExecutable": "bun",
-            "runtimeArgs": ["nx", "serve", "@parishbooks/parishbooks-svc"],
-            "env": {
-                "NODE_OPTIONS": "--inspect=9229"
-            },
+            "runtimeArgs": ["nx", "serve", "@parishbooks/parishbooks-svc", "--configuration=development"],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "skipFiles": ["<node_internals>/**"],

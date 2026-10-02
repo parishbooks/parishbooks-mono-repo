@@ -34,11 +34,21 @@
             "dependsOn": ["build"],
             "options": {
                 "buildTarget": "@parishbooks/parishbooks-svc:build",
-                "runBuildTargetDependencies": false
+                "runBuildTargetDependencies": false,
+                "inspect": true,
+                "port": 9229,
+                "buildTargetOptions": {
+                    "format": "cjs",
+                    "tsConfig": "apps/parishbooks-svc/tsconfig.app.json"
+                }
             },
             "configurations": {
                 "development": {
-                    "buildTarget": "@parishbooks/parishbooks-svc:build:development"
+                    "buildTarget": "@parishbooks/parishbooks-svc:build:development",
+                    "buildTargetOptions": {
+                        "format": "cjs",
+                        "tsConfig": "apps/parishbooks-svc/tsconfig.app.json"
+                    }
                 },
                 "production": {
                     "buildTarget": "@parishbooks/parishbooks-svc:build:production"

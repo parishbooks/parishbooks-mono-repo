@@ -1,0 +1,7 @@
+{
+    "name": "@parishbooks/site-ui",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/site-ui/src",
+    "projectType": "library",
+    "tags": ["scope:shared", "type:ui"]
+}

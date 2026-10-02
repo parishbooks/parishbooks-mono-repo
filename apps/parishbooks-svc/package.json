@@ -2,6 +2,7 @@
     "name": "@parishbooks/parishbooks-svc",
     "version": "0.0.1",
     "private": true,
+    "type": "commonjs",
     "dependencies": {
         "@parishbooks/iam": "workspace:*",
         "@nestjs/common": "^11.0.0",

@@ -17,6 +17,12 @@
         },
         {
             "path": "./packages/iam"
+        },
+        {
+            "path": "./packages/design-system"
+        },
+        {
+            "path": "./packages/site-ui"
         }
     ]
 }

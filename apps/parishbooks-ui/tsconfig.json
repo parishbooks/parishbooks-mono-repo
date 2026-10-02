@@ -22,7 +22,11 @@
             }
         ],
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@parishbooks/design-system": ["../../packages/design-system/src/index.ts"],
+            "@parishbooks/design-system/*": ["../../packages/design-system/src/*"],
+            "@parishbooks/site-ui": ["../../packages/site-ui/src/index.ts"],
+            "@parishbooks/site-ui/*": ["../../packages/site-ui/src/*"]
         },
         "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"],
         "outDir": "dist",
@@ -61,5 +65,13 @@
         "eslint.config.js",
         "eslint.config.cjs",
         "eslint.config.mjs"
+    ],
+    "references": [
+        {
+            "path": "../../packages/site-ui"
+        },
+        {
+            "path": "../../packages/design-system"
+        }
     ]
 }
