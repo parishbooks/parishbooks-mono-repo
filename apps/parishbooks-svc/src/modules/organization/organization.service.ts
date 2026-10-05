@@ -26,10 +26,17 @@ export class OrganizationService {
     async createOrganization(dto: CreateOrganizationDto, sessionToken: string) {
         const headers = Utils.getHeader(sessionToken);
         await this.assertSlugAvailable(dto.slug, headers);
-        const org = await this.auth.api.createOrganization({ body: { name: dto.name, slug: dto.slug, metadata: { timezone: dto.timezone } }, headers });
+        const body = { name: dto.name, slug: dto.slug, metadata: { timezone: dto.timezone, country: dto.country, currency: dto.currency } };
+        const org = await this.auth.api.createOrganization({ body, headers });
         if (!org?.id) throw new BadRequestException('Failed to create organization');
-        const orgProfile = this.organizationProfileRepository.create({ organizationId: org.id, timezone: dto.timezone });
-        return await this.organizationProfileRepository.save(orgProfile);
+        return await this.organizationProfileRepository.save(
+            this.organizationProfileRepository.create({
+                organizationId: org.id,
+                timezone: dto.timezone,
+                country: dto.country,
+                currency: dto.currency,
+            }),
+        );
     }
 
     async setActiveOrganization(dto: SetActiveOrganizationDto, sessionToken: string, response: Response) {

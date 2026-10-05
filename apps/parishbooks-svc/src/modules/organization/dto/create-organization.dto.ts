@@ -1,5 +1,6 @@
-import { IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { OrganizationCountry, OrganizationCurrency } from '@parishbooks/database';
 
 export class CreateOrganizationDto {
     @ApiProperty({ example: 'St. Mary Parish' })
@@ -21,4 +22,12 @@ export class CreateOrganizationDto {
     @IsString()
     @IsNotEmpty()
     timezone: string;
+
+    @ApiProperty({ enum: OrganizationCountry, enumName: 'OrganizationCountry', example: OrganizationCountry.IN })
+    @IsEnum(OrganizationCountry)
+    country: OrganizationCountry;
+
+    @ApiProperty({ enum: OrganizationCurrency, enumName: 'OrganizationCurrency', example: OrganizationCurrency.INR })
+    @IsEnum(OrganizationCurrency)
+    currency: OrganizationCurrency;
 }
