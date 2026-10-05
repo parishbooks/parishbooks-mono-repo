@@ -1,10 +1,13 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { auth as authInstance } from '@parishbooks/iam';
 import { AuthService as BetterAuthService } from '@thallesp/nestjs-better-auth';
 import { isAPIError } from 'better-auth/api';
-import { CreateOrganizationDto } from './dto/create-organization.dto';
-import { OrganizationProfileRepository } from './repository/organization.repository';
+import type { Response } from 'express';
+import { ACCESS_TOKEN_MAX_AGE, ACCESS_TOKEN_NAME } from '../auth/constants';
 import { Utils } from '../../library/utils';
+import { CreateOrganizationDto } from './dto/create-organization.dto';
+import { SetActiveOrganizationDto } from './dto/set-active-organization.dto';
+import { OrganizationProfileRepository } from './repository/organization.repository';
 
 @Injectable()
 export class OrganizationService {
@@ -20,19 +23,23 @@ export class OrganizationService {
         });
     }
 
-    async createOrganization(dto: CreateOrganizationDto, accessToken: string) {
-        const headers = Utils.getHeader(accessToken);
+    async createOrganization(dto: CreateOrganizationDto, sessionToken: string) {
+        const headers = Utils.getHeader(sessionToken);
         await this.assertSlugAvailable(dto.slug, headers);
+        const org = await this.auth.api.createOrganization({ body: { name: dto.name, slug: dto.slug, metadata: { timezone: dto.timezone } }, headers });
+        if (!org?.id) throw new BadRequestException('Failed to create organization');
+        const orgProfile = this.organizationProfileRepository.create({ organizationId: org.id, timezone: dto.timezone });
+        return await this.organizationProfileRepository.save(orgProfile);
+    }
 
-        try {
-            const org = await this.auth.api.createOrganization({ body: { name: dto.name, slug: dto.slug, metadata: { timezone: dto.timezone } }, headers });
-            if (!org?.id) throw new BadRequestException('Failed to create organization');
-            const orgProfile = this.organizationProfileRepository.create({ organizationId: org.id, timezone: dto.timezone });
-            return await this.organizationProfileRepository.save(orgProfile);
-        } catch (error) {
-            if (error instanceof BadRequestException || error instanceof UnauthorizedException) throw error;
-            if (isAPIError(error)) throw new BadRequestException(error.body?.message ?? 'Failed to create organization');
-            throw error;
-        }
+    async setActiveOrganization(dto: SetActiveOrganizationDto, sessionToken: string, response: Response) {
+        const headers = Utils.getHeader(sessionToken);
+        const body = { organizationId: dto.organizationId, organizationSlug: dto.organizationSlug };
+        const organization = await this.auth.api.setActiveOrganization({ body, headers });
+        const session = await this.auth.api.getSession({ headers });
+        if (!session) throw new BadRequestException('Failed to set active organization');
+        const { token } = await this.auth.api.getToken({ headers: Utils.getHeader(session.session.token) });
+        response.cookie(ACCESS_TOKEN_NAME, token, { ...Utils.getCookieOptions(), maxAge: ACCESS_TOKEN_MAX_AGE });
+        return organization;
     }
 }

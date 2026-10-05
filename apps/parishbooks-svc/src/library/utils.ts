@@ -1,3 +1,5 @@
+import type { CookieOptions } from 'express';
+
 export class Utils {
     static slugify(text: string) {
         return text
@@ -10,5 +12,11 @@ export class Utils {
         const header = new Headers();
         header.set('Authorization', `Bearer ${token}`);
         return header;
+    }
+
+    static getCookieOptions(): CookieOptions {
+        const secure = process.env.NODE_ENV === 'production';
+        const sameSite = process.env.NODE_ENV === 'production' ? 'strict' : 'lax';
+        return { httpOnly: true, secure, sameSite };
     }
 }

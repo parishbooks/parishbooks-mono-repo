@@ -13,7 +13,7 @@ import { Throttle } from '@nestjs/throttler';
 import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import type { Request, Response } from 'express';
 import { ErrorResponseDto } from '@parishbooks/core';
-import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME } from './constants';
+import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME, SESSION_TOKEN_NAME } from './constants';
 import { AuthService } from './auth.service';
 import {
     ForgotPasswordDto,
@@ -36,7 +36,7 @@ export class AuthController {
     @Throttle({ default: { limit: 10, ttl: 60_000 } })
     @ApiOperation({ operationId: 'signIn', summary: 'Sign in with email and password' })
     @ApiBody({ type: SignInDto })
-    @ApiOkResponse({ type: SignInResponseDto, description: 'Sets pb_access_token and pb_refresh_token cookies when email is verified' })
+    @ApiOkResponse({ type: SignInResponseDto, description: 'Sets pb_access_token, pb_refresh_token, and pb_session_token cookies when email is verified' })
     @ApiBadRequestResponse({ type: ErrorResponseDto })
     @ApiUnauthorizedResponse({ type: ErrorResponseDto })
     @ApiTooManyRequestsResponse({ type: ErrorResponseDto })
@@ -61,6 +61,7 @@ export class AuthController {
     @ApiOperation({ operationId: 'signOut', summary: 'Sign out and clear auth cookies' })
     @ApiCookieAuth(ACCESS_TOKEN_NAME)
     @ApiCookieAuth(REFRESH_TOKEN_NAME)
+    @ApiCookieAuth(SESSION_TOKEN_NAME)
     @ApiOkResponse({ type: SuccessResponseDto })
     @ApiBadRequestResponse({ type: ErrorResponseDto })
     async signOut(@Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<SuccessResponseDto> {

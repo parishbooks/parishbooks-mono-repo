@@ -1,6 +1,6 @@
 import { Application } from '@parishbooks/core';
 import { AppModule } from './modules/app.module';
-import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME } from './modules/auth/constants';
+import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME, SESSION_TOKEN_NAME } from './modules/auth/constants';
 
 void Application.bootstrap({
     module: AppModule,
@@ -14,6 +14,7 @@ void Application.bootstrap({
         cookieAuth: [
             { name: ACCESS_TOKEN_NAME, cookieName: ACCESS_TOKEN_NAME },
             { name: REFRESH_TOKEN_NAME, cookieName: REFRESH_TOKEN_NAME },
+            { name: SESSION_TOKEN_NAME, cookieName: SESSION_TOKEN_NAME },
         ],
     },
 });
