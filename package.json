@@ -7,7 +7,8 @@
         "generate": "bun tools/generate/index.ts",
         "reset-workspace": "bunx nx reset",
         "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
-        "auth:migrate": "bun nx run @parishbooks/iam:migrate"
+        "auth:migrate": "bun nx run @parishbooks/iam:migrate",
+        "openapi:generate": "bun nx run @parishbooks/parishbooks-ui:generate-api"
     },
     "private": true,
     "dependencies": {

@@ -13,6 +13,18 @@
                 "envFile": "{workspaceRoot}/.env",
                 "command": "sh -c 'next dev --port ${APP_UI_PORT:-3000}'"
             }
+        },
+        "generate-api": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "apps/parishbooks-ui",
+                "command": "bunx openapi-ts"
+            },
+            "configurations": {
+                "from-svc": {
+                    "command": "sh -c 'curl -fsS \"${OPENAPI_URL:-http://localhost:8000/api/docs-json}\" -o openapi.json && bunx openapi-ts'"
+                }
+            }
         }
     }
 }
