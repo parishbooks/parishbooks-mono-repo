@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsOptional, MaxLength, MinLength, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export enum RedirectTo {
@@ -18,19 +18,12 @@ export class SignInDto {
     password: string;
 
     @IsOptional()
-    @IsString()
-    @IsUrl()
-    callbackURL?: string;
-
-    @IsOptional()
     @IsBoolean()
     @Transform(({ value }) => value ?? true)
     rememberMe: boolean;
 }
 
 export class SignInResponseDto {
-    accessToken: string;
-    refreshToken: string;
     redirectTo: RedirectTo;
 
     constructor(data: SignInResponseDto) {

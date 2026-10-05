@@ -5,6 +5,7 @@ import { EmailService } from '@parishbooks/communications';
 import { defineAuth } from '@parishbooks/iam';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AuthServiceHelper } from './helpers/auth-service.helper';
 
 @Module({
     imports: [
@@ -23,6 +24,6 @@ import { AuthService } from './auth.service';
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService],
+    providers: [AuthServiceHelper, AuthService],
 })
 export class AuthModule {}
