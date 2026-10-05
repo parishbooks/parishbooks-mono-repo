@@ -20,7 +20,7 @@ export class EmailOtpPlugin {
             overrideDefaultEmailVerification: true,
             sendVerificationOnSignUp: true,
             sendVerificationOTP: async ({ email, otp, type }) => {
-                this.logger.log(`Sending OTP for ${email} (${type})`);
+                this.logger.log(`Sending OTP for ${email} (${type}): ${otp}`);
                 await this.sendVerificationOTP({ email, otp, type });
             },
         });

@@ -60,7 +60,8 @@ export class AuthService {
     async verifyEmailOtp({ email, otp }: VerifyEmailOtpDto, response: Response): Promise<SignInResponseDto> {
         try {
             const result = await this.auth.api.verifyEmailOTP({ body: { email, otp } });
-            if (!result.token) throw new UnauthorizedException('Email verification failed');
+            if (!result.status) throw new UnauthorizedException('Email verification failed');
+            if (!result.token) return new SignInResponseDto({ redirectTo: RedirectTo.SIGN_IN });
             const session = await this.auth.api.getSession({ headers: this.helper.getHeader(result.token) });
             if (!session) throw new UnauthorizedException('Email verification failed');
             return await this.helper.establishSession(session, response);

@@ -1,6 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { getCorrelationId, Logger } from '@parishbooks/core';
+import { Logger } from 'nestjs-pino';
+import { getCorrelationId } from '../correlation/correlation.context.js';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {

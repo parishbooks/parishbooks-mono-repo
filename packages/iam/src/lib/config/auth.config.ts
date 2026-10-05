@@ -21,7 +21,7 @@ export const defineAuth = (config: AuthConfig) => {
         trustedOrigins: config.trustedOrigins,
         advanced: { database: { joins: true, generateId: 'uuid' } },
         emailAndPassword: { enabled: true, minPasswordLength: 8, maxPasswordLength: 128 },
-        emailVerification: { autoSignInAfterVerification: true },
+        emailVerification: { autoSignInAfterVerification: true, sendOnSignUp: true },
         plugins: [OrganizationPlugin.init({ httpService }), EmailOtpPlugin.init(config.emailService), JwtPlugin.init(), bearer()],
     });
 };

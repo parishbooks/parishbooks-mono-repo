@@ -3,11 +3,16 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { CommunicationsModule } from '@parishbooks/communications';
-import { CorrelationMiddleware, defineLogger, LoggerModule } from '@parishbooks/core';
+import {
+    AllExceptionsFilter,
+    CorrelationMiddleware,
+    defineLogger,
+    defineThrottler,
+    HealthModule,
+    LoggerModule,
+} from '@parishbooks/core';
 import { validateEnv } from '../config/env.validation';
-import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
 import { AuthModule } from './auth/auth.module';
-import { HealthModule } from './health/health.module';
 
 @Module({
     imports: [
@@ -18,11 +23,11 @@ import { HealthModule } from './health/health.module';
         }),
         ThrottlerModule.forRootAsync({
             inject: [ConfigService],
-            useFactory: (configService: ConfigService) => {
-                const ttl = configService.getOrThrow<number>('THROTTLE_TTL');
-                const limit = configService.getOrThrow<number>('THROTTLE_LIMIT');
-                return { throttlers: [{ name: 'default', ttl, limit }] };
-            },
+            useFactory: (configService: ConfigService) =>
+                defineThrottler({
+                    ttl: configService.getOrThrow<number>('THROTTLE_TTL'),
+                    limit: configService.getOrThrow<number>('THROTTLE_LIMIT'),
+                }),
         }),
         CommunicationsModule.forRootAsync({
             inject: [ConfigService],

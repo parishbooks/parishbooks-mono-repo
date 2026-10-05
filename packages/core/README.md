@@ -1,11 +1,24 @@
-# core
+# @parishbooks/core
 
-This library was generated with [Nx](https://nx.dev).
+Shared Nest platform primitives for ParishBooks services.
 
-## Building
+## Includes
 
-Run `nx build core` to build the library.
+- `Application.init` / `Application.bootstrap` — common service bootstrap
+- Logger (`defineLogger`, `LoggerModule`) + correlation IDs
+- Helmet (`defineHelmet`), Swagger (`setupSwagger`), throttling (`defineThrottler`)
+- Health module, global exception filter, shared env schema fragments
 
-## Running unit tests
+## Bootstrap example
 
-Run `nx test core` to execute the unit tests via [Vitest](https://vitest.dev/).
+```ts
+import { Application } from '@parishbooks/core';
+import { AppModule } from './modules/app.module';
+
+void Application.bootstrap({
+  module: AppModule,
+  port: Number(process.env.APP_SVC_PORT),
+  corsOrigin: process.env.APP_UI_URL,
+  swagger: { title: 'My Service API', tags: [{ name: 'health' }] },
+});
+```
