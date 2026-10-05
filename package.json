@@ -8,7 +8,7 @@
         "reset-workspace": "bunx nx reset",
         "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
         "auth:migrate": "bun nx run @parishbooks/iam:migrate",
-        "openapi:generate": "bun nx run @parishbooks/parishbooks-ui:generate-api",
+        "openapi:generate": "bun nx run @parishbooks/parishbooks-ui:generate-api:from-svc",
         "db:generate": "bun nx run @parishbooks/database:db-generate",
         "db:migrate": "bun nx run @parishbooks/database:db-migrate"
     },

@@ -56,6 +56,31 @@ export type ResetPasswordDto = {
     password: string;
 };
 
+export type OrganizationCountry = 'IN' | 'US';
+
+export type OrganizationCurrency = 'INR' | 'USD';
+
+export type CreateOrganizationDto = {
+    name: string;
+    slug: string;
+    timezone: string;
+    country: OrganizationCountry;
+    currency: OrganizationCurrency;
+};
+
+export type SetActiveOrganizationDto = {
+    /**
+     * Organization id to activate, or null to unset
+     */
+    organizationId?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Organization slug to activate when organizationId is omitted
+     */
+    organizationSlug?: string;
+};
+
 export type SignInData = {
     body: SignInDto;
     path?: never;
@@ -73,7 +98,7 @@ export type SignInError = SignInErrors[keyof SignInErrors];
 
 export type SignInResponses = {
     /**
-     * Sets pb_access_token and pb_refresh_token cookies when email is verified
+     * Sets pb_access_token, pb_refresh_token, and pb_session_token cookies when email is verified
      */
     200: SignInResponseDto;
 };
@@ -199,6 +224,48 @@ export type ResetPasswordResponses = {
 };
 
 export type ResetPasswordResponse = ResetPasswordResponses[keyof ResetPasswordResponses];
+
+export type CreateOrganizationData = {
+    body: CreateOrganizationDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/organization';
+};
+
+export type CreateOrganizationErrors = {
+    400: ErrorResponseDto;
+    401: ErrorResponseDto;
+};
+
+export type CreateOrganizationError = CreateOrganizationErrors[keyof CreateOrganizationErrors];
+
+export type CreateOrganizationResponses = {
+    /**
+     * Organization profile created
+     */
+    201: unknown;
+};
+
+export type SetActiveOrganizationData = {
+    body: SetActiveOrganizationDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/organization/active';
+};
+
+export type SetActiveOrganizationErrors = {
+    400: ErrorResponseDto;
+    401: ErrorResponseDto;
+};
+
+export type SetActiveOrganizationError = SetActiveOrganizationErrors[keyof SetActiveOrganizationErrors];
+
+export type SetActiveOrganizationResponses = {
+    /**
+     * Active organization updated; pb_access_token reminted with the new organizationId
+     */
+    200: unknown;
+};
 
 export type HealthLiveData = {
     body?: never;

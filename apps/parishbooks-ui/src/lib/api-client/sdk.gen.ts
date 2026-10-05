@@ -2,44 +2,9 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type {
-    ForgotPasswordData,
-    ForgotPasswordErrors,
-    ForgotPasswordResponses,
-    HealthCheckData,
-    HealthCheckErrors,
-    HealthCheckResponses,
-    HealthLiveData,
-    HealthLiveErrors,
-    HealthLiveResponses,
-    HealthReadyData,
-    HealthReadyErrors,
-    HealthReadyResponses,
-    ResetPasswordData,
-    ResetPasswordErrors,
-    ResetPasswordResponses,
-    SendEmailOtpData,
-    SendEmailOtpErrors,
-    SendEmailOtpResponses,
-    SignInData,
-    SignInErrors,
-    SignInResponses,
-    SignOutData,
-    SignOutErrors,
-    SignOutResponses,
-    SignUpData,
-    SignUpErrors,
-    SignUpResponses,
-    VerifyEmailOtpData,
-    VerifyEmailOtpErrors,
-    VerifyEmailOtpResponses,
-} from './types.gen';
+import type { CreateOrganizationData, CreateOrganizationErrors, CreateOrganizationResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, SendEmailOtpData, SendEmailOtpErrors, SendEmailOtpResponses, SetActiveOrganizationData, SetActiveOrganizationErrors, SetActiveOrganizationResponses, SignInData, SignInErrors, SignInResponses, SignOutData, SignOutErrors, SignOutResponses, SignUpData, SignUpErrors, SignUpResponses, VerifyEmailOtpData, VerifyEmailOtpErrors, VerifyEmailOtpResponses } from './types.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<
-    TData,
-    ThrowOnError,
-    TResponse
-> & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
      * You can provide a client instance returned by `createClient()` instead of
      * individual options. This might be also useful if you want to implement a
@@ -56,136 +21,145 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 /**
  * Sign in with email and password
  */
-export const signIn = <ThrowOnError extends boolean = false>(
-    options: Options<SignInData, ThrowOnError>,
-): RequestResult<SignInResponses, SignInErrors, ThrowOnError> =>
-    (options.client ?? client).post<SignInResponses, SignInErrors, ThrowOnError>({
-        url: '/api/v1/auth/sign-in',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
+export const signIn = <ThrowOnError extends boolean = false>(options: Options<SignInData, ThrowOnError>): RequestResult<SignInResponses, SignInErrors, ThrowOnError> => (options.client ?? client).post<SignInResponses, SignInErrors, ThrowOnError>({
+    url: '/api/v1/auth/sign-in',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Create an account and start email verification
  */
-export const signUp = <ThrowOnError extends boolean = false>(
-    options: Options<SignUpData, ThrowOnError>,
-): RequestResult<SignUpResponses, SignUpErrors, ThrowOnError> =>
-    (options.client ?? client).post<SignUpResponses, SignUpErrors, ThrowOnError>({
-        url: '/api/v1/auth/sign-up',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
+export const signUp = <ThrowOnError extends boolean = false>(options: Options<SignUpData, ThrowOnError>): RequestResult<SignUpResponses, SignUpErrors, ThrowOnError> => (options.client ?? client).post<SignUpResponses, SignUpErrors, ThrowOnError>({
+    url: '/api/v1/auth/sign-up',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Sign out and clear auth cookies
  */
-export const signOut = <ThrowOnError extends boolean = false>(
-    options?: Options<SignOutData, ThrowOnError>,
-): RequestResult<SignOutResponses, SignOutErrors, ThrowOnError> =>
-    (options?.client ?? client).post<SignOutResponses, SignOutErrors, ThrowOnError>({
-        security: [
-            {
-                in: 'cookie',
-                name: 'pb_refresh_token',
-                type: 'apiKey',
-            },
-            {
-                in: 'cookie',
-                name: 'pb_access_token',
-                type: 'apiKey',
-            },
-        ],
-        url: '/api/v1/auth/sign-out',
-        ...options,
-    });
+export const signOut = <ThrowOnError extends boolean = false>(options?: Options<SignOutData, ThrowOnError>): RequestResult<SignOutResponses, SignOutErrors, ThrowOnError> => (options?.client ?? client).post<SignOutResponses, SignOutErrors, ThrowOnError>({
+    security: [
+        {
+            in: 'cookie',
+            name: 'pb_session_token',
+            type: 'apiKey'
+        },
+        {
+            in: 'cookie',
+            name: 'pb_refresh_token',
+            type: 'apiKey'
+        },
+        {
+            in: 'cookie',
+            name: 'pb_access_token',
+            type: 'apiKey'
+        }
+    ],
+    url: '/api/v1/auth/sign-out',
+    ...options
+});
 
 /**
  * Send an email OTP
  */
-export const sendEmailOtp = <ThrowOnError extends boolean = false>(
-    options: Options<SendEmailOtpData, ThrowOnError>,
-): RequestResult<SendEmailOtpResponses, SendEmailOtpErrors, ThrowOnError> =>
-    (options.client ?? client).post<SendEmailOtpResponses, SendEmailOtpErrors, ThrowOnError>({
-        url: '/api/v1/auth/email-otp/send',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
+export const sendEmailOtp = <ThrowOnError extends boolean = false>(options: Options<SendEmailOtpData, ThrowOnError>): RequestResult<SendEmailOtpResponses, SendEmailOtpErrors, ThrowOnError> => (options.client ?? client).post<SendEmailOtpResponses, SendEmailOtpErrors, ThrowOnError>({
+    url: '/api/v1/auth/email-otp/send',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Verify email with OTP and establish session cookies
  */
-export const verifyEmailOtp = <ThrowOnError extends boolean = false>(
-    options: Options<VerifyEmailOtpData, ThrowOnError>,
-): RequestResult<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError> =>
-    (options.client ?? client).post<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError>({
-        url: '/api/v1/auth/email-otp/verify',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
+export const verifyEmailOtp = <ThrowOnError extends boolean = false>(options: Options<VerifyEmailOtpData, ThrowOnError>): RequestResult<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError> => (options.client ?? client).post<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError>({
+    url: '/api/v1/auth/email-otp/verify',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Request a password reset OTP
  */
-export const forgotPassword = <ThrowOnError extends boolean = false>(
-    options: Options<ForgotPasswordData, ThrowOnError>,
-): RequestResult<ForgotPasswordResponses, ForgotPasswordErrors, ThrowOnError> =>
-    (options.client ?? client).post<ForgotPasswordResponses, ForgotPasswordErrors, ThrowOnError>({
-        url: '/api/v1/auth/forgot-password',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
+export const forgotPassword = <ThrowOnError extends boolean = false>(options: Options<ForgotPasswordData, ThrowOnError>): RequestResult<ForgotPasswordResponses, ForgotPasswordErrors, ThrowOnError> => (options.client ?? client).post<ForgotPasswordResponses, ForgotPasswordErrors, ThrowOnError>({
+    url: '/api/v1/auth/forgot-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Reset password with email OTP
  */
-export const resetPassword = <ThrowOnError extends boolean = false>(
-    options: Options<ResetPasswordData, ThrowOnError>,
-): RequestResult<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError> =>
-    (options.client ?? client).post<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError>({
-        url: '/api/v1/auth/reset-password',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
+export const resetPassword = <ThrowOnError extends boolean = false>(options: Options<ResetPasswordData, ThrowOnError>): RequestResult<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError> => (options.client ?? client).post<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError>({
+    url: '/api/v1/auth/reset-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Create an organization and profile
+ */
+export const createOrganization = <ThrowOnError extends boolean = false>(options: Options<CreateOrganizationData, ThrowOnError>): RequestResult<CreateOrganizationResponses, CreateOrganizationErrors, ThrowOnError> => (options.client ?? client).post<CreateOrganizationResponses, CreateOrganizationErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'pb_session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/v1/organization',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Set the active organization for the current session
+ */
+export const setActiveOrganization = <ThrowOnError extends boolean = false>(options: Options<SetActiveOrganizationData, ThrowOnError>): RequestResult<SetActiveOrganizationResponses, SetActiveOrganizationErrors, ThrowOnError> => (options.client ?? client).post<SetActiveOrganizationResponses, SetActiveOrganizationErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'pb_session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/v1/organization/active',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Liveness probe
  */
-export const healthLive = <ThrowOnError extends boolean = false>(
-    options?: Options<HealthLiveData, ThrowOnError>,
-): RequestResult<HealthLiveResponses, HealthLiveErrors, ThrowOnError> =>
-    (options?.client ?? client).get<HealthLiveResponses, HealthLiveErrors, ThrowOnError>({ url: '/api/health/live', ...options });
+export const healthLive = <ThrowOnError extends boolean = false>(options?: Options<HealthLiveData, ThrowOnError>): RequestResult<HealthLiveResponses, HealthLiveErrors, ThrowOnError> => (options?.client ?? client).get<HealthLiveResponses, HealthLiveErrors, ThrowOnError>({ url: '/api/health/live', ...options });
 
 /**
  * Readiness probe
  */
-export const healthReady = <ThrowOnError extends boolean = false>(
-    options?: Options<HealthReadyData, ThrowOnError>,
-): RequestResult<HealthReadyResponses, HealthReadyErrors, ThrowOnError> =>
-    (options?.client ?? client).get<HealthReadyResponses, HealthReadyErrors, ThrowOnError>({ url: '/api/health/ready', ...options });
+export const healthReady = <ThrowOnError extends boolean = false>(options?: Options<HealthReadyData, ThrowOnError>): RequestResult<HealthReadyResponses, HealthReadyErrors, ThrowOnError> => (options?.client ?? client).get<HealthReadyResponses, HealthReadyErrors, ThrowOnError>({ url: '/api/health/ready', ...options });
 
 /**
  * Combined health check
  */
-export const healthCheck = <ThrowOnError extends boolean = false>(
-    options?: Options<HealthCheckData, ThrowOnError>,
-): RequestResult<HealthCheckResponses, HealthCheckErrors, ThrowOnError> =>
-    (options?.client ?? client).get<HealthCheckResponses, HealthCheckErrors, ThrowOnError>({ url: '/api/health', ...options });
+export const healthCheck = <ThrowOnError extends boolean = false>(options?: Options<HealthCheckData, ThrowOnError>): RequestResult<HealthCheckResponses, HealthCheckErrors, ThrowOnError> => (options?.client ?? client).get<HealthCheckResponses, HealthCheckErrors, ThrowOnError>({ url: '/api/health', ...options });
