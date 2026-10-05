@@ -3,14 +3,7 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { CommunicationsModule } from '@parishbooks/communications';
-import {
-    AllExceptionsFilter,
-    CorrelationMiddleware,
-    defineLogger,
-    defineThrottler,
-    HealthModule,
-    LoggerModule,
-} from '@parishbooks/core';
+import { AllExceptionsFilter, CorrelationMiddleware, defineLogger, defineThrottler, HealthModule, LoggerModule } from '@parishbooks/core';
 import { validateEnv } from '../config/env.validation';
 import { AuthModule } from './auth/auth.module';
 

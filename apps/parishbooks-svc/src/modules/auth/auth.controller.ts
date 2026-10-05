@@ -1,12 +1,30 @@
 import { Body, Controller, Post, Req, Res } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBody, ApiCookieAuth, ApiOkResponse, ApiOperation, ApiTags, ApiTooManyRequestsResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+    ApiBadRequestResponse,
+    ApiBody,
+    ApiCookieAuth,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags,
+    ApiTooManyRequestsResponse,
+    ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import type { Request, Response } from 'express';
 import { ErrorResponseDto } from '@parishbooks/core';
 import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME } from './constants';
 import { AuthService } from './auth.service';
-import { ForgotPasswordDto, ResetPasswordDto, SendEmailOtpDto, SignInDto, SignInResponseDto, SignUpDto, SuccessResponseDto, VerifyEmailOtpDto } from './dto/signin.dto';
+import {
+    ForgotPasswordDto,
+    ResetPasswordDto,
+    SendEmailOtpDto,
+    SignInDto,
+    SignInResponseDto,
+    SignUpDto,
+    SuccessResponseDto,
+    VerifyEmailOtpDto,
+} from './dto/signin.dto';
 
 @ApiTags('auth')
 @Controller('auth')

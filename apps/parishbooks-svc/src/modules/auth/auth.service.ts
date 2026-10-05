@@ -4,7 +4,17 @@ import { auth as authInstance } from '@parishbooks/iam';
 import { AuthService as BetterAuthService } from '@thallesp/nestjs-better-auth';
 import type { Request, Response } from 'express';
 import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME } from './constants';
-import { ForgotPasswordDto, RedirectTo, ResetPasswordDto, SendEmailOtpDto, SignInDto, SignInResponseDto, SignUpDto, SuccessResponseDto, VerifyEmailOtpDto } from './dto/signin.dto';
+import {
+    ForgotPasswordDto,
+    RedirectTo,
+    ResetPasswordDto,
+    SendEmailOtpDto,
+    SignInDto,
+    SignInResponseDto,
+    SignUpDto,
+    SuccessResponseDto,
+    VerifyEmailOtpDto,
+} from './dto/signin.dto';
 import { AuthServiceHelper } from './helpers/auth-service.helper';
 
 @Injectable()
@@ -40,7 +50,11 @@ export class AuthService {
     async signOut(request: Request, response: Response): Promise<SuccessResponseDto> {
         const token = request.cookies?.[REFRESH_TOKEN_NAME] ?? request.cookies?.[ACCESS_TOKEN_NAME];
         if (token) {
-            try { await this.auth.api.signOut({ headers: this.helper.getHeader(token) }); } catch { /* clear cookies anyway */ }
+            try {
+                await this.auth.api.signOut({ headers: this.helper.getHeader(token) });
+            } catch {
+                /* clear cookies anyway */
+            }
         }
         this.helper.clearCookies(response);
         return new SuccessResponseDto({ success: true });

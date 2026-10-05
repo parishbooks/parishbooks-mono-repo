@@ -36,9 +36,6 @@ export class HealthController {
     @ApiOperation({ operationId: 'healthCheck', summary: 'Combined health check' })
     @ApiOkResponse({ type: HealthCheckResponseDto })
     check() {
-        return this.health.check([
-            () => this.memory.checkHeap('memory_heap', 512 * 1024 * 1024),
-            () => this.postgres.isHealthy('database'),
-        ]);
+        return this.health.check([() => this.memory.checkHeap('memory_heap', 512 * 1024 * 1024), () => this.postgres.isHealthy('database')]);
     }
 }

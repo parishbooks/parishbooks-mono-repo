@@ -30,7 +30,12 @@ export function LinkButton({
 }) {
     const classes = cn(buttonVariants({ variant: mapVariant(variant), size: 'lg' }), marketingSize, className);
 
-    if (href) return <Link href={href} className={classes} onClick={onClick}>{children}</Link>;
+    if (href)
+        return (
+            <Link href={href} className={classes} onClick={onClick}>
+                {children}
+            </Link>
+        );
 
     return (
         <button type={type} disabled={disabled} className={classes} onClick={onClick}>

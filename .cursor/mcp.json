@@ -1,8 +1,8 @@
 {
-  "mcpServers": {
-    "shadcn": {
-      "command": "/opt/homebrew/bin/npx",
-      "args": ["-y", "shadcn@latest", "mcp"]
+    "mcpServers": {
+        "shadcn": {
+            "command": "/opt/homebrew/bin/npx",
+            "args": ["-y", "shadcn@latest", "mcp"]
+        }
     }
-  }
 }

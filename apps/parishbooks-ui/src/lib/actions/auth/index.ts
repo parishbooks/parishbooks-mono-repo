@@ -29,10 +29,7 @@ export const signUp = async ({ email, password, name }: SignUpDto) => {
 };
 
 export const googleSignIn = async () => {
-    const response = await authClient.signIn.social(
-        { provider: 'google', callbackURL: '/', disableRedirect: true },
-        { headers: await authRequestHeaders() },
-    );
+    const response = await authClient.signIn.social({ provider: 'google', callbackURL: '/', disableRedirect: true }, { headers: await authRequestHeaders() });
     if (response.error || !response.data?.url) return { success: false as const, error: response.error?.message ?? 'Google sign-in failed.' };
     return { success: true as const, data: { url: response.data.url } };
 };
@@ -52,10 +49,7 @@ export const forgotPassword = async (_email: string) => notImplemented;
 export const resetPassword = async (_token: string, _password: string) => notImplemented;
 
 export const sendEmailOtp = async (email: string) => {
-    const response = await authClient.emailOtp.sendVerificationOtp(
-        { email, type: 'email-verification' },
-        { headers: await authRequestHeaders() },
-    );
+    const response = await authClient.emailOtp.sendVerificationOtp({ email, type: 'email-verification' }, { headers: await authRequestHeaders() });
     if (response.error) return { success: false as const, error: response.error.message };
     return { success: true as const };
 };

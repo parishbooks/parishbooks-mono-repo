@@ -16,9 +16,9 @@ import { Application } from '@parishbooks/core';
 import { AppModule } from './modules/app.module';
 
 void Application.bootstrap({
-  module: AppModule,
-  port: Number(process.env.APP_SVC_PORT),
-  corsOrigin: process.env.APP_UI_URL,
-  swagger: { title: 'My Service API', tags: [{ name: 'health' }] },
+    module: AppModule,
+    port: Number(process.env.APP_SVC_PORT),
+    corsOrigin: process.env.APP_UI_URL,
+    swagger: { title: 'My Service API', tags: [{ name: 'health' }] },
 });
 ```

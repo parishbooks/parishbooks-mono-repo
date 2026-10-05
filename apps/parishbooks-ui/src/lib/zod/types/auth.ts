@@ -1,12 +1,5 @@
 import { z } from 'zod';
-import {
-    forgotPasswordDtoSchema,
-    resetPasswordDtoSchema,
-    signInDtoSchema,
-    signUpDtoSchema,
-    verifyEmailDtoSchema,
-    verifyPhoneDtoSchema,
-} from '../schemas';
+import { forgotPasswordDtoSchema, resetPasswordDtoSchema, signInDtoSchema, signUpDtoSchema, verifyEmailDtoSchema, verifyPhoneDtoSchema } from '../schemas';
 
 export type SignUpDto = z.infer<typeof signUpDtoSchema>;
 export type SignInDto = z.infer<typeof signInDtoSchema>;
