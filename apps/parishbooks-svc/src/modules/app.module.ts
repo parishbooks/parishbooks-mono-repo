@@ -1,11 +1,29 @@
-import { Module } from '@nestjs/common';
+import { Module, type MiddlewareConsumer, type NestModule } from '@nestjs/common';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { CommunicationsModule } from '@parishbooks/communications';
+import { CorrelationMiddleware, defineLogger, LoggerModule } from '@parishbooks/core';
+import { validateEnv } from '../config/env.validation';
+import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
 import { AuthModule } from './auth/auth.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
+        LoggerModule.forRootAsync({
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => defineLogger({ isProd: configService.get('NODE_ENV') === 'production' }),
+        }),
+        ThrottlerModule.forRootAsync({
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => {
+                const ttl = configService.getOrThrow<number>('THROTTLE_TTL');
+                const limit = configService.getOrThrow<number>('THROTTLE_LIMIT');
+                return { throttlers: [{ name: 'default', ttl, limit }] };
+            },
+        }),
         CommunicationsModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({
@@ -18,6 +36,15 @@ import { AuthModule } from './auth/auth.module';
             }),
         }),
         AuthModule,
+        HealthModule,
+    ],
+    providers: [
+        { provide: APP_FILTER, useClass: AllExceptionsFilter },
+        { provide: APP_GUARD, useClass: ThrottlerGuard },
     ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer): void {
+        consumer.apply(CorrelationMiddleware).forRoutes('*path');
+    }
+}

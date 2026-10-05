@@ -12,6 +12,8 @@
         "noEmit": true,
         "strictPropertyInitialization": false,
         "paths": {
+            "@parishbooks/core": ["../../packages/core/src/index.ts"],
+            "@parishbooks/core/*": ["../../packages/core/src/*"],
             "@parishbooks/iam": ["../../packages/iam/src/index.ts"],
             "@parishbooks/iam/*": ["../../packages/iam/src/*"],
             "@parishbooks/communications": ["../../packages/communications/src/index.ts"],
@@ -41,6 +43,9 @@
     "references": [
         {
             "path": "../../packages/iam"
+        },
+        {
+            "path": "../../packages/core/tsconfig.lib.json"
         },
         {
             "path": "../../packages/communications"
