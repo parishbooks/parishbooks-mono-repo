@@ -55,4 +55,17 @@ export class AuthServiceHelper {
         response.cookie(ACCESS_TOKEN_NAME, accessToken, { ...options, maxAge: ACCESS_TOKEN_MAX_AGE });
         response.cookie(REFRESH_TOKEN_NAME, refreshToken, { ...options, maxAge: REFRESH_TOKEN_MAX_AGE });
     }
+
+    clearCookies(response: Response): void {
+        const options = this.getCookieOptions();
+        response.clearCookie(ACCESS_TOKEN_NAME, options);
+        response.clearCookie(REFRESH_TOKEN_NAME, options);
+    }
+
+    async establishSession(session: AuthUserSession, response: Response): Promise<SignInResponseDto> {
+        const accessToken = await this.mintAccessToken(session);
+        const refreshToken = await this.mintRefreshToken(session);
+        this.setCookies(accessToken, refreshToken, response);
+        return new SignInResponseDto({ redirectTo: this.determineRedirect(session) });
+    }
 }

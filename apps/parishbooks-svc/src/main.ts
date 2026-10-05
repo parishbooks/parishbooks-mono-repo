@@ -29,8 +29,10 @@ async function bootstrap() {
     app.use(cookieParser());
 
     const port = Number(config.getOrThrow('APP_SVC_PORT'));
-    await app.listen(port);
-    app.get(Logger).log(`Application is running on: http://localhost:${port}/${globalPrefix}/v1`);
+    await app.listen(port, () => {
+        const logger = app.get(Logger);
+        logger.log(`Application is running on: http://localhost:${port}/${globalPrefix}/v1`);
+    });
 }
 
 bootstrap().catch((error) => {
