@@ -2,16 +2,16 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { redirect } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, Back, Submit } from '@/components/auth/shared';
-import { forgotPassword } from '@/lib/actions/auth';
+import { forgotPassword, pathForRedirect } from '@/lib/actions/auth';
 import { forgotPasswordDtoSchema, type ForgotPasswordDto } from '@/lib/zod';
 
 export function ForgotPasswordForm() {
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [formError, setFormError] = useState<string | null>(null);
 
     const form = useForm<ForgotPasswordDto>({
@@ -26,20 +26,7 @@ export function ForgotPasswordForm() {
             setFormError(result.error);
             return;
         }
-        setSuccessMessage(result.data.message);
-    }
-
-    if (successMessage) {
-        return (
-            <>
-                <p className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm leading-6 text-foreground" role="status">
-                    {successMessage}
-                </p>
-                <Link href="/sign-in" className="mt-6 inline-flex text-sm font-medium text-primary hover:underline">
-                    Back to sign in
-                </Link>
-            </>
-        );
+        redirect(pathForRedirect(result.data.redirectTo ?? 'password-reset', values.email));
     }
 
     return (
@@ -65,11 +52,17 @@ export function ForgotPasswordForm() {
                         )}
                     />
                     <Submit type="submit" submitted={form.formState.isSubmitting}>
-                        Send reset link
+                        Send reset code
                     </Submit>
                 </form>
             </Form>
             <Back href="/sign-in" />
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+                Remembered your password?{' '}
+                <Link href="/sign-in" className="font-medium text-primary hover:underline">
+                    Sign in
+                </Link>
+            </p>
         </>
     );
 }

@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { CommunicationsModule } from '@parishbooks/communications';
 import { AllExceptionsFilter, CorrelationMiddleware, defineLogger, defineThrottler, HealthModule, LoggerModule } from '@parishbooks/core';
+import { DatabaseModule } from '@parishbooks/database';
 import { validateEnv } from '../config/env.validation';
 import { AuthModule } from './auth/auth.module';
 
@@ -21,6 +22,13 @@ import { AuthModule } from './auth/auth.module';
                     ttl: configService.getOrThrow<number>('THROTTLE_TTL'),
                     limit: configService.getOrThrow<number>('THROTTLE_LIMIT'),
                 }),
+        }),
+        DatabaseModule.forRootAsync({
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => ({
+                url: configService.getOrThrow<string>('DATABASE_URL'),
+                logging: configService.get('NODE_ENV') !== 'production',
+            }),
         }),
         CommunicationsModule.forRootAsync({
             inject: [ConfigService],

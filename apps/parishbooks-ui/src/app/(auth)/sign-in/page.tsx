@@ -1,14 +1,11 @@
-import { Suspense } from 'react';
 import Link from 'next/link';
-import { Divider, Shell } from '@/components/auth/shared';
+import { Suspense } from 'react';
+import { Shell } from '@/components/auth/shared';
 import { SignInForm } from '@/components/auth/sign-in/sign-in-form';
-import { SignInOAuth } from '@/components/auth/sign-in/sign-in-oauth';
 
 export default function SignInPage() {
     return (
         <Shell eyebrow="Welcome back" title="Sign in to continue" description="Enter your details to access your parish's back office.">
-            <SignInOAuth />
-            <Divider />
             <Suspense fallback={null}>
                 <SignInForm />
             </Suspense>

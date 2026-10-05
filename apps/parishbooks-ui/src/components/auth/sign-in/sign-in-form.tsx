@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, PasswordToggle, Submit } from '@/components/auth/shared';
-import { signIn } from '@/lib/actions/auth';
+import { destinationForRedirect, signIn } from '@/lib/actions/auth';
 import { signInDtoSchema, type SignInDto } from '@/lib/zod';
 
 export function SignInForm() {
@@ -27,14 +27,15 @@ export function SignInForm() {
 
     async function onSubmit(values: SignInDto) {
         setFormError(null);
+        let redirectTo;
         try {
-            await signIn(values);
+            const data = await signIn(values);
+            redirectTo = data.redirectTo;
         } catch (error) {
             setFormError(error instanceof Error ? error.message : 'Sign in failed.');
             return;
         }
-        const destination = next?.startsWith('/') && !next.startsWith('//') ? next : '/';
-        redirect(destination);
+        redirect(destinationForRedirect(redirectTo, { email: values.email, next }));
     }
 
     return (

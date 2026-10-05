@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { redirect } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, PasswordToggle, Submit } from '@/components/auth/shared';
-import { signUp } from '@/lib/actions/auth';
+import { pathForRedirect, signUp } from '@/lib/actions/auth';
 import { signUpDtoSchema, type SignUpDto } from '@/lib/zod';
-import { redirect } from 'next/navigation';
 
 export function SignUpForm() {
     const [showPassword, setShowPassword] = useState(false);
@@ -21,13 +21,15 @@ export function SignUpForm() {
 
     async function onSubmit(values: SignUpDto) {
         setFormError(null);
+        let redirectTo;
         try {
-            await signUp(values);
+            const data = await signUp(values);
+            redirectTo = data.redirectTo;
         } catch (error) {
             setFormError(error instanceof Error ? error.message : 'Sign up failed.');
             return;
         }
-        redirect(`/verify-email?email=${encodeURIComponent(values.email)}`);
+        redirect(pathForRedirect(redirectTo, values.email));
     }
 
     return (

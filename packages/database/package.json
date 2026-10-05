@@ -1,0 +1,33 @@
+{
+    "name": "@parishbooks/database",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "db:generate": "bun scripts/db-generate.ts",
+        "db:migrate": "bun scripts/db-migrate.ts"
+    },
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "@parishbooks/source": "./src/index.ts",
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        }
+    },
+    "dependencies": {
+        "@nestjs/common": "^11.0.0",
+        "@nestjs/typeorm": "^12.0.2",
+        "dotenv": "^18.0.5",
+        "tslib": "^2.3.0",
+        "typeorm": "0.3.28",
+        "typeorm-naming-strategies": "^4.1.0",
+        "reflect-metadata": "^0.2.0"
+    },
+    "devDependencies": {
+        "@types/pg": "^8.23.1"
+    }
+}

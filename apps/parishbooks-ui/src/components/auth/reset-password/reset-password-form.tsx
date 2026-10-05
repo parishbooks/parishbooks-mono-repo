@@ -1,37 +1,43 @@
 'use client';
 
 import { useState } from 'react';
+import { redirect } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
 import { authInputClassName, Back, Submit } from '@/components/auth/shared';
-import { resetPassword } from '@/lib/actions/auth';
+import { pathForRedirect, resetPassword } from '@/lib/actions/auth';
 import { resetPasswordDtoSchema, type ResetPasswordDto } from '@/lib/zod';
 
-export function ResetPasswordForm({ token }: { token: string | undefined }) {
+export function ResetPasswordForm({ email }: { email: string }) {
     const [formError, setFormError] = useState<string | null>(null);
 
     const form = useForm<ResetPasswordDto>({
         resolver: zodResolver(resetPasswordDtoSchema),
-        defaultValues: { password: '', confirmPassword: '' },
+        defaultValues: { otp: '', password: '', confirmPassword: '' },
     });
 
     async function onSubmit(values: ResetPasswordDto) {
         setFormError(null);
-        if (!token) {
-            setFormError('This reset link is invalid or missing a token. Request a new link from forgot password.');
+        if (!email) {
+            setFormError('Missing email. Request a new password reset.');
             return;
         }
-        const result = await resetPassword(token, values.password);
-        if (!result.success) setFormError(result.error);
+        const result = await resetPassword({ email, otp: values.otp, password: values.password });
+        if (!result.success) {
+            setFormError(result.error);
+            return;
+        }
+        redirect(`${pathForRedirect(result.data.redirectTo ?? 'sign-in')}?reset=1`);
     }
 
-    if (!token) {
+    if (!email) {
         return (
             <>
                 <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-                    This reset link is invalid or expired. Request a new password reset email.
+                    This reset link is missing an email. Request a new password reset.
                 </p>
                 <Back href="/forgot-password" />
             </>
@@ -47,6 +53,28 @@ export function ResetPasswordForm({ token }: { token: string | undefined }) {
                             {formError}
                         </p>
                     ) : null}
+                    <p className="text-sm text-muted-foreground">
+                        Enter the code sent to <span className="font-medium text-foreground">{email}</span>.
+                    </p>
+                    <FormField
+                        control={form.control}
+                        name="otp"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col items-center">
+                                <FormLabel>Reset code</FormLabel>
+                                <FormControl>
+                                    <InputOTP maxLength={6} aria-label="Password reset code" {...field}>
+                                        <InputOTPGroup>
+                                            {[0, 1, 2, 3, 4, 5].map((i) => (
+                                                <InputOTPSlot key={i} index={i} />
+                                            ))}
+                                        </InputOTPGroup>
+                                    </InputOTP>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <FormField
                         control={form.control}
                         name="password"

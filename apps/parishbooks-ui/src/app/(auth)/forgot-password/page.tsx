@@ -3,7 +3,7 @@ import { ForgotPasswordForm } from '@/components/auth/forgot-password/forgot-pas
 
 export default function ForgotPasswordPage() {
     return (
-        <Shell eyebrow="Account recovery" title="Forgot your password?" description="No worries. Enter your email and we'll send you a link to reset it.">
+        <Shell eyebrow="Account recovery" title="Forgot your password?" description="No worries. Enter your email and we'll send you a code to reset it.">
             <ForgotPasswordForm />
         </Shell>
     );

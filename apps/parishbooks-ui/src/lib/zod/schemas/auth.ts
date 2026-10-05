@@ -22,6 +22,7 @@ export const forgotPasswordDtoSchema = z.object({
 
 export const resetPasswordDtoSchema = z
     .object({
+        otp: otpDtoSchema,
         password: newPasswordDtoSchema,
         confirmPassword: z.string().min(1, 'Please confirm your password.'),
     })

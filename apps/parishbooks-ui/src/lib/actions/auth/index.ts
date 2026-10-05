@@ -1,77 +1,73 @@
-'use server';
-import { headers } from 'next/headers';
-import { authClient } from '@/lib/auth-client';
-import { resolvePostLoginPath } from '@/lib/auth/post-login-destination';
-import { setAccessToken } from '@/lib/session';
-import { type SignInDto, type SignUpDto } from '@/lib/zod';
+import {
+    forgotPassword as apiForgotPassword,
+    resetPassword as apiResetPassword,
+    sendEmailOtp as apiSendEmailOtp,
+    signIn as apiSignIn,
+    signOut as apiSignOut,
+    signUp as apiSignUp,
+    verifyEmailOtp as apiVerifyEmailOtp,
+    type ErrorResponseDto,
+    type RedirectTo,
+    type SignInDto,
+    type SignUpDto,
+} from '@/lib/api-client';
+import { safeNextPath } from '@/lib/auth/safe-next-path';
 
-async function authRequestHeaders() {
-    const headerList = await headers();
-    const originHeader = headerList.get('origin');
-    if (originHeader) return { origin: originHeader };
-
-    const referer = headerList.get('referer');
-    if (referer) {
-        try {
-            return { origin: new URL(referer).origin };
-        } catch {
-            // fall through
-        }
-    }
-
-    return { origin: process.env.APP_UI_URL ?? `http://localhost:${process.env.APP_UI_PORT ?? '3000'}` };
+function errorMessage(error: ErrorResponseDto | undefined, fallback: string): string {
+    if (!error?.message) return fallback;
+    return Array.isArray(error.message) ? error.message.join(' ') : error.message;
 }
 
-export const signUp = async ({ email, password, name }: SignUpDto) => {
-    const response = await authClient.signUp.email({ email, password, name }, { headers: await authRequestHeaders() });
-    if (response.error) throw new Error(response.error.message);
-    return response.data;
-};
+export function pathForRedirect(redirectTo: RedirectTo, email?: string): string {
+    if (redirectTo === 'dashboard') return '/dashboard';
+    if (redirectTo === 'email-verification') return email ? `/verify-email?email=${encodeURIComponent(email)}` : '/verify-email';
+    if (redirectTo === 'password-reset') return email ? `/reset-password?email=${encodeURIComponent(email)}` : '/reset-password';
+    if (redirectTo === 'org-setup') return '/onboarding';
+    return '/sign-in';
+}
 
-export const googleSignIn = async () => {
-    const response = await authClient.signIn.social({ provider: 'google', callbackURL: '/', disableRedirect: true }, { headers: await authRequestHeaders() });
-    if (response.error || !response.data?.url) return { success: false as const, error: response.error?.message ?? 'Google sign-in failed.' };
-    return { success: true as const, data: { url: response.data.url } };
-};
+export function destinationForRedirect(redirectTo: RedirectTo, options?: { email?: string; next?: string | null }): string {
+    if (redirectTo === 'dashboard') return safeNextPath(options?.next);
+    return pathForRedirect(redirectTo, options?.email);
+}
 
-export const signIn = async ({ email, password }: SignInDto) => {
-    const response = await authClient.signIn.email({ email, password }, { headers: await authRequestHeaders() });
-    if (response.error) throw new Error(response.error.message);
-    const accessToken = response.data.token;
-    if (accessToken) await setAccessToken(accessToken);
-    return response.data;
-};
+export async function signUp(body: SignUpDto) {
+    const { data, error } = await apiSignUp({ body });
+    if (error) throw new Error(errorMessage(error, 'Sign up failed.'));
+    return data;
+}
 
-const notImplemented = { success: false as const, error: 'Not implemented.' };
+export async function signIn(body: SignInDto) {
+    const { data, error } = await apiSignIn({ body });
+    if (error) throw new Error(errorMessage(error, 'Sign in failed.'));
+    return data;
+}
 
-export const forgotPassword = async (_email: string) => notImplemented;
+export async function signOut() {
+    const { error } = await apiSignOut();
+    if (error) throw new Error(errorMessage(error, 'Sign out failed.'));
+}
 
-export const resetPassword = async (_token: string, _password: string) => notImplemented;
+export async function sendEmailOtp(email: string) {
+    const { data, error } = await apiSendEmailOtp({ body: { email, type: 'email-verification' } });
+    if (error) return { success: false as const, error: errorMessage(error, 'Failed to send code.') };
+    return { success: true as const, data };
+}
 
-export const sendEmailOtp = async (email: string) => {
-    const response = await authClient.emailOtp.sendVerificationOtp({ email, type: 'email-verification' }, { headers: await authRequestHeaders() });
-    if (response.error) return { success: false as const, error: response.error.message };
-    return { success: true as const };
-};
+export async function verifyEmailOtp(email: string, otp: string) {
+    const { data, error } = await apiVerifyEmailOtp({ body: { email, otp } });
+    if (error) return { success: false as const, error: errorMessage(error, 'Email verification failed.') };
+    return { success: true as const, data };
+}
 
-export const verifyEmailOtp = async (email: string, otp: string) => {
-    const response = await authClient.emailOtp.verifyEmail({ email, otp }, { headers: await authRequestHeaders() });
-    if (response.error) return { success: false as const, error: response.error.message };
+export async function forgotPassword(email: string) {
+    const { data, error } = await apiForgotPassword({ body: { email } });
+    if (error) return { success: false as const, error: errorMessage(error, 'Failed to send reset code.') };
+    return { success: true as const, data };
+}
 
-    const token = response.data?.token;
-    if (token) await setAccessToken(token);
-
-    const user = response.data?.user;
-    const destination = resolvePostLoginPath({
-        user: {
-            email: user?.email ?? email,
-            emailVerified: user?.emailVerified ?? true,
-        },
-        session: { activeOrganizationId: null },
-        organizations: [],
-    });
-
-    return { success: true as const, data: { destination } };
-};
-
-export const signOut = async () => undefined;
+export async function resetPassword(body: { email: string; otp: string; password: string }) {
+    const { data, error } = await apiResetPassword({ body });
+    if (error) return { success: false as const, error: errorMessage(error, 'Failed to reset password.') };
+    return { success: true as const, data };
+}

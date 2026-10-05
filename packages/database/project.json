@@ -1,0 +1,26 @@
+{
+    "name": "@parishbooks/database",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/database/src",
+    "projectType": "library",
+    "tags": [],
+    "// targets": "to see all targets run: nx show project @parishbooks/database --web",
+    "targets": {
+        "db-generate": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "packages/database",
+                "envFile": "{workspaceRoot}/.env",
+                "command": "bun scripts/db-generate.ts"
+            }
+        },
+        "db-migrate": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "packages/database",
+                "envFile": "{workspaceRoot}/.env",
+                "command": "bun scripts/db-migrate.ts"
+            }
+        }
+    }
+}
