@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { createWorkspace } from '@/lib/actions/org';
+import { redirect } from 'next/navigation';
+import { createOrg, setActiveOrg } from '@/lib/actions/org';
 import { slugFromName, isValidChurchName, isValidSlug } from '@/lib/org/slug';
 import {
     COUNTRY_DEFAULTS,
@@ -65,11 +66,15 @@ export function ChurchSetupFlow() {
         if (submitting) return;
         setSubmitting(true);
         setError(null);
-        const result = await createWorkspace({ name: churchName, slug, timezone, country, currency });
-        if (result?.success === false) {
-            setError(result.error);
+        try {
+            await createOrg({ name: churchName, slug, timezone, country, currency });
+            await setActiveOrg({ organizationSlug: slug });
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Create organization failed.');
             setSubmitting(false);
+            return;
         }
+        redirect('/dashboard');
     };
 
     return (
