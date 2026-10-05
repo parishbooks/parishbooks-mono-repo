@@ -7,6 +7,8 @@ export interface SmtpConfig {
     from: string;
 }
 
+export const SMTP_CONFIG = Symbol('SMTP_CONFIG');
+
 export interface SendEmailOptions {
     to: string | string[];
     subject: string;

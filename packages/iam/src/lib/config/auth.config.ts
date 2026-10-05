@@ -20,20 +20,8 @@ export const defineAuth = (config: AuthConfig) => {
         database: getDatabaseConfig(config),
         trustedOrigins: config.trustedOrigins,
         advanced: { database: { joins: true, generateId: 'uuid' } },
-        emailAndPassword: { enabled: true, requireEmailVerification: true, minPasswordLength: 8 },
+        emailAndPassword: { enabled: true, minPasswordLength: 8, maxPasswordLength: 128 },
         emailVerification: { autoSignInAfterVerification: true },
-        plugins: [
-            OrganizationPlugin.init({ httpService }),
-            EmailOtpPlugin.init({
-                smtpHost: config.smtpHost,
-                smtpPort: config.smtpPort,
-                smtpSecure: config.smtpSecure,
-                smtpUser: config.smtpUser,
-                smtpPass: config.smtpPass,
-                smtpFrom: config.smtpFrom,
-            }),
-            JwtPlugin.init(),
-            bearer(),
-        ],
+        plugins: [OrganizationPlugin.init({ httpService }), EmailOtpPlugin.init(config.emailService), JwtPlugin.init(), bearer()],
     });
 };

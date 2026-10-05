@@ -1,31 +1,27 @@
-import { DynamicModule, Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DynamicModule, InjectionToken, Module, ModuleMetadata, OptionalFactoryDependency, Provider } from '@nestjs/common';
 import { EmailService } from './email/email.service';
+import { SMTP_CONFIG, type SmtpConfig } from './email/email.types';
 import { SmsService } from './sms/sms.service';
+
+export interface CommunicationsModuleAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
+    inject?: Array<InjectionToken | OptionalFactoryDependency>;
+    useFactory: (...args: any[]) => SmtpConfig | Promise<SmtpConfig>;
+}
 
 @Module({})
 export class CommunicationsModule {
-    static forRootAsync(): DynamicModule {
+    static forRootAsync(options: CommunicationsModuleAsyncOptions): DynamicModule {
+        const smtpConfigProvider: Provider = {
+            provide: SMTP_CONFIG,
+            inject: options.inject ?? [],
+            useFactory: options.useFactory,
+        };
+
         return {
             module: CommunicationsModule,
             global: true,
-            imports: [ConfigModule],
-            providers: [
-                {
-                    provide: EmailService,
-                    inject: [ConfigService],
-                    useFactory: (configService: ConfigService) =>
-                        new EmailService({
-                            host: configService.getOrThrow('SMTP_HOST'),
-                            port: Number(configService.get('SMTP_PORT') || '465'),
-                            secure: configService.get('SMTP_SECURE') !== 'false',
-                            user: configService.getOrThrow('SMTP_USER'),
-                            pass: configService.getOrThrow('SMTP_PASS'),
-                            from: configService.get('SMTP_FROM') || configService.getOrThrow('SMTP_USER'),
-                        }),
-                },
-                SmsService,
-            ],
+            imports: options.imports ?? [],
+            providers: [smtpConfigProvider, EmailService, SmsService],
             exports: [EmailService, SmsService],
         };
     }

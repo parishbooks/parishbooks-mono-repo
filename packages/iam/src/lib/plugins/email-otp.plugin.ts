@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { emailOTP } from 'better-auth/plugins';
-import { EmailService } from '@parishbooks/communications';
+import type { EmailService } from '@parishbooks/communications';
 
 const OTP_SUBJECTS = {
     'sign-in': 'Your ParishBooks sign-in code',
@@ -9,28 +9,12 @@ const OTP_SUBJECTS = {
     'change-email': 'Confirm your new ParishBooks email',
 } as const;
 
-export interface EmailOtpPluginOptions {
-    smtpHost: string;
-    smtpPort: number;
-    smtpSecure: boolean;
-    smtpUser: string;
-    smtpPass: string;
-    smtpFrom: string;
-}
-
 export class EmailOtpPlugin {
     private static logger = new Logger(EmailOtpPlugin.name);
     private static emailService: EmailService;
 
-    public static init(options: EmailOtpPluginOptions) {
-        this.emailService = new EmailService({
-            host: options.smtpHost,
-            port: options.smtpPort,
-            secure: options.smtpSecure,
-            user: options.smtpUser,
-            pass: options.smtpPass,
-            from: options.smtpFrom,
-        });
+    public static init(emailService: EmailService) {
+        this.emailService = emailService;
         return emailOTP({
             otpLength: 6,
             overrideDefaultEmailVerification: true,

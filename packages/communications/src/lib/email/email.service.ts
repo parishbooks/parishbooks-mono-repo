@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import nodemailer, { type Transporter } from 'nodemailer';
-import type { SendEmailOptions, SmtpConfig } from './email.types';
+import { SMTP_CONFIG, type SendEmailOptions, type SmtpConfig } from './email.types';
 
 @Injectable()
 export class EmailService {
@@ -8,7 +8,7 @@ export class EmailService {
     private readonly transporter: Transporter;
     private readonly from: string;
 
-    constructor(config: SmtpConfig) {
+    constructor(@Inject(SMTP_CONFIG) config: SmtpConfig) {
         this.from = config.from;
         this.transporter = nodemailer.createTransport({
             host: config.host,
