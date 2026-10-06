@@ -1,5 +1,5 @@
 import { Column, Entity, Index } from 'typeorm';
-import { TenantEntity } from './tenant.entity.js'
+import { TenantEntity } from './tenant.entity.js';
 
 export enum DonationStatus {
     PENDING = 'pending',

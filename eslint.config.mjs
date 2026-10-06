@@ -5,7 +5,7 @@ export default [
     ...nx.configs['flat/typescript'],
     ...nx.configs['flat/javascript'],
     {
-        ignores: ['**/dist', '**/out-tsc', '**/vitest.config.*.timestamp*', '**/test-output', '**/api-client/**'],
+        ignores: ['**/dist', '**/out-tsc', '**/vitest.config.*.timestamp*', '**/test-output', '**/api-client/**', '**/next-env.d.ts'],
     },
     {
         files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
@@ -28,13 +28,14 @@ export default [
     {
         files: ['**/*.ts', '**/*.tsx', '**/*.cts', '**/*.mts'],
         rules: {
+            // Ban TypeScript/JSX extensions in relative imports. Allow .js/.mjs/.cjs for NodeNext.
             'no-restricted-imports': [
                 'error',
                 {
                     patterns: [
                         {
-                            regex: String.raw`^\.\.?/.+\.(?:[cm]?(?:js|ts|jsx|tsx|mts|cts))$`,
-                            message: 'Use extensionless relative imports.',
+                            regex: String.raw`^\.\.?/.+\.(?:[cm]?ts|tsx|jsx)$`,
+                            message: 'Use extensionless or .js relative imports (not .ts/.tsx).',
                         },
                     ],
                 },

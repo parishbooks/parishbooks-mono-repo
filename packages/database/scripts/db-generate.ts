@@ -39,15 +39,11 @@ async function main() {
     if (build.status !== 0) process.exit(build.status ?? 1);
 
     // Generate against the compiled data source (Bun's decorator emit breaks TypeORM metadata).
-    const result = spawnSync(
-        'bunx',
-        ['typeorm', 'migration:generate', '-d', 'dist/data-source.js', `src/lib/migrations/${migrationName}`],
-        {
-            cwd: packageRoot,
-            stdio: 'inherit',
-            env: process.env,
-        },
-    );
+    const result = spawnSync('bunx', ['typeorm', 'migration:generate', '-d', 'dist/data-source.js', `src/lib/migrations/${migrationName}`], {
+        cwd: packageRoot,
+        stdio: 'inherit',
+        env: process.env,
+    });
 
     process.exit(result.status ?? 1);
 }

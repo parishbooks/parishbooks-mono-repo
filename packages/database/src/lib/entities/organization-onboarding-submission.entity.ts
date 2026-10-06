@@ -1,5 +1,5 @@
 import { Column, Entity, Index } from 'typeorm';
-import { TenantEntity } from './tenant.entity.js'
+import { TenantEntity } from './tenant.entity.js';
 
 // KYC submission audit trail for vendor onboarding
 // (docs/superpowers/specs/2026-09-22-vendor-onboarding-kyc-design.md §4).

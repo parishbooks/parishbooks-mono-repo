@@ -9,7 +9,11 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
     const { email } = await searchParams;
 
     return (
-        <Shell eyebrow="Set a new password" title="Reset your password" description="Enter the email code and choose a strong password you haven't used before.">
+        <Shell
+            eyebrow="Set a new password"
+            title="Reset your password"
+            description="Enter the email code and choose a strong password you haven't used before."
+        >
             <ResetPasswordForm email={email ?? ''} />
         </Shell>
     );

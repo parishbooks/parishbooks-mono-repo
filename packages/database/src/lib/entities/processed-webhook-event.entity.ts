@@ -1,5 +1,5 @@
 import { Column, Entity, Unique } from 'typeorm';
-import { BaseEntity } from './base.entity.js'
+import { BaseEntity } from './base.entity.js';
 
 export enum WebhookProvider {
     CASHFREE = 'cashfree',

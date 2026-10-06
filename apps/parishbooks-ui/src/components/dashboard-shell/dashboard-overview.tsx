@@ -1,10 +1,14 @@
 'use client';
 
 import { BarChart3, CalendarDays, CircleDollarSign, FileText, Megaphone, Users } from 'lucide-react';
+import { useOrg } from '@/lib/context/org';
+import { dashboardPath } from '@/lib/utils/paths';
 import { OrganizationsCard } from './organizations-card';
 import { StatCard } from './stat-card';
 
 export function DashboardOverview() {
+    const { orgSlug } = useOrg();
+
     return (
         <div className="mx-auto max-w-7xl">
             <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -16,10 +20,10 @@ export function DashboardOverview() {
                 <button className="h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm">Record donation</button>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <StatCard label="Total giving" value="$0" note="No donations recorded yet" icon={CircleDollarSign} />
-                <StatCard label="Active members" value="0" note="Build your community" icon={Users} />
-                <StatCard label="Upcoming events" value="0" note="Plan your next gathering" icon={CalendarDays} />
-                <StatCard label="Open campaigns" value="0" note="Create your first campaign" icon={Megaphone} />
+                <StatCard label="Total giving" value="$0" note="No donations recorded yet" icon={CircleDollarSign} href={dashboardPath(orgSlug, 'giving')} />
+                <StatCard label="Active members" value="0" note="Build your community" icon={Users} href={dashboardPath(orgSlug, 'members')} />
+                <StatCard label="Upcoming events" value="0" note="Plan your next gathering" icon={CalendarDays} href={dashboardPath(orgSlug, 'events')} />
+                <StatCard label="Open campaigns" value="0" note="Create your first campaign" icon={Megaphone} href={dashboardPath(orgSlug, 'campaigns')} />
             </div>
             <div className="mt-6">
                 <OrganizationsCard />

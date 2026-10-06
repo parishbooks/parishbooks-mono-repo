@@ -1,5 +1,5 @@
 import { Column, Entity, Index, Unique } from 'typeorm';
-import { TenantEntity } from './tenant.entity.js'
+import { TenantEntity } from './tenant.entity.js';
 
 // 1:1 with Donation. fundFcraSnapshot is copied from Fund.fcraFlag at issue
 // time so a later fund reclassification never alters an already-issued

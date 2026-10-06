@@ -1,5 +1,5 @@
 import { Check, Column, Entity, Index } from 'typeorm';
-import { TenantEntity } from './tenant.entity.js'
+import { TenantEntity } from './tenant.entity.js';
 
 // Append-only, same as JournalEntry (see its immutability-trigger note).
 // The CHECK constraint is a DB-level backstop against writes that bypass

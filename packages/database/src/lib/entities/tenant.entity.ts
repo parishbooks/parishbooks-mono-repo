@@ -1,5 +1,5 @@
 import { Column, Index } from 'typeorm';
-import { BaseEntity } from './base.entity.js'
+import { BaseEntity } from './base.entity.js';
 
 // Subclasses must add @Entity(...) plus @Index(['organizationId', 'id']) —
 // see docs/specs/typeorm-database-schema.md §2. Every tenant-scoped query
