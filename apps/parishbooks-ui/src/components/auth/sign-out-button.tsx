@@ -1,20 +1,16 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { LogOut } from 'lucide-react';
 import { Button } from '@parishbooks/design-system/ui/button';
 import { signOut } from '@/lib/actions/auth';
 
 export function SignOutButton({ variant = 'nav' }: { variant?: 'nav' | 'header' }) {
-    const router = useRouter();
     const [pending, startTransition] = useTransition();
 
     function onSignOut() {
         startTransition(async () => {
             await signOut();
-            router.replace('/sign-in');
-            router.refresh();
         });
     }
 
