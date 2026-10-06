@@ -39,14 +39,19 @@ export class OrganizationService {
         );
     }
 
+    async remintAccessToken(sessionToken: string, response: Response): Promise<void> {
+        const headers = Utils.getHeader(sessionToken);
+        const session = await this.auth.api.getSession({ headers });
+        if (!session) throw new BadRequestException('Failed to remint access token');
+        const { token } = await this.auth.api.getToken({ headers: Utils.getHeader(session.session.token) });
+        response.cookie(ACCESS_TOKEN_NAME, token, { ...Utils.getCookieOptions(), maxAge: ACCESS_TOKEN_MAX_AGE });
+    }
+
     async setActiveOrganization(dto: SetActiveOrganizationDto, sessionToken: string, response: Response) {
         const headers = Utils.getHeader(sessionToken);
         const body = { organizationId: dto.organizationId, organizationSlug: dto.organizationSlug };
         const organization = await this.auth.api.setActiveOrganization({ body, headers });
-        const session = await this.auth.api.getSession({ headers });
-        if (!session) throw new BadRequestException('Failed to set active organization');
-        const { token } = await this.auth.api.getToken({ headers: Utils.getHeader(session.session.token) });
-        response.cookie(ACCESS_TOKEN_NAME, token, { ...Utils.getCookieOptions(), maxAge: ACCESS_TOKEN_MAX_AGE });
+        await this.remintAccessToken(sessionToken, response);
         return organization;
     }
 }
