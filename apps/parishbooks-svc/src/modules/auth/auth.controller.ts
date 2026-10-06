@@ -79,6 +79,19 @@ export class AuthController {
         return this.authService.signOut(request, response);
     }
 
+    @Post('refresh')
+    @Public()
+    @Throttle({ default: { limit: 30, ttl: 60_000 } })
+    @ApiOperation({ operationId: 'refreshAccessToken', summary: 'Remint pb_access_token from a valid session cookie' })
+    @ApiCookieAuth(SESSION_TOKEN_NAME)
+    @ApiCookieAuth(REFRESH_TOKEN_NAME)
+    @ApiOkResponse({ type: SuccessResponseDto, description: 'Sets a fresh pb_access_token cookie' })
+    @ApiUnauthorizedResponse({ type: ErrorResponseDto })
+    @ApiTooManyRequestsResponse({ type: ErrorResponseDto })
+    async refreshAccessToken(@Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<SuccessResponseDto> {
+        return this.authService.refreshAccessToken(request, response);
+    }
+
     @Post('email-otp/send')
     @Public()
     @Throttle({ default: { limit: 5, ttl: 60_000 } })

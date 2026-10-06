@@ -3,6 +3,7 @@ const PUBLIC_AUTH_API_PATHS = [
     '/api/v1/auth/sign-in',
     '/api/v1/auth/sign-up',
     '/api/v1/auth/sign-out',
+    '/api/v1/auth/refresh',
     '/api/v1/auth/email-otp/send',
     '/api/v1/auth/email-otp/verify',
     '/api/v1/auth/forgot-password',
@@ -16,6 +17,6 @@ function pathnameFromInput(input: RequestInfo | URL): string {
 }
 
 export function isPublicAuthApiRequest(input: RequestInfo | URL | string): boolean {
-    const pathname = typeof input === 'string' && input.startsWith('/') ? input.split('?')[0] ?? input : pathnameFromInput(input);
+    const pathname = typeof input === 'string' && input.startsWith('/') ? (input.split('?')[0] ?? input) : pathnameFromInput(input);
     return PUBLIC_AUTH_API_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 }

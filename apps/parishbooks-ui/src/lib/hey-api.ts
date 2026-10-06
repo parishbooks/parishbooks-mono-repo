@@ -1,5 +1,4 @@
 import type { CreateClientConfig } from './api-client/client.gen';
-import { isPublicAuthApiRequest } from './auth/public-auth-api';
 import { ACCESS_TOKEN_COOKIE_NAME } from './session/constants';
 
 const baseUrl =
@@ -7,18 +6,21 @@ const baseUrl =
 
 const isServer = typeof window === 'undefined';
 
+/** Attach Bearer + Cookie from the Next cookie store. 401 refresh/logout lives in auth interceptors. */
 const serverFetch: typeof fetch = async (input, init = {}) => {
     const { cookies } = await import('next/headers');
     const cookieStore = await cookies();
     const headers = new Headers(init.headers);
     const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE_NAME)?.value;
     if (accessToken && !headers.has('Authorization')) headers.set('Authorization', `Bearer ${accessToken}`);
-    const response = await fetch(input, { ...init, headers });
-    if (response.status === 401 && !isPublicAuthApiRequest(input)) {
-        const { clearSession } = await import('./actions/auth/clear-session');
-        await clearSession();
+    if (!headers.has('cookie')) {
+        const cookie = cookieStore
+            .getAll()
+            .map((entry) => `${entry.name}=${entry.value}`)
+            .join('; ');
+        if (cookie) headers.set('cookie', cookie);
     }
-    return response;
+    return fetch(input, { ...init, headers });
 };
 
 export const createClientConfig: CreateClientConfig = (config) => ({

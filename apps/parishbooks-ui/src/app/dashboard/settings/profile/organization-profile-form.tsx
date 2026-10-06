@@ -24,7 +24,7 @@ const organizationProfileSchema = z.object({
     currency: z.enum(['INR', 'USD']),
 });
 
-type OrganizationProfileFormValues = z.infer<typeof organizationProfileSchema>;
+export type OrganizationProfileFormValues = z.infer<typeof organizationProfileSchema>;
 
 function countryFlag(country: WorkspaceCountry) {
     if (country === 'IN') return <IndiaFlag className="block size-full" />;
@@ -37,15 +37,22 @@ function currencyLabel(value: WorkspaceCurrency) {
     return `${option.description} — ${option.title}`;
 }
 
-export function OrganizationProfileForm() {
+function formatUpdatedAt(updatedAt: string | null | undefined): string {
+    if (!updatedAt) return 'Last updated unknown';
+    const date = new Date(updatedAt);
+    if (Number.isNaN(date.getTime())) return 'Last updated unknown';
+    return `Last updated ${new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date)}`;
+}
+
+type OrganizationProfileFormProps = {
+    defaultValues: OrganizationProfileFormValues;
+    updatedAt?: string | null;
+};
+
+export function OrganizationProfileForm({ defaultValues, updatedAt }: OrganizationProfileFormProps) {
     const form = useForm<OrganizationProfileFormValues>({
         resolver: zodResolver(organizationProfileSchema),
-        defaultValues: {
-            organizationName: "St. Mary's Parish",
-            country: 'US',
-            timezone: COUNTRY_DEFAULTS.US.timezone,
-            currency: COUNTRY_DEFAULTS.US.currency,
-        },
+        defaultValues,
     });
 
     const country = form.watch('country');
@@ -59,7 +66,7 @@ export function OrganizationProfileForm() {
     }
 
     async function onSubmit() {
-        // No organization-profile endpoint exists yet — this stub just reports success locally.
+        // No organization-profile update endpoint exists yet — this stub just reports success locally.
     }
 
     return (
@@ -151,7 +158,7 @@ export function OrganizationProfileForm() {
                     </div>
                 </div>
                 <div className="mt-6 flex items-center justify-between border-t pt-6">
-                    <span className="text-sm text-muted-foreground">{form.formState.isSubmitSuccessful ? 'Changes saved' : 'Last updated just now'}</span>
+                    <span className="text-sm text-muted-foreground">{form.formState.isSubmitSuccessful ? 'Changes saved' : formatUpdatedAt(updatedAt)}</span>
                     <Button type="submit" disabled={form.formState.isSubmitting} className="h-11 rounded-xl px-5">
                         Save changes
                     </Button>

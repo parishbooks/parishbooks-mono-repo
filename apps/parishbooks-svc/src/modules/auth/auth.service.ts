@@ -3,7 +3,7 @@ import { isAPIError } from 'better-auth/api';
 import { auth as authInstance, AuthUserSession } from '@parishbooks/iam';
 import { AuthService as BetterAuthService } from '@thallesp/nestjs-better-auth';
 import type { Request, Response } from 'express';
-import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME, SESSION_TOKEN_NAME } from './constants';
+import { ACCESS_TOKEN_MAX_AGE, ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME, SESSION_TOKEN_NAME } from './constants';
 import {
     ForgotPasswordDto,
     RedirectTo,
@@ -104,5 +104,16 @@ export class AuthService {
 
     async getCurrentSession(sessionToken: string): Promise<AuthUserSession | null> {
         return await this.auth.api.getSession({ headers: Utils.getHeader(sessionToken) });
+    }
+
+    /** Remint pb_access_token from a still-valid session/refresh cookie (no access JWT required). */
+    async refreshAccessToken(request: Request, response: Response): Promise<SuccessResponseDto> {
+        const sessionToken = request.cookies?.[SESSION_TOKEN_NAME] ?? request.cookies?.[REFRESH_TOKEN_NAME];
+        if (!sessionToken) throw new UnauthorizedException('Session required');
+        const session = await this.auth.api.getSession({ headers: Utils.getHeader(sessionToken) });
+        if (!session) throw new UnauthorizedException('Invalid session');
+        const accessToken = await this.helper.mintAccessToken(session);
+        response.cookie(ACCESS_TOKEN_NAME, accessToken, { ...Utils.getCookieOptions(), maxAge: ACCESS_TOKEN_MAX_AGE });
+        return new SuccessResponseDto({ success: true });
     }
 }

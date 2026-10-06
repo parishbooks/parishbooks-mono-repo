@@ -1,10 +1,17 @@
 import { clearSession } from '@/lib/actions/auth/clear-session';
 import { isPublicAuthApiRequest } from '@/lib/auth/public-auth-api';
+import { refreshAccessTokenOnce } from '@/lib/auth/refresh-access-token';
 import { client } from '@/lib/api-client/client.gen';
 
 let registered = false;
 
-/** Register once: any authenticated API 401 clears cookies and sends the user to sign-in. */
+async function obtainAccessToken(): Promise<string | null> {
+    if (typeof window === 'undefined') return refreshAccessTokenOnce();
+    const { refreshSession } = await import('@/lib/actions/auth/refresh-session');
+    return refreshSession();
+}
+
+/** Register once: on 401, refresh access token and retry once; logout if refresh fails. */
 export function registerAuthInterceptors(): void {
     if (registered) return;
     registered = true;
@@ -12,8 +19,24 @@ export function registerAuthInterceptors(): void {
     client.interceptors.response.use(async (response, options) => {
         if (response.status !== 401) return response;
         if (isPublicAuthApiRequest(options.url)) return response;
-        await clearSession();
-        return response;
+
+        const accessToken = await obtainAccessToken();
+        if (!accessToken) {
+            await clearSession();
+            return response;
+        }
+
+        const headers = new Headers(options.headers);
+        headers.set('Authorization', `Bearer ${accessToken}`);
+        const retryResponse = await (options.fetch ?? globalThis.fetch)(client.buildUrl(options), {
+            method: options.method,
+            headers,
+            body: options.serializedBody as BodyInit | null | undefined,
+            credentials: options.credentials,
+        });
+
+        if (retryResponse.status === 401) await clearSession();
+        return retryResponse;
     });
 }
 

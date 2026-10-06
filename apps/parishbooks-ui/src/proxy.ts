@@ -1,15 +1,13 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient, createConfig } from '@/lib/api-client/client';
-import { getCurrentSessionApi } from '@/lib/api-client';
-import { AUTH_COOKIE_NAMES, hasAuthCookies } from '@/lib/session/auth-cookies';
+import { refreshAccessTokenApi } from '@/lib/api-client';
+import { isAccessTokenValid, svcBaseUrl } from '@/lib/auth/verify-access-token';
 import { signInPath } from '@/lib/auth/sign-in-path';
+import { AUTH_COOKIE_NAMES, hasAuthCookies } from '@/lib/session/auth-cookies';
+import { ACCESS_TOKEN_COOKIE_NAME } from '@/lib/session/constants';
 
-const svcBaseUrl = (
-    process.env.NEXT_PUBLIC_APP_SVC_URL ??
-    process.env.APP_SVC_URL ??
-    process.env.IAM_BASE_URL ??
-    `http://localhost:${process.env.APP_SVC_PORT ?? '8000'}`
-).replace(/\/$/, '');
+/** Dedicated client: no serverFetch/clearSession — proxy handles auth redirects itself. */
+const proxyClient = createClient(createConfig({ baseUrl: svcBaseUrl }));
 
 function withPathnameHeader(request: NextRequest): NextResponse {
     const headers = new Headers(request.headers);
@@ -23,16 +21,21 @@ function redirectToSignIn(request: NextRequest, pathname: string): NextResponse 
     return response;
 }
 
-async function isSessionValid(request: NextRequest): Promise<boolean> {
+function withSetCookies(response: NextResponse, from: Response): NextResponse {
+    const setCookies = typeof from.headers.getSetCookie === 'function' ? from.headers.getSetCookie() : [];
+    for (const cookie of setCookies) response.headers.append('Set-Cookie', cookie);
+    return response;
+}
+
+async function refreshAccessToken(request: NextRequest): Promise<Response | null> {
     try {
         const cookie = request.headers.get('cookie');
-        if (!cookie) return false;
-        const proxyClient = createClient(createConfig({ baseUrl: svcBaseUrl }));
-        const { response } = await getCurrentSessionApi({ client: proxyClient, headers: { cookie } });
-        if (response?.status === 401 || response?.status === 403) return false;
-        return true;
+        if (!cookie) return null;
+        const { response } = await refreshAccessTokenApi({ client: proxyClient, headers: { cookie } });
+        if (!response?.ok) return null;
+        return response;
     } catch {
-        return true;
+        return null;
     }
 }
 
@@ -40,9 +43,11 @@ export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const getCookie = (name: string) => request.cookies.get(name)?.value;
     if (!hasAuthCookies(getCookie)) return redirectToSignIn(request, pathname);
-    const valid = await isSessionValid(request);
-    if (!valid) return redirectToSignIn(request, pathname);
-    return withPathnameHeader(request);
+    const accessToken = getCookie(ACCESS_TOKEN_COOKIE_NAME);
+    if (accessToken && (await isAccessTokenValid(accessToken))) return withPathnameHeader(request);
+    const refreshed = await refreshAccessToken(request);
+    if (!refreshed) return redirectToSignIn(request, pathname);
+    return withSetCookies(withPathnameHeader(request), refreshed);
 }
 
 export const config = {

@@ -625,3 +625,26 @@ export type HealthCheckResponses = {
 };
 
 export type HealthCheckResponse = HealthCheckResponses[keyof HealthCheckResponses];
+
+export type RefreshAccessTokenData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/refresh';
+};
+
+export type RefreshAccessTokenErrors = {
+    401: ErrorResponseDto;
+    429: ErrorResponseDto;
+};
+
+export type RefreshAccessTokenError = RefreshAccessTokenErrors[keyof RefreshAccessTokenErrors];
+
+export type RefreshAccessTokenResponses = {
+    /**
+     * Sets a fresh pb_access_token cookie
+     */
+    200: SuccessResponseDto;
+};
+
+export type RefreshAccessTokenResponse = RefreshAccessTokenResponses[keyof RefreshAccessTokenResponses];

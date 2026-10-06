@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateOrganizationData, CreateOrganizationErrors, CreateOrganizationResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetCurrentSessionData, GetCurrentSessionErrors, GetCurrentSessionResponses, GetOrganizationData, GetOrganizationErrors, GetOrganizationProfileData, GetOrganizationProfileErrors, GetOrganizationProfileResponses, GetOrganizationResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, ListOrganizationsData, ListOrganizationsErrors, ListOrganizationsResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, SendEmailOtpData, SendEmailOtpErrors, SendEmailOtpResponses, SetActiveOrganizationData, SetActiveOrganizationErrors, SetActiveOrganizationResponses, SignInData, SignInErrors, SignInResponses, SignOutData, SignOutErrors, SignOutResponses, SignUpData, SignUpErrors, SignUpResponses, VerifyEmailOtpData, VerifyEmailOtpErrors, VerifyEmailOtpResponses } from './types.gen';
+import type { CreateOrganizationData, CreateOrganizationErrors, CreateOrganizationResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetCurrentSessionData, GetCurrentSessionErrors, GetCurrentSessionResponses, GetOrganizationData, GetOrganizationErrors, GetOrganizationProfileData, GetOrganizationProfileErrors, GetOrganizationProfileResponses, GetOrganizationResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, ListOrganizationsData, ListOrganizationsErrors, ListOrganizationsResponses, RefreshAccessTokenData, RefreshAccessTokenErrors, RefreshAccessTokenResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, SendEmailOtpData, SendEmailOtpErrors, SendEmailOtpResponses, SetActiveOrganizationData, SetActiveOrganizationErrors, SetActiveOrganizationResponses, SignInData, SignInErrors, SignInResponses, SignOutData, SignOutErrors, SignOutResponses, SignUpData, SignUpErrors, SignUpResponses, VerifyEmailOtpData, VerifyEmailOtpErrors, VerifyEmailOtpResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -215,3 +215,20 @@ export const healthReadyApi = <ThrowOnError extends boolean = false>(options?: O
  * Combined health check
  */
 export const healthCheckApi = <ThrowOnError extends boolean = false>(options?: Options<HealthCheckData, ThrowOnError>): RequestResult<HealthCheckResponses, HealthCheckErrors, ThrowOnError> => (options?.client ?? client).get<HealthCheckResponses, HealthCheckErrors, ThrowOnError>({ url: '/api/health', ...options });
+
+/**
+ * Remint pb_access_token from a valid session cookie
+ */
+export const refreshAccessTokenApi = <ThrowOnError extends boolean = false>(options?: Options<RefreshAccessTokenData, ThrowOnError>): RequestResult<RefreshAccessTokenResponses, RefreshAccessTokenErrors, ThrowOnError> => (options?.client ?? client).post<RefreshAccessTokenResponses, RefreshAccessTokenErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'pb_session_token',
+            type: 'apiKey'
+        }, {
+            in: 'cookie',
+            name: 'pb_refresh_token',
+            type: 'apiKey'
+        }],
+    url: '/api/v1/auth/refresh',
+    ...options
+});
