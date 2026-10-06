@@ -20,11 +20,12 @@ import { OrganizationModule } from './organization/organization.module';
         }),
         ThrottlerModule.forRootAsync({
             inject: [ConfigService],
-            useFactory: (configService: ConfigService) =>
-                defineThrottler({
+            useFactory: (configService: ConfigService) => {
+                return defineThrottler({
                     ttl: configService.getOrThrow<number>('THROTTLE_TTL'),
                     limit: configService.getOrThrow<number>('THROTTLE_LIMIT'),
-                }),
+                });
+            },
         }),
         DatabaseModule.forRootAsync({
             inject: [ConfigService],
@@ -47,8 +48,8 @@ import { OrganizationModule } from './organization/organization.module';
         BetterAuthModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService, EmailService],
+            disableGlobalAuthGuard: true,
             useFactory: (configService: ConfigService, emailService: EmailService) => ({
-                disableGlobalAuthGuard: true,
                 auth: defineAuth({
                     secret: configService.getOrThrow('IAM_SECRET'),
                     baseURL: configService.get('APP_SVC_URL') || configService.get('IAM_BASE_URL') || '',
