@@ -1,5 +1,4 @@
 import type { CreateClientConfig } from './api-client/client.gen';
-import { clearSession } from './actions/auth/clear-session';
 import { isPublicAuthApiRequest } from './auth/public-auth-api';
 import { ACCESS_TOKEN_COOKIE_NAME } from './session/constants';
 
@@ -15,7 +14,10 @@ const serverFetch: typeof fetch = async (input, init = {}) => {
     const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE_NAME)?.value;
     if (accessToken && !headers.has('Authorization')) headers.set('Authorization', `Bearer ${accessToken}`);
     const response = await fetch(input, { ...init, headers });
-    if (response.status === 401 && !isPublicAuthApiRequest(input)) await clearSession();
+    if (response.status === 401 && !isPublicAuthApiRequest(input)) {
+        const { clearSession } = await import('./actions/auth/clear-session');
+        await clearSession();
+    }
     return response;
 };
 
