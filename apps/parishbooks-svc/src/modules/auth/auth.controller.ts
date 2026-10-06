@@ -10,9 +10,8 @@ import {
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import type { Request, Response } from 'express';
-import { ErrorResponseDto } from '@parishbooks/core';
+import { ErrorResponseDto, Public } from '@parishbooks/core';
 import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME, SESSION_TOKEN_NAME } from './constants';
 import { AuthService } from './auth.service';
 import {
@@ -32,7 +31,7 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Post('sign-in')
-    @AllowAnonymous()
+    @Public()
     @Throttle({ default: { limit: 10, ttl: 60_000 } })
     @ApiOperation({ operationId: 'signIn', summary: 'Sign in with email and password' })
     @ApiBody({ type: SignInDto })
@@ -45,7 +44,7 @@ export class AuthController {
     }
 
     @Post('sign-up')
-    @AllowAnonymous()
+    @Public()
     @Throttle({ default: { limit: 10, ttl: 60_000 } })
     @ApiOperation({ operationId: 'signUp', summary: 'Create an account and start email verification' })
     @ApiBody({ type: SignUpDto })
@@ -57,7 +56,7 @@ export class AuthController {
     }
 
     @Post('sign-out')
-    @AllowAnonymous()
+    @Public()
     @ApiOperation({ operationId: 'signOut', summary: 'Sign out and clear auth cookies' })
     @ApiCookieAuth(ACCESS_TOKEN_NAME)
     @ApiCookieAuth(REFRESH_TOKEN_NAME)
@@ -69,7 +68,7 @@ export class AuthController {
     }
 
     @Post('email-otp/send')
-    @AllowAnonymous()
+    @Public()
     @Throttle({ default: { limit: 5, ttl: 60_000 } })
     @ApiOperation({ operationId: 'sendEmailOtp', summary: 'Send an email OTP' })
     @ApiBody({ type: SendEmailOtpDto })
@@ -81,7 +80,7 @@ export class AuthController {
     }
 
     @Post('email-otp/verify')
-    @AllowAnonymous()
+    @Public()
     @Throttle({ default: { limit: 10, ttl: 60_000 } })
     @ApiOperation({ operationId: 'verifyEmailOtp', summary: 'Verify email with OTP and establish session cookies' })
     @ApiBody({ type: VerifyEmailOtpDto })
@@ -94,7 +93,7 @@ export class AuthController {
     }
 
     @Post('forgot-password')
-    @AllowAnonymous()
+    @Public()
     @Throttle({ default: { limit: 5, ttl: 60_000 } })
     @ApiOperation({ operationId: 'forgotPassword', summary: 'Request a password reset OTP' })
     @ApiBody({ type: ForgotPasswordDto })
@@ -106,7 +105,7 @@ export class AuthController {
     }
 
     @Post('reset-password')
-    @AllowAnonymous()
+    @Public()
     @Throttle({ default: { limit: 10, ttl: 60_000 } })
     @ApiOperation({ operationId: 'resetPassword', summary: 'Reset password with email OTP' })
     @ApiBody({ type: ResetPasswordDto })

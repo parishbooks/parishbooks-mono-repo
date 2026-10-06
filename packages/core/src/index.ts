@@ -3,6 +3,7 @@ export * from './lib/correlation/index.js';
 export * from './lib/decorators/index.js';
 export * from './lib/env/index.js';
 export * from './lib/errors/index.js';
+export * from './lib/guards/index.js';
 export * from './lib/health/index.js';
 export * from './lib/helmet/index.js';
 export * from './lib/logger/index.js';
