@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { isAPIError } from 'better-auth/api';
-import { auth as authInstance } from '@parishbooks/iam';
+import { auth as authInstance, AuthUserSession } from '@parishbooks/iam';
 import { AuthService as BetterAuthService } from '@thallesp/nestjs-better-auth';
 import type { Request, Response } from 'express';
 import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME, SESSION_TOKEN_NAME } from './constants';
@@ -50,13 +50,7 @@ export class AuthService {
 
     async signOut(request: Request, response: Response): Promise<SuccessResponseDto> {
         const token = request.cookies?.[SESSION_TOKEN_NAME] ?? request.cookies?.[REFRESH_TOKEN_NAME] ?? request.cookies?.[ACCESS_TOKEN_NAME];
-        if (token) {
-            try {
-                await this.auth.api.signOut({ headers: Utils.getHeader(token) });
-            } catch {
-                /* clear cookies anyway */
-            }
-        }
+        if (token) await this.auth.api.signOut({ headers: Utils.getHeader(token) });
         this.helper.clearCookies(response);
         return new SuccessResponseDto({ success: true });
     }
@@ -106,5 +100,9 @@ export class AuthService {
             if (isAPIError(error)) throw new BadRequestException(error.body?.message ?? 'Failed to reset password');
             throw error;
         }
+    }
+
+    async getCurrentSession(sessionToken: string): Promise<AuthUserSession | null> {
+        return await this.auth.api.getSession({ headers: Utils.getHeader(sessionToken) });
     }
 }

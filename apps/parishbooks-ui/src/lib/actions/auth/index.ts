@@ -2,6 +2,7 @@ export * from './redirect';
 export * from './sign-up';
 export * from './sign-in';
 export * from './sign-out';
+export * from './clear-session';
 export * from './send-email-otp';
 export * from './verify-email-otp';
 export * from './forgot-password';

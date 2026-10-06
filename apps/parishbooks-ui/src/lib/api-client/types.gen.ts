@@ -4,6 +4,15 @@ export type ClientOptions = {
     baseUrl: string;
 };
 
+export type ErrorResponseDto = {
+    statusCode: number;
+    message: string | Array<string>;
+    error?: string;
+    timestamp: string;
+    path: string;
+    correlationId?: string;
+};
+
 export type SignInDto = {
     email: string;
     password: string;
@@ -14,15 +23,6 @@ export type RedirectTo = 'dashboard' | 'email-verification' | 'password-reset' |
 
 export type SignInResponseDto = {
     redirectTo: RedirectTo;
-};
-
-export type ErrorResponseDto = {
-    statusCode: number;
-    message: string | Array<string>;
-    error?: string;
-    timestamp: string;
-    path: string;
-    correlationId?: string;
 };
 
 export type SignUpDto = {
@@ -79,6 +79,26 @@ export type SetActiveOrganizationDto = {
      * Organization slug to activate when organizationId is omitted
      */
     organizationSlug?: string;
+};
+
+export type GetCurrentSessionData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/session';
+};
+
+export type GetCurrentSessionErrors = {
+    401: ErrorResponseDto;
+};
+
+export type GetCurrentSessionError = GetCurrentSessionErrors[keyof GetCurrentSessionErrors];
+
+export type GetCurrentSessionResponses = {
+    /**
+     * Current user session
+     */
+    200: unknown;
 };
 
 export type SignInData = {

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiBody,
@@ -11,7 +11,8 @@ import {
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
-import { ErrorResponseDto, Public } from '@parishbooks/core';
+import { ErrorResponseDto, Public, Token } from '@parishbooks/core';
+import type { AuthUserSession } from '@parishbooks/iam';
 import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME, SESSION_TOKEN_NAME } from './constants';
 import { AuthService } from './auth.service';
 import {
@@ -29,6 +30,17 @@ import {
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
+
+    @Get('session')
+    @ApiOperation({ operationId: 'getCurrentSession', summary: 'Get the current session' })
+    @ApiCookieAuth(SESSION_TOKEN_NAME)
+    @ApiOkResponse({ description: 'Current user session' })
+    @ApiUnauthorizedResponse({ type: ErrorResponseDto })
+    async getCurrentSession(@Token('session') sessionToken: string): Promise<AuthUserSession> {
+        const session = await this.authService.getCurrentSession(sessionToken);
+        if (!session) throw new UnauthorizedException('Invalid session');
+        return session;
+    }
 
     @Post('sign-in')
     @Public()
