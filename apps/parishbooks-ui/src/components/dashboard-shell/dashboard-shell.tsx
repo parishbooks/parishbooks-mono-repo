@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ModeToggle } from '@parishbooks/design-system/mode-toggle';
 import { BarChart3, Bell, BookOpen, CalendarDays, CircleDollarSign, LayoutDashboard, Menu, Megaphone, Search, Settings, Users, X } from 'lucide-react';
 import { useState } from 'react';
 import { SignOutButton } from '@/components/auth/sign-out-button';
@@ -84,6 +85,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                         >
                             <Bell className="size-4" />
                         </button>
+                        <ModeToggle />
                         <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">JD</div>
                     </div>
                 </header>
