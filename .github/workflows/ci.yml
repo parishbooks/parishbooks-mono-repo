@@ -1,0 +1,52 @@
+name: CI
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+permissions:
+    actions: read
+    contents: read
+
+concurrency:
+    group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+env:
+    NEXT_PUBLIC_APP_SVC_URL: http://localhost:8000
+    APP_SVC_URL: http://localhost:8000
+    APP_UI_URL: http://localhost:3000
+    IAM_BASE_URL: http://localhost:8000
+
+jobs:
+    ci:
+        name: Lint, test, build
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  filter: tree:0
+                  fetch-depth: 0
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+
+            - name: Set Nx SHAs
+              uses: nrwl/nx-set-shas@v4
+
+            - name: Lint
+              run: bunx nx affected -t lint --parallel=3
+
+            - name: Test
+              run: bunx nx affected -t test --parallel=3
+
+            - name: Build
+              run: bunx nx affected -t build --parallel=3

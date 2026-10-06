@@ -124,6 +124,16 @@ tools/                 Generators / workspace tools
 - UI calls the API through hey-api (`apps/parishbooks-ui/src/lib/api-client`, generated) and server actions
 - Protected UI routes (`/dashboard`, `/onboarding`) are gated in `apps/parishbooks-ui/src/proxy.ts`
 
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on pushes to `main` and on pull requests:
+
+1. **Lint** — `nx affected -t lint`
+2. **Test** — `nx affected -t test`
+3. **Build** — `nx affected -t build`
+
+Uses Bun and [nx affected](https://nx.dev/ci/features/affected) so only changed projects (and dependents) run.
+
 ## License
 
 MIT
