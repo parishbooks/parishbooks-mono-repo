@@ -250,7 +250,7 @@ export type SetActiveOrganizationData = {
     body: SetActiveOrganizationDto;
     path?: never;
     query?: never;
-    url: '/api/v1/organization/active';
+    url: '/api/v1/organization/activate';
 };
 
 export type SetActiveOrganizationErrors = {

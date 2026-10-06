@@ -141,7 +141,7 @@ export const setActiveOrganization = <ThrowOnError extends boolean = false>(opti
             name: 'pb_session_token',
             type: 'apiKey'
         }],
-    url: '/api/v1/organization/active',
+    url: '/api/v1/organization/activate',
     ...options,
     headers: {
         'Content-Type': 'application/json',

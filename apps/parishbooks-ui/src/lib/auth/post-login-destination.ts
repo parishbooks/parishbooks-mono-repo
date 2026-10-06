@@ -34,7 +34,7 @@ export const postLoginGates: PostLoginGate[] = [
     },
     {
         id: 'organization-setup',
-        when: (ctx) => !ctx.session.activeOrganizationId,
+        when: (ctx) => ctx.organizations.length === 0,
         path: () => '/onboarding',
     },
 ];
