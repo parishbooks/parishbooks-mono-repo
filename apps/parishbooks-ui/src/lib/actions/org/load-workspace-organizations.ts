@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { getCurrentSessionApi, listOrganizationsApi } from '@/lib/api-client';
 
 export type WorkspaceOrganization = {
@@ -35,10 +36,10 @@ function organizationsFromResponse(data: unknown): WorkspaceOrganization[] {
     return organizations;
 }
 
-export async function loadWorkspaceOrganizations(): Promise<WorkspaceOrganizations | null> {
+export const loadWorkspaceOrganizations = cache(async (): Promise<WorkspaceOrganizations | null> => {
     const [currentSessionData, organizationsData] = await Promise.all([getCurrentSessionApi(), listOrganizationsApi()]);
     const { data: session, error: sessionError } = currentSessionData;
     const { data: organizations, error: orgsError } = organizationsData;
     if (sessionError || orgsError) return null;
     return { organizations: organizationsFromResponse(organizations), activeOrganizationId: activeOrganizationIdFromSession(session) };
-}
+});
