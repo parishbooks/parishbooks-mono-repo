@@ -2,8 +2,7 @@ import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedExceptio
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_TOKEN_COOKIE } from '../../decorators/token/token.constants.js';
-import { AUTH_GUARD_OPTIONS, IS_PUBLIC_KEY } from './auth.constants.js';
+import { ACCESS_TOKEN_COOKIE, AUTH_GUARD_OPTIONS, IS_PUBLIC_KEY, REFRESH_TOKEN_COOKIE, SESSION_TOKEN_COOKIE } from './auth.constants.js';
 import type { AuthGuardOptions, AuthSession, RequestTokens } from './auth.types.js';
 
 type AuthenticatedRequest = Request & {

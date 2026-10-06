@@ -1,10 +1,8 @@
 import type { RequestTokens, TokenKind } from '../../guards/auth/auth.types.js';
+import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_TOKEN_COOKIE } from '../../guards/auth/auth.constants.js';
 
 export type { TokenKind };
-
-export const ACCESS_TOKEN_COOKIE = 'pb_access_token';
-export const REFRESH_TOKEN_COOKIE = 'pb_refresh_token';
-export const SESSION_TOKEN_COOKIE = 'pb_session_token';
+export { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_TOKEN_COOKIE };
 
 export const TOKEN_COOKIE_NAMES: Record<TokenKind, string> = {
     access: ACCESS_TOKEN_COOKIE,
