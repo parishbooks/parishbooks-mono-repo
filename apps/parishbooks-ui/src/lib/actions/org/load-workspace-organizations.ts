@@ -36,13 +36,9 @@ function organizationsFromResponse(data: unknown): WorkspaceOrganization[] {
 }
 
 export async function loadWorkspaceOrganizations(): Promise<WorkspaceOrganizations | null> {
-    const [{ data: session, error: sessionError }, { data: organizations, error: orgsError }] = await Promise.all([
-        getCurrentSessionApi(),
-        listOrganizationsApi(),
-    ]);
+    const [currentSessionData, organizationsData] = await Promise.all([getCurrentSessionApi(), listOrganizationsApi()]);
+    const { data: session, error: sessionError } = currentSessionData;
+    const { data: organizations, error: orgsError } = organizationsData;
     if (sessionError || orgsError) return null;
-    return {
-        organizations: organizationsFromResponse(organizations),
-        activeOrganizationId: activeOrganizationIdFromSession(session),
-    };
+    return { organizations: organizationsFromResponse(organizations), activeOrganizationId: activeOrganizationIdFromSession(session) };
 }

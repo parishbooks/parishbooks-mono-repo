@@ -2,13 +2,15 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { Check, ChevronDown } from 'lucide-react';
+import Link from 'next/link';
+import { Check, ChevronDown, Plus } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@parishbooks/design-system/ui/dropdown-menu';
 import { setActiveOrg } from '@/lib/actions/org/set-active-org';
@@ -61,6 +63,11 @@ export function WorkspaceSwitcher({ organizations, activeOrganizationId }: Works
                         );
                     })}
                 </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem render={<Link href="/onboarding" />}>
+                    <Plus className="size-4" />
+                    Create organization
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

@@ -88,7 +88,10 @@ export function DashboardShell({ children, organizations, activeOrganizationId }
                         <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">JD</div>
                     </div>
                 </header>
-                <main className="min-h-[calc(100vh-5rem)] p-5 md:p-8">{children}</main>
+                {/* Remount page trees when the active org changes so client state (forms, etc.) picks up fresh server data after router.refresh(). */}
+                <main key={activeOrganizationId ?? 'none'} className="min-h-[calc(100vh-5rem)] p-5 md:p-8">
+                    {children}
+                </main>
             </div>
         </div>
     );

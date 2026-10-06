@@ -9,13 +9,8 @@ type SetActiveOrgInput = {
     organizationSlug?: string;
 };
 
-export async function setActiveOrg(body: SetActiveOrgInput) {
-    const { data, error, response } = await setActiveOrganizationApi({
-        body: {
-            organizationId: body.organizationId as never,
-            organizationSlug: body.organizationSlug,
-        },
-    });
+export async function setActiveOrg({ organizationId, organizationSlug }: SetActiveOrgInput) {
+    const { data, error, response } = await setActiveOrganizationApi({ body: { organizationId: organizationId as never, organizationSlug } });
     if (error) throw new Error(errorMessage(error, 'Set active organization failed.'));
     if (response) await applyUpstreamCookies(response);
     return data;
