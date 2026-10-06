@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { auth as authInstance } from '@parishbooks/iam';
 import { AuthService as BetterAuthService } from '@thallesp/nestjs-better-auth';
 import { isAPIError } from 'better-auth/api';
@@ -53,5 +53,25 @@ export class OrganizationService {
         const organization = await this.auth.api.setActiveOrganization({ body, headers });
         await this.remintAccessToken(sessionToken, response);
         return organization;
+    }
+
+    async listOrganizations(sessionToken: string) {
+        const headers = Utils.getHeader(sessionToken);
+        const organizations = await this.auth.api.listOrganizations({ headers });
+        return organizations;
+    }
+
+    async getOrganization(organizationId: string, sessionToken: string) {
+        const headers = Utils.getHeader(sessionToken);
+        const organization = await this.auth.api.getOrganization({ headers, query: { organizationId } });
+        if (!organization) throw new NotFoundException('Organization not found');
+        const organizationProfile = await this.getOrganizationProfile(organizationId);
+        return { ...organization, profile: organizationProfile };
+    }
+
+    async getOrganizationProfile(organizationId: string) {
+        const organizationProfile = await this.organizationProfileRepository.findOne({ where: { organizationId } });
+        if (!organizationProfile) throw new NotFoundException('Organization profile not found');
+        return organizationProfile;
     }
 }

@@ -1,11 +1,13 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiBody,
     ApiCookieAuth,
     ApiCreatedResponse,
+    ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiParam,
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -20,6 +22,37 @@ import { OrganizationService } from './organization.service';
 @Controller('organization')
 export class OrganizationController {
     constructor(private readonly organizationService: OrganizationService) {}
+
+    @Get()
+    @ApiOperation({ operationId: 'listOrganizations', summary: 'List organizations for the current user' })
+    @ApiCookieAuth(SESSION_TOKEN_NAME)
+    @ApiOkResponse({ description: 'Organizations the current user belongs to' })
+    @ApiUnauthorizedResponse({ type: ErrorResponseDto })
+    async listOrganizations(@Token('session') sessionToken: string) {
+        return this.organizationService.listOrganizations(sessionToken);
+    }
+
+    @Get(':organizationId/profile')
+    @ApiOperation({ operationId: 'getOrganizationProfile', summary: 'Get an organization profile' })
+    @ApiCookieAuth(SESSION_TOKEN_NAME)
+    @ApiParam({ name: 'organizationId', description: 'Organization id' })
+    @ApiOkResponse({ description: 'Organization profile' })
+    @ApiNotFoundResponse({ type: ErrorResponseDto })
+    @ApiUnauthorizedResponse({ type: ErrorResponseDto })
+    async getOrganizationProfile(@Param('organizationId') organizationId: string) {
+        return this.organizationService.getOrganizationProfile(organizationId);
+    }
+
+    @Get(':organizationId')
+    @ApiOperation({ operationId: 'getOrganization', summary: 'Get an organization with its profile' })
+    @ApiCookieAuth(SESSION_TOKEN_NAME)
+    @ApiParam({ name: 'organizationId', description: 'Organization id' })
+    @ApiOkResponse({ description: 'Organization with profile' })
+    @ApiNotFoundResponse({ type: ErrorResponseDto })
+    @ApiUnauthorizedResponse({ type: ErrorResponseDto })
+    async getOrganization(@Param('organizationId') organizationId: string, @Token('session') sessionToken: string) {
+        return this.organizationService.getOrganization(organizationId, sessionToken);
+    }
 
     @Post()
     @ApiOperation({ operationId: 'createOrganization', summary: 'Create an organization and profile' })
