@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { signOut as apiSignOut } from '@/lib/api-client';
+import { signOutApi } from '@/lib/api-client';
 import { deleteCookie } from '@/lib/cookies';
 import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME, SESSION_TOKEN_NAME } from '@/lib/session/constants';
 
@@ -11,7 +11,7 @@ async function clearAuthCookies(): Promise<void> {
 
 export async function signOut() {
     try {
-        await apiSignOut({ signal: AbortSignal.timeout(5_000) });
+        await signOutApi({ signal: AbortSignal.timeout(5_000) });
     } catch {
         /* clear local cookies and redirect anyway */
     }

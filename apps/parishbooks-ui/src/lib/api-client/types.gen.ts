@@ -225,6 +225,26 @@ export type ResetPasswordResponses = {
 
 export type ResetPasswordResponse = ResetPasswordResponses[keyof ResetPasswordResponses];
 
+export type ListOrganizationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/organization';
+};
+
+export type ListOrganizationsErrors = {
+    401: ErrorResponseDto;
+};
+
+export type ListOrganizationsError = ListOrganizationsErrors[keyof ListOrganizationsErrors];
+
+export type ListOrganizationsResponses = {
+    /**
+     * Organizations the current user belongs to
+     */
+    200: unknown;
+};
+
 export type CreateOrganizationData = {
     body: CreateOrganizationDto;
     path?: never;
@@ -244,6 +264,58 @@ export type CreateOrganizationResponses = {
      * Organization profile created
      */
     201: unknown;
+};
+
+export type GetOrganizationProfileData = {
+    body?: never;
+    path: {
+        /**
+         * Organization id
+         */
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/v1/organization/{organizationId}/profile';
+};
+
+export type GetOrganizationProfileErrors = {
+    401: ErrorResponseDto;
+    404: ErrorResponseDto;
+};
+
+export type GetOrganizationProfileError = GetOrganizationProfileErrors[keyof GetOrganizationProfileErrors];
+
+export type GetOrganizationProfileResponses = {
+    /**
+     * Organization profile
+     */
+    200: unknown;
+};
+
+export type GetOrganizationData = {
+    body?: never;
+    path: {
+        /**
+         * Organization id
+         */
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/v1/organization/{organizationId}';
+};
+
+export type GetOrganizationErrors = {
+    401: ErrorResponseDto;
+    404: ErrorResponseDto;
+};
+
+export type GetOrganizationError = GetOrganizationErrors[keyof GetOrganizationErrors];
+
+export type GetOrganizationResponses = {
+    /**
+     * Organization with profile
+     */
+    200: unknown;
 };
 
 export type SetActiveOrganizationData = {
