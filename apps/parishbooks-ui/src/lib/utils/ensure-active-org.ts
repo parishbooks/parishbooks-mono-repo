@@ -2,7 +2,7 @@ import 'server-only';
 
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { loadWorkspaceOrganizations } from './load-workspace-organizations';
+import { loadWorkspaceOrganizations } from '@/lib/utils/load-workspace-organizations';
 
 /**
  * If the session active org does not match the URL tenant, bounce through the

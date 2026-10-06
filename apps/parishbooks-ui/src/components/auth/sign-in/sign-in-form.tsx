@@ -8,7 +8,8 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, FormError, FormStatus, PasswordToggle, Submit } from '@/components/auth/shared';
-import { destinationForRedirect, signIn } from '@/lib/actions/auth';
+import { signIn } from '@/lib/actions/auth';
+import { destinationForRedirect } from '@/lib/utils/redirect';
 import { signInDtoSchema, type SignInDto } from '@/lib/zod';
 
 export function SignInForm() {

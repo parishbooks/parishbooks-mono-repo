@@ -8,7 +8,8 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, Back, FormError, Submit } from '@/components/auth/shared';
-import { forgotPassword, pathForRedirect } from '@/lib/actions/auth';
+import { forgotPassword } from '@/lib/actions/auth';
+import { pathForRedirect } from '@/lib/utils/redirect';
 import { forgotPasswordDtoSchema, type ForgotPasswordDto } from '@/lib/zod';
 
 export function ForgotPasswordForm() {

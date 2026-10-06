@@ -7,7 +7,8 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, FormError, PasswordToggle, Submit } from '@/components/auth/shared';
-import { pathForRedirect, signUp } from '@/lib/actions/auth';
+import { signUp } from '@/lib/actions/auth';
+import { pathForRedirect } from '@/lib/utils/redirect';
 import { signUpDtoSchema, type SignUpDto } from '@/lib/zod';
 
 export function SignUpForm() {

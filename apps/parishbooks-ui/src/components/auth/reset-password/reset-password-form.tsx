@@ -8,7 +8,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@parishbooks/design-system/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
 import { authInputClassName, Back, FormError, Submit } from '@/components/auth/shared';
-import { pathForRedirect, resetPassword } from '@/lib/actions/auth';
+import { resetPassword } from '@/lib/actions/auth';
+import { pathForRedirect } from '@/lib/utils/redirect';
 import { resetPasswordDtoSchema, type ResetPasswordDto } from '@/lib/zod';
 
 export function ResetPasswordForm({ email }: { email: string }) {

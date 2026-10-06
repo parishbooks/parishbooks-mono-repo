@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { setActiveOrg } from '@/lib/actions/org/set-active-org';
-import type { WorkspaceOrganization, WorkspaceOrganizations } from '@/lib/actions/org/load-workspace-organizations';
+import type { WorkspaceOrganization, WorkspaceOrganizations } from '@/lib/utils/load-workspace-organizations';
 import { replaceDashboardOrgSlug } from '@/lib/dashboard/paths';
 
 type OrgContextValue = {
