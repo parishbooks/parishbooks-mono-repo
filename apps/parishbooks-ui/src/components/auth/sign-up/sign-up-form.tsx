@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
-import { authInputClassName, PasswordToggle, Submit } from '@/components/auth/shared';
+import { authInputClassName, FormError, PasswordToggle, Submit } from '@/components/auth/shared';
 import { pathForRedirect, signUp } from '@/lib/actions/auth';
 import { signUpDtoSchema, type SignUpDto } from '@/lib/zod';
 
@@ -35,11 +35,7 @@ export function SignUpForm() {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
-                {formError ? (
-                    <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-                        {formError}
-                    </p>
-                ) : null}
+                <FormError>{formError}</FormError>
                 <FormField
                     control={form.control}
                     name="name"

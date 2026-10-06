@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
-import { authInputClassName, Back, Submit } from '@/components/auth/shared';
+import { authInputClassName, Back, FormError, Submit } from '@/components/auth/shared';
 import { pathForRedirect, resetPassword } from '@/lib/actions/auth';
 import { resetPasswordDtoSchema, type ResetPasswordDto } from '@/lib/zod';
 
@@ -36,9 +36,7 @@ export function ResetPasswordForm({ email }: { email: string }) {
     if (!email) {
         return (
             <>
-                <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-                    This reset link is missing an email. Request a new password reset.
-                </p>
+                <FormError>This reset link is missing an email. Request a new password reset.</FormError>
                 <Back href="/forgot-password" />
             </>
         );
@@ -48,11 +46,7 @@ export function ResetPasswordForm({ email }: { email: string }) {
         <>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
-                    {formError ? (
-                        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-                            {formError}
-                        </p>
-                    ) : null}
+                    <FormError>{formError}</FormError>
                     <p className="text-sm text-muted-foreground">
                         Enter the code sent to <span className="font-medium text-foreground">{email}</span>.
                     </p>

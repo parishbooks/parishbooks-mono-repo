@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient, createConfig } from '@/lib/api-client/client';
 import { refreshAccessTokenApi } from '@/lib/api-client';
-import { isAccessTokenValid, svcBaseUrl } from '@/lib/auth/verify-access-token';
-import { signInPath } from '@/lib/auth/sign-in-path';
+import { isAccessTokenValid, svcBaseUrl } from '@/lib/security/verify-access-token';
+import { signInPath } from '@/lib/security/sign-in-path';
 import { AUTH_COOKIE_NAMES, hasAuthCookies } from '@/lib/session/auth-cookies';
 import { ACCESS_TOKEN_COOKIE_NAME } from '@/lib/session/constants';
 

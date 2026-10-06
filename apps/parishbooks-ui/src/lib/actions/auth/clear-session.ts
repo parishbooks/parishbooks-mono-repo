@@ -3,7 +3,7 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { deleteCookie } from '@/lib/cookies';
-import { signInPath } from '@/lib/auth/sign-in-path';
+import { signInPath } from '@/lib/security/sign-in-path';
 import { AUTH_COOKIE_NAMES } from '@/lib/session/auth-cookies';
 
 export async function clearAuthCookies(): Promise<void> {

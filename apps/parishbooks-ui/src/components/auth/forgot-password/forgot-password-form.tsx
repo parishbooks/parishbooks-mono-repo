@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
-import { authInputClassName, Back, Submit } from '@/components/auth/shared';
+import { authInputClassName, Back, FormError, Submit } from '@/components/auth/shared';
 import { forgotPassword, pathForRedirect } from '@/lib/actions/auth';
 import { forgotPasswordDtoSchema, type ForgotPasswordDto } from '@/lib/zod';
 
@@ -33,11 +33,7 @@ export function ForgotPasswordForm() {
         <>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
-                    {formError ? (
-                        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-                            {formError}
-                        </p>
-                    ) : null}
+                    <FormError>{formError}</FormError>
                     <FormField
                         control={form.control}
                         name="email"

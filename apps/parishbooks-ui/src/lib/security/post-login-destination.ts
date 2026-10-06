@@ -1,4 +1,4 @@
-import { safeNextPath } from '@/lib/auth/safe-next-path';
+import { safeNextPath } from '@/lib/security/safe-next-path';
 
 export type PostLoginUser = {
     email: string;

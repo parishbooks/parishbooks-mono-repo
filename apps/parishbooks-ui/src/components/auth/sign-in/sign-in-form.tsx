@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
-import { authInputClassName, PasswordToggle, Submit } from '@/components/auth/shared';
+import { authInputClassName, FormError, FormStatus, PasswordToggle, Submit } from '@/components/auth/shared';
 import { destinationForRedirect, signIn } from '@/lib/actions/auth';
 import { signInDtoSchema, type SignInDto } from '@/lib/zod';
 
@@ -41,21 +41,9 @@ export function SignInForm() {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
-                {verified ? (
-                    <p className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-foreground" role="status">
-                        Email verified. Sign in to continue.
-                    </p>
-                ) : null}
-                {reset ? (
-                    <p className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-foreground" role="status">
-                        Password updated. Sign in with your new password.
-                    </p>
-                ) : null}
-                {formError ? (
-                    <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-                        {formError}
-                    </p>
-                ) : null}
+                {verified ? <FormStatus>Email verified. Sign in to continue.</FormStatus> : null}
+                {reset ? <FormStatus>Password updated. Sign in with your new password.</FormStatus> : null}
+                <FormError>{formError}</FormError>
                 <FormField
                     control={form.control}
                     name="email"

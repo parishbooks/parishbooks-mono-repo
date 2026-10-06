@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@parishbooks/design-system/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
-import { Back, Submit } from '@/components/auth/shared';
+import { Back, FormError, FormStatus, Submit } from '@/components/auth/shared';
 import { destinationForRedirect, sendEmailOtp, verifyEmailOtp } from '@/lib/actions/auth';
 import { verifyEmailDtoSchema, type VerifyEmailDto } from '@/lib/zod';
 
@@ -58,16 +58,8 @@ export function VerifyEmailForm({ email }: { email: string }) {
         <>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center gap-6">
-                    {formError ? (
-                        <p className="w-full rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-                            {formError}
-                        </p>
-                    ) : null}
-                    {resendMessage ? (
-                        <p className="w-full rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-foreground" role="status">
-                            {resendMessage}
-                        </p>
-                    ) : null}
+                    <FormError className="w-full">{formError}</FormError>
+                    <FormStatus className="w-full">{resendMessage}</FormStatus>
                     <FormField
                         control={form.control}
                         name="otp"

@@ -1,5 +1,5 @@
 import type { RedirectTo } from '@/lib/api-client';
-import { safeNextPath } from '@/lib/auth/safe-next-path';
+import { safeNextPath } from '@/lib/security/safe-next-path';
 
 export function pathForRedirect(redirectTo: RedirectTo, email?: string): string {
     if (redirectTo === 'dashboard') return '/dashboard';

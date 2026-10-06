@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient, createConfig } from '@/lib/api-client/client';
 import { setActiveOrganizationApi } from '@/lib/api-client';
-import { safeNextPath } from '@/lib/auth/safe-next-path';
-import { svcBaseUrl } from '@/lib/auth/verify-access-token';
+import { safeNextPath } from '@/lib/security/safe-next-path';
+import { svcBaseUrl } from '@/lib/security/verify-access-token';
 
 const activateClient = createClient(createConfig({ baseUrl: svcBaseUrl }));
 

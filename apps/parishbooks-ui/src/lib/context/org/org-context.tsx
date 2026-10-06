@@ -41,19 +41,7 @@ export function OrgProvider({ initial, orgSlug, children }: OrgProviderProps) {
         setOrganizations(initial.organizations);
     }, [initial.organizations]);
 
-    return (
-        <OrgContext.Provider
-            value={{
-                organizations,
-                orgSlug,
-                activeOrganizationId,
-                activeOrganization,
-                switchOrg,
-            }}
-        >
-            {children}
-        </OrgContext.Provider>
-    );
+    return <OrgContext.Provider value={{ organizations, orgSlug, activeOrganizationId, activeOrganization, switchOrg }}>{children}</OrgContext.Provider>;
 }
 
 export function useOrg(): OrgContextValue {

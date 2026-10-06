@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Noto_Sans, Roboto } from 'next/font/google';
 import '@parishbooks/design-system/styles/globals.css';
 import { cn } from '@parishbooks/design-system/utils';
 import { ThemeProvider } from '@parishbooks/design-system/theme-provider';
-import '@/lib/auth/register-auth-interceptors';
+import '@/lib/security/register-auth-interceptors';
 
 const notoSansHeading = Noto_Sans({ subsets: ['latin'], variable: '--font-heading' });
 const roboto = Roboto({ subsets: ['latin'], variable: '--font-sans' });

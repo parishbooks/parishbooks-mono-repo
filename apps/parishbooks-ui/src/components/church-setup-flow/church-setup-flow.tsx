@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { redirect } from 'next/navigation';
 import { createOrg, setActiveOrg } from '@/lib/actions/org';
-import { slugFromName, isValidChurchName, isValidSlug } from '@/lib/org/slug';
+import { slugFromName, isValidChurchName, isValidSlug } from '@/lib/utils/slug';
 import {
     COUNTRY_DEFAULTS,
     DEFAULT_COUNTRY,

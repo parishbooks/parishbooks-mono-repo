@@ -1,6 +1,6 @@
 import { clearSession } from '@/lib/actions/auth/clear-session';
-import { isPublicAuthApiRequest } from '@/lib/auth/public-auth-api';
-import { refreshAccessTokenOnce } from '@/lib/auth/refresh-access-token';
+import { isPublicAuthApiRequest } from '@/lib/security/public-auth-api';
+import { refreshAccessTokenOnce } from '@/lib/security/refresh-access-token';
 import { client } from '@/lib/api-client/client.gen';
 
 let registered = false;

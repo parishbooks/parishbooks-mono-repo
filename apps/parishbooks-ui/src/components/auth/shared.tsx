@@ -4,6 +4,25 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@parishbooks/design-system/ui/button';
+import { cn } from '@parishbooks/design-system/utils';
+
+export function FormStatus({ children, className }: { children?: ReactNode; className?: string }) {
+    if (!children) return null;
+    return (
+        <p className={cn('rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-foreground', className)} role="status">
+            {children}
+        </p>
+    );
+}
+
+export function FormError({ children, className }: { children?: ReactNode; className?: string }) {
+    if (!children) return null;
+    return (
+        <p className={cn('rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive', className)} role="alert">
+            {children}
+        </p>
+    );
+}
 
 export function Testimonial() {
     return (

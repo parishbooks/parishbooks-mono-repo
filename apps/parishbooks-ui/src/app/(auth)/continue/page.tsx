@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { resolvePostLoginRedirect } from '@/lib/auth/resolve-post-login-redirect';
+import { resolvePostLoginRedirect } from '@/lib/security/resolve-post-login-redirect';
 
 type ContinuePageProps = {
     searchParams: Promise<{ next?: string }>;
