@@ -2,23 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-    BarChart3,
-    Bell,
-    BookOpen,
-    CalendarDays,
-    ChevronDown,
-    CircleDollarSign,
-    LayoutDashboard,
-    Menu,
-    Megaphone,
-    Search,
-    Settings,
-    Users,
-    X,
-} from 'lucide-react';
+import { BarChart3, Bell, BookOpen, CalendarDays, CircleDollarSign, LayoutDashboard, Menu, Megaphone, Search, Settings, Users, X } from 'lucide-react';
 import { useState } from 'react';
 import { SignOutButton } from '@/components/auth/sign-out-button';
+import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
+import { WorkspaceSwitcher } from './workspace-switcher';
 
 const nav = [
     ['Overview', '/dashboard', LayoutDashboard],
@@ -30,7 +18,13 @@ const nav = [
     ['Reports', '/dashboard/reports', BarChart3],
 ] as const;
 
-export function DashboardShell({ children }: { children: React.ReactNode }) {
+type DashboardShellProps = {
+    children: React.ReactNode;
+    organizations: WorkspaceOrganization[];
+    activeOrganizationId: string | null;
+};
+
+export function DashboardShell({ children, organizations, activeOrganizationId }: DashboardShellProps) {
     const pathname = usePathname();
     const [open, setOpen] = useState(false);
     return (
@@ -79,11 +73,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                     <button className="lg:hidden" onClick={() => setOpen(true)} aria-label="Open navigation">
                         <Menu />
                     </button>
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                        <span className="hidden text-muted-foreground sm:inline">Workspace /</span>
-                        <span>Overview</span>
-                        <ChevronDown className="size-4 text-muted-foreground" />
-                    </div>
+                    <WorkspaceSwitcher organizations={organizations} activeOrganizationId={activeOrganizationId} />
                     <div className="ml-auto flex items-center gap-3">
                         <div className="hidden h-10 w-64 items-center gap-2 rounded-xl border bg-background px-3 md:flex">
                             <Search className="size-4 text-muted-foreground" />
