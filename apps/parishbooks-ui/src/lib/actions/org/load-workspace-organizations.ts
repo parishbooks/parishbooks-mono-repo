@@ -4,7 +4,8 @@ import { getCurrentSessionApi, listOrganizationsApi } from '@/lib/api-client';
 export type WorkspaceOrganization = {
     id: string;
     name: string;
-    slug?: string;
+    /** Prefer Better Auth slug; falls back to id for routing when slug is missing. */
+    slug: string;
 };
 
 export type WorkspaceOrganizations = {
@@ -30,7 +31,7 @@ function organizationsFromResponse(data: unknown): WorkspaceOrganization[] {
         organizations.push({
             id: org.id,
             name: org.name,
-            ...(typeof org.slug === 'string' ? { slug: org.slug } : {}),
+            slug: typeof org.slug === 'string' && org.slug.length > 0 ? org.slug : org.id,
         });
     }
     return organizations;

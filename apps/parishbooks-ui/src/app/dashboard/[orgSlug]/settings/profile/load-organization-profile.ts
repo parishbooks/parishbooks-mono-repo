@@ -1,8 +1,10 @@
-import { getCurrentSessionApi, getOrganizationApi } from '@/lib/api-client';
+import { getOrganizationApi } from '@/lib/api-client';
+import { loadWorkspaceOrganizations } from '@/lib/actions/org/load-workspace-organizations';
 import type { WorkspaceCountry, WorkspaceCurrency } from '@/components/church-setup-flow/constants';
 import type { OrganizationProfileFormValues } from './organization-profile-form';
 
 export type LoadedOrganizationProfile = {
+    organizationId: string;
     defaults: OrganizationProfileFormValues;
     updatedAt: string | null;
 };
@@ -15,14 +17,7 @@ function isCurrency(value: unknown): value is WorkspaceCurrency {
     return value === 'INR' || value === 'USD';
 }
 
-function activeOrganizationIdFromSession(data: unknown): string | null {
-    if (!data || typeof data !== 'object') return null;
-    const session = (data as { session?: { activeOrganizationId?: unknown } }).session;
-    const id = session?.activeOrganizationId;
-    return typeof id === 'string' && id.length > 0 ? id : null;
-}
-
-function organizationProfileFromResponse(data: unknown): LoadedOrganizationProfile | null {
+function organizationProfileFromResponse(organizationId: string, data: unknown): LoadedOrganizationProfile | null {
     if (!data || typeof data !== 'object') return null;
     const org = data as {
         name?: unknown;
@@ -34,6 +29,7 @@ function organizationProfileFromResponse(data: unknown): LoadedOrganizationProfi
     if (typeof profile.timezone !== 'string' || !profile.timezone) return null;
     const updatedAt = typeof profile.updatedAt === 'string' ? profile.updatedAt : profile.updatedAt instanceof Date ? profile.updatedAt.toISOString() : null;
     return {
+        organizationId,
         defaults: {
             organizationName: org.name,
             country: profile.country,
@@ -44,12 +40,12 @@ function organizationProfileFromResponse(data: unknown): LoadedOrganizationProfi
     };
 }
 
-export async function loadOrganizationProfile(): Promise<LoadedOrganizationProfile | null> {
-    const { data: session, error: sessionError } = await getCurrentSessionApi();
-    if (sessionError || !session) return null;
-    const organizationId = activeOrganizationIdFromSession(session);
-    if (!organizationId) return null;
-    const { data: organization, error } = await getOrganizationApi({ path: { organizationId } });
-    if (error || !organization) return null;
-    return organizationProfileFromResponse(organization);
+/** Load profile for the org identified by the URL slug. */
+export async function loadOrganizationProfile(orgSlug: string): Promise<LoadedOrganizationProfile | null> {
+    const workspace = await loadWorkspaceOrganizations();
+    const organization = workspace?.organizations.find((org) => org.slug === orgSlug);
+    if (!organization) return null;
+    const { data, error } = await getOrganizationApi({ path: { organizationId: organization.id } });
+    if (error || !data) return null;
+    return organizationProfileFromResponse(organization.id, data);
 }

@@ -1,16 +1,10 @@
 'use client';
 
 import { BarChart3, CalendarDays, CircleDollarSign, FileText, Megaphone, Users } from 'lucide-react';
-import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
 import { OrganizationsCard } from './organizations-card';
 import { StatCard } from './stat-card';
 
-type DashboardOverviewProps = {
-    organizations: WorkspaceOrganization[];
-    activeOrganizationId: string | null;
-};
-
-export function DashboardOverview({ organizations, activeOrganizationId }: DashboardOverviewProps) {
+export function DashboardOverview() {
     return (
         <div className="mx-auto max-w-7xl">
             <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -28,7 +22,7 @@ export function DashboardOverview({ organizations, activeOrganizationId }: Dashb
                 <StatCard label="Open campaigns" value="0" note="Create your first campaign" icon={Megaphone} />
             </div>
             <div className="mt-6">
-                <OrganizationsCard organizations={organizations} activeOrganizationId={activeOrganizationId} />
+                <OrganizationsCard />
             </div>
             <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
                 <div className="rounded-2xl border bg-card p-6">

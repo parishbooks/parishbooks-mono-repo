@@ -1,10 +1,12 @@
 import { redirect } from 'next/navigation';
-import { DashboardOverview } from '@/components/dashboard-shell';
 import { loadWorkspaceOrganizations } from '@/lib/actions/org/load-workspace-organizations';
+import { dashboardPath, defaultOrgSlug } from '@/lib/dashboard/paths';
 
-export default async function DashboardPage() {
+/** `/dashboard` → `/dashboard/{orgSlug}` for the active (or first) organization. */
+export default async function DashboardIndexPage() {
     const workspace = await loadWorkspaceOrganizations();
     if (!workspace || workspace.organizations.length === 0) redirect('/onboarding');
-
-    return <DashboardOverview organizations={workspace.organizations} activeOrganizationId={workspace.activeOrganizationId} />;
+    const slug = defaultOrgSlug(workspace.organizations, workspace.activeOrganizationId);
+    if (!slug) redirect('/onboarding');
+    redirect(dashboardPath(slug));
 }

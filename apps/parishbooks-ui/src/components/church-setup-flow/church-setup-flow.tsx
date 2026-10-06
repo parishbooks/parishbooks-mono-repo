@@ -74,7 +74,7 @@ export function ChurchSetupFlow() {
             setSubmitting(false);
             return;
         }
-        redirect('/dashboard');
+        redirect(`/dashboard/${slug}`);
     };
 
     return (

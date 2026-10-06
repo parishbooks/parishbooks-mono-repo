@@ -1,16 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
 import { Building2, Check, Plus } from 'lucide-react';
-import { setActiveOrg } from '@/lib/actions/org/set-active-org';
-import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
-
-type OrganizationsCardProps = {
-    organizations: WorkspaceOrganization[];
-    activeOrganizationId: string | null;
-};
+import { useOrg } from '@/lib/context/org';
 
 function orgInitial(name: string): string {
     const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -21,23 +13,8 @@ function orgInitial(name: string): string {
     return `${first[0] ?? ''}${second[0] ?? ''}`.toUpperCase();
 }
 
-export function OrganizationsCard({ organizations, activeOrganizationId }: OrganizationsCardProps) {
-    const router = useRouter();
-    const [pendingId, setPendingId] = useState<string | null>(null);
-    const [isPending, startTransition] = useTransition();
-
-    function selectOrganization(organizationId: string) {
-        if (organizationId === activeOrganizationId || isPending) return;
-        setPendingId(organizationId);
-        startTransition(async () => {
-            try {
-                await setActiveOrg({ organizationId });
-                router.refresh();
-            } finally {
-                setPendingId(null);
-            }
-        });
-    }
+export function OrganizationsCard() {
+    const { organizations, activeOrganizationId, switchOrg } = useOrg();
 
     return (
         <div>
@@ -55,14 +32,12 @@ export function OrganizationsCard({ organizations, activeOrganizationId }: Organ
             <ul className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {organizations.map((org) => {
                     const isActive = org.id === activeOrganizationId;
-                    const isSelecting = pendingId === org.id;
                     return (
                         <li key={org.id}>
                             <button
                                 type="button"
-                                disabled={isPending}
-                                onClick={() => selectOrganization(org.id)}
-                                className={`flex h-full w-full flex-col gap-4 rounded-2xl border bg-card p-4 text-left transition-colors disabled:opacity-60 ${
+                                onClick={() => switchOrg(org.id)}
+                                className={`flex h-full w-full flex-col gap-4 rounded-2xl border bg-card p-4 text-left transition-colors ${
                                     isActive ? 'border-primary/40 bg-primary/5' : 'hover:bg-accent'
                                 }`}
                             >
@@ -74,10 +49,10 @@ export function OrganizationsCard({ organizations, activeOrganizationId }: Organ
                                     >
                                         {orgInitial(org.name)}
                                     </span>
-                                    {isActive || isSelecting ? (
+                                    {isActive ? (
                                         <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
                                             <Check className="size-3.5" />
-                                            {isSelecting ? 'Switching…' : 'Active'}
+                                            Active
                                         </span>
                                     ) : (
                                         <Building2 className="size-4 shrink-0 text-muted-foreground" />
@@ -85,7 +60,7 @@ export function OrganizationsCard({ organizations, activeOrganizationId }: Organ
                                 </div>
                                 <span className="min-w-0">
                                     <span className="block truncate text-sm font-medium">{org.name}</span>
-                                    {org.slug ? <span className="mt-0.5 block truncate text-xs text-muted-foreground">/{org.slug}</span> : null}
+                                    <span className="mt-0.5 block truncate text-xs text-muted-foreground">/{org.slug}</span>
                                 </span>
                             </button>
                         </li>

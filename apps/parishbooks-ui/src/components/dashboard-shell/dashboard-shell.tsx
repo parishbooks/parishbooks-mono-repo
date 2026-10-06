@@ -5,35 +5,34 @@ import { usePathname } from 'next/navigation';
 import { BarChart3, Bell, BookOpen, CalendarDays, CircleDollarSign, LayoutDashboard, Menu, Megaphone, Search, Settings, Users, X } from 'lucide-react';
 import { useState } from 'react';
 import { SignOutButton } from '@/components/auth/sign-out-button';
-import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
+import { useOrg } from '@/lib/context/org';
+import { dashboardPath } from '@/lib/dashboard/paths';
 import { WorkspaceSwitcher } from './workspace-switcher';
 
-const nav = [
-    ['Overview', '/dashboard', LayoutDashboard],
-    ['Giving', '/dashboard/giving', CircleDollarSign],
-    ['Members', '/dashboard/members', Users],
-    ['Funds & Ledger', '/dashboard/funds-ledger', BookOpen],
-    ['Events', '/dashboard/events', CalendarDays],
-    ['Campaigns', '/dashboard/campaigns', Megaphone],
-    ['Reports', '/dashboard/reports', BarChart3],
-] as const;
-
-type DashboardShellProps = {
-    children: React.ReactNode;
-    organizations: WorkspaceOrganization[];
-    activeOrganizationId: string | null;
-};
-
-export function DashboardShell({ children, organizations, activeOrganizationId }: DashboardShellProps) {
+export function DashboardShell({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const { orgSlug } = useOrg();
     const [open, setOpen] = useState(false);
+
+    const nav = [
+        ['Overview', dashboardPath(orgSlug), LayoutDashboard],
+        ['Giving', dashboardPath(orgSlug, 'giving'), CircleDollarSign],
+        ['Members', dashboardPath(orgSlug, 'members'), Users],
+        ['Funds & Ledger', dashboardPath(orgSlug, 'funds-ledger'), BookOpen],
+        ['Events', dashboardPath(orgSlug, 'events'), CalendarDays],
+        ['Campaigns', dashboardPath(orgSlug, 'campaigns'), Megaphone],
+        ['Reports', dashboardPath(orgSlug, 'reports'), BarChart3],
+    ] as const;
+
+    const settingsHref = dashboardPath(orgSlug, 'settings/profile');
+
     return (
         <div className="min-h-screen bg-muted/30 text-foreground">
             <aside
                 className={`fixed inset-y-0 left-0 z-40 flex h-full w-72 flex-col border-r bg-card p-5 transition-transform lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 <div className="flex items-center justify-between px-2 pb-8">
-                    <Link href="/dashboard" className="flex items-center gap-3 font-semibold tracking-tight">
+                    <Link href={dashboardPath(orgSlug)} className="flex items-center gap-3 font-semibold tracking-tight">
                         <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">pb</span>
                         <span className="text-lg">ParishBooks</span>
                     </Link>
@@ -57,9 +56,9 @@ export function DashboardShell({ children, organizations, activeOrganizationId }
                 </nav>
                 <div className="mt-auto flex flex-col gap-1 pt-8">
                     <Link
-                        href="/dashboard/settings/profile"
+                        href={settingsHref}
                         onClick={() => setOpen(false)}
-                        className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium ${pathname.startsWith('/dashboard/settings') ? 'bg-accent text-foreground' : 'text-muted-foreground hover:bg-accent'}`}
+                        className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium ${pathname.startsWith(dashboardPath(orgSlug, 'settings')) ? 'bg-accent text-foreground' : 'text-muted-foreground hover:bg-accent'}`}
                     >
                         <Settings className="size-4" />
                         Settings
@@ -73,7 +72,7 @@ export function DashboardShell({ children, organizations, activeOrganizationId }
                     <button className="lg:hidden" onClick={() => setOpen(true)} aria-label="Open navigation">
                         <Menu />
                     </button>
-                    <WorkspaceSwitcher organizations={organizations} activeOrganizationId={activeOrganizationId} />
+                    <WorkspaceSwitcher />
                     <div className="ml-auto flex items-center gap-3">
                         <div className="hidden h-10 w-64 items-center gap-2 rounded-xl border bg-background px-3 md:flex">
                             <Search className="size-4 text-muted-foreground" />
@@ -88,10 +87,7 @@ export function DashboardShell({ children, organizations, activeOrganizationId }
                         <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">JD</div>
                     </div>
                 </header>
-                {/* Remount page trees when the active org changes so client state (forms, etc.) picks up fresh server data after router.refresh(). */}
-                <main key={activeOrganizationId ?? 'none'} className="min-h-[calc(100vh-5rem)] p-5 md:p-8">
-                    {children}
-                </main>
+                <main className="min-h-[calc(100vh-5rem)] p-5 md:p-8">{children}</main>
             </div>
         </div>
     );

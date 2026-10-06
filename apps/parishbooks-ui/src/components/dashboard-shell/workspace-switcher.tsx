@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Check, ChevronDown, Plus } from 'lucide-react';
 import {
@@ -13,34 +11,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@parishbooks/design-system/ui/dropdown-menu';
-import { setActiveOrg } from '@/lib/actions/org/set-active-org';
-import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
+import { useOrg } from '@/lib/context/org';
 
-type WorkspaceSwitcherProps = {
-    organizations: WorkspaceOrganization[];
-    activeOrganizationId: string | null;
-};
-
-export function WorkspaceSwitcher({ organizations, activeOrganizationId }: WorkspaceSwitcherProps) {
-    const router = useRouter();
-    const [pendingId, setPendingId] = useState<string | null>(null);
-    const [isPending, startTransition] = useTransition();
-
-    const active = organizations.find((org) => org.id === activeOrganizationId) ?? organizations[0];
-    const label = active?.name ?? 'Select organization';
-
-    function selectOrganization(organizationId: string) {
-        if (organizationId === activeOrganizationId || isPending) return;
-        setPendingId(organizationId);
-        startTransition(async () => {
-            try {
-                await setActiveOrg({ organizationId });
-                router.refresh();
-            } finally {
-                setPendingId(null);
-            }
-        });
-    }
+export function WorkspaceSwitcher() {
+    const { organizations, activeOrganizationId, activeOrganization, switchOrg } = useOrg();
+    const label = activeOrganization?.name ?? 'Select organization';
 
     return (
         <DropdownMenu>
@@ -53,12 +28,11 @@ export function WorkspaceSwitcher({ organizations, activeOrganizationId }: Works
                 <DropdownMenuGroup>
                     <DropdownMenuLabel>Organizations</DropdownMenuLabel>
                     {organizations.map((org) => {
-                        const isActive = org.id === (activeOrganizationId ?? active?.id);
-                        const isSelecting = pendingId === org.id;
+                        const isActive = org.id === activeOrganizationId;
                         return (
-                            <DropdownMenuItem key={org.id} disabled={isPending} onClick={() => selectOrganization(org.id)}>
+                            <DropdownMenuItem key={org.id} onClick={() => switchOrg(org.id)}>
                                 <span className="flex-1 truncate">{org.name}</span>
-                                {(isActive || isSelecting) && <Check className="size-4 text-primary" />}
+                                {isActive && <Check className="size-4 text-primary" />}
                             </DropdownMenuItem>
                         );
                     })}

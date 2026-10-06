@@ -122,7 +122,8 @@ tools/                 Generators / workspace tools
 - Session cookies: `pb_access_token`, `pb_refresh_token`, `pb_session_token`
 - Organizations via Better Auth organization plugin; create flow activates the org and remints the access JWT
 - UI calls the API through hey-api (`apps/parishbooks-ui/src/lib/api-client`, generated) and server actions
-- Protected UI routes (`/dashboard`, `/onboarding`) are gated in `apps/parishbooks-ui/src/proxy.ts` (local access-JWT verify; refresh via `POST /api/v1/auth/refresh` when expired)
+- Protected UI routes (`/dashboard/[orgSlug]`, `/onboarding`) are gated in `apps/parishbooks-ui/src/proxy.ts` (local access-JWT verify; refresh via `POST /api/v1/auth/refresh` when expired)
+- Dashboard is multi-tenant by route: `/dashboard/{orgSlug}/...`; switching workspaces navigates between slugs and activates that org for API calls
 
 ## CI
 
