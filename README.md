@@ -126,11 +126,11 @@ tools/                 Generators / workspace tools
 
 ## CI
 
-GitHub Actions (`.github/workflows/ci.yml`) runs on pushes to `main` and on pull requests:
+GitHub Actions (`.github/workflows/ci.yml`) runs on pushes to `main` and on pull requests as three parallel jobs:
 
-1. **Lint** — `nx affected -t lint`
-2. **Test** — `nx affected -t test`
-3. **Build** — `nx affected -t build`
+- **Lint** — `nx affected -t lint`
+- **Test** — `nx affected -t test`
+- **Build** — `nx affected -t build`
 
 Uses Bun and [nx affected](https://nx.dev/ci/features/affected) so only changed projects (and dependents) run.
 
