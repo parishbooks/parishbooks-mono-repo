@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { loadWorkspaceOrganizations } from '@/lib/utils/load-workspace-organizations';
-import { dashboardPath, defaultOrgSlug } from '@/lib/dashboard/paths';
+import { dashboardPath, defaultOrgSlug } from '@/lib/utils/paths';
 
 /** `/dashboard` → `/dashboard/{orgSlug}` for the active (or first) organization. */
 export default async function DashboardIndexPage() {

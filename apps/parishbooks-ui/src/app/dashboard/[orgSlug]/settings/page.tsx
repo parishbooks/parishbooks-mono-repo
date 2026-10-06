@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { dashboardPath } from '@/lib/dashboard/paths';
+import { dashboardPath } from '@/lib/utils/paths';
 
 type SettingsIndexProps = {
     params: Promise<{ orgSlug: string }>;

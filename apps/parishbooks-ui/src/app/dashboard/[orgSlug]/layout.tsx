@@ -3,7 +3,7 @@ import DashboardShell from '@/components/dashboard-shell';
 import { ensureActiveOrganization } from '@/lib/utils/ensure-active-org';
 import { loadWorkspaceOrganizations } from '@/lib/utils/load-workspace-organizations';
 import { OrgProvider } from '@/lib/context/org';
-import { dashboardPath, defaultOrgSlug } from '@/lib/dashboard/paths';
+import { dashboardPath, defaultOrgSlug } from '@/lib/utils/paths';
 
 type OrgLayoutProps = {
     children: React.ReactNode;

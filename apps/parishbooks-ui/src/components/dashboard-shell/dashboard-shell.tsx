@@ -6,7 +6,7 @@ import { BarChart3, Bell, BookOpen, CalendarDays, CircleDollarSign, LayoutDashbo
 import { useState } from 'react';
 import { SignOutButton } from '@/components/auth/sign-out-button';
 import { useOrg } from '@/lib/context/org';
-import { dashboardPath } from '@/lib/dashboard/paths';
+import { dashboardPath } from '@/lib/utils/paths';
 import { WorkspaceSwitcher } from './workspace-switcher';
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {

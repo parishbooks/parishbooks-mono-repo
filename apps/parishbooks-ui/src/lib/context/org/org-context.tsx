@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { usePathname, useRouter } from 'next/navigation';
 import { setActiveOrg } from '@/lib/actions/org/set-active-org';
 import type { WorkspaceOrganization, WorkspaceOrganizations } from '@/lib/utils/load-workspace-organizations';
-import { replaceDashboardOrgSlug } from '@/lib/dashboard/paths';
+import { replaceDashboardOrgSlug } from '@/lib/utils/paths';
 
 type OrgContextValue = {
     organizations: WorkspaceOrganization[];

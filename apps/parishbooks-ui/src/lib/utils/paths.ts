@@ -1,13 +1,10 @@
-/** Build a tenant-scoped dashboard path: `/dashboard/{orgSlug}` or `/dashboard/{orgSlug}/{suffix}`. */
 export function dashboardPath(orgSlug: string, suffix = ''): string {
     const clean = suffix.replace(/^\/+/, '').replace(/\/+$/, '');
     return clean ? `/dashboard/${orgSlug}/${clean}` : `/dashboard/${orgSlug}`;
 }
 
-/** Replace the org slug segment in a `/dashboard/{slug}/...` pathname. */
 export function replaceDashboardOrgSlug(pathname: string, orgSlug: string): string {
     const segments = pathname.split('/');
-    // ['', 'dashboard', '{slug}', ...]
     if (segments[1] !== 'dashboard' || !segments[2]) return dashboardPath(orgSlug);
     segments[2] = orgSlug;
     return segments.join('/') || dashboardPath(orgSlug);
