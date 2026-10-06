@@ -4,3 +4,5 @@
 /.nx/cache
 /.nx/workspace-data
 bun.lock
+**/api-client/**
+**/openapi.json

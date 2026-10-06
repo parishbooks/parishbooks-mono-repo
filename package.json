@@ -10,7 +10,18 @@
         "auth:migrate": "bun nx run @parishbooks/iam:migrate",
         "openapi:generate": "bun nx run @parishbooks/parishbooks-ui:generate-api:from-svc",
         "db:generate": "bun nx run @parishbooks/database:db-generate",
-        "db:migrate": "bun nx run @parishbooks/database:db-migrate"
+        "db:migrate": "bun nx run @parishbooks/database:db-migrate",
+        "prepare": "husky",
+        "lint-staged": "lint-staged"
+    },
+    "lint-staged": {
+        "*.{ts,tsx,js,jsx,mjs,cjs}": [
+            "eslint --fix --max-warnings=0",
+            "prettier --write"
+        ],
+        "*.{json,md,css,yml,yaml}": [
+            "prettier --write"
+        ]
     },
     "private": true,
     "dependencies": {
@@ -112,8 +123,10 @@
         "eslint-plugin-playwright": "^1.6.2",
         "eslint-plugin-react": "^7.35.0",
         "eslint-plugin-react-hooks": "5.0.0",
+        "husky": "^9.1.7",
         "jsdom": "^27.1.0",
         "jsonc-eslint-parser": "^2.1.0",
+        "lint-staged": "^17.6.0",
         "nx": "23.2.1",
         "pino-pretty": "^13.2.0",
         "prettier": "~3.6.2",
