@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@parishbooks/design-system/utils';
-import { setActiveOrg } from '@/lib/actions/org/set-active-org';
-import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
+import type { WorkspaceOrganization } from '@/lib/stub/workspace';
 import { dashboardPath } from '@/lib/utils/paths';
 import { EmptyOrganizations } from './empty-organizations';
 import { OrganizationList } from './organization-list';
@@ -17,20 +16,12 @@ type OrganizationPickerProps = {
 export function OrganizationPicker({ organizations, activeOrganizationId }: OrganizationPickerProps) {
     const router = useRouter();
     const [pendingId, setPendingId] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
     const hasOrganizations = organizations.length > 0;
 
-    async function openOrganization(organization: WorkspaceOrganization) {
+    function openOrganization(organization: WorkspaceOrganization) {
         if (pendingId) return;
-        setError(null);
         setPendingId(organization.id);
-        try {
-            await setActiveOrg({ organizationId: organization.id });
-            router.push(dashboardPath(organization.slug));
-        } catch (cause) {
-            setPendingId(null);
-            setError(cause instanceof Error ? cause.message : 'Could not open this organization.');
-        }
+        router.push(dashboardPath(organization.slug));
     }
 
     return (
@@ -40,7 +31,7 @@ export function OrganizationPicker({ organizations, activeOrganizationId }: Orga
                     organizations={organizations}
                     activeOrganizationId={activeOrganizationId}
                     pendingId={pendingId}
-                    error={error}
+                    error={null}
                     onOpen={openOrganization}
                 />
             ) : (

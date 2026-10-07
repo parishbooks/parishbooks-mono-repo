@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { redirect } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -8,33 +7,16 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@parishbooks/design-system/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
 import { authInputClassName, Back, FormError, Submit } from '@/components/auth/shared';
-import { resetPassword } from '@/lib/actions/auth';
 import { resetPasswordDtoSchema, type ResetPasswordDto } from '@/lib/zod';
 
 export function ResetPasswordForm({ email }: { email: string }) {
-    const [formError, setFormError] = useState<string | null>(null);
-
     const form = useForm<ResetPasswordDto>({
         resolver: zodResolver(resetPasswordDtoSchema),
         defaultValues: { otp: '', password: '', confirmPassword: '' },
     });
 
-    async function onSubmit(values: ResetPasswordDto) {
-        setFormError(null);
-        if (!email) {
-            setFormError('Missing email. Request a new password reset.');
-            return;
-        }
-        const result = await resetPassword({ email, otp: values.otp, password: values.password });
-        if (!result.success) {
-            setFormError(result.error);
-            return;
-        }
-        if (!result.data.redirectTo) {
-            setFormError('Could not finish resetting your password.');
-            return;
-        }
-        redirect(result.data.redirectTo);
+    function onSubmit() {
+        redirect('/sign-in?reset=1');
     }
 
     if (!email) {
@@ -50,7 +32,6 @@ export function ResetPasswordForm({ email }: { email: string }) {
         <>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
-                    <FormError>{formError}</FormError>
                     <p className="text-sm text-muted-foreground">
                         Enter the code sent to <span className="font-medium text-foreground">{email}</span>.
                     </p>

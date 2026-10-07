@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { redirect } from 'next/navigation';
-import { createOrg, setActiveOrg } from '@/lib/actions/org';
 import { slugFromName, isValidChurchName, isValidSlug } from '@/lib/utils/slug';
 import {
     COUNTRY_DEFAULTS,
@@ -24,19 +23,14 @@ export function ChurchSetupFlow() {
     const [country, setCountry] = useState<WorkspaceCountry>(DEFAULT_COUNTRY);
     const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
     const [currency, setCurrency] = useState<WorkspaceCurrency>(DEFAULT_CURRENCY);
-    const [submitting, setSubmitting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     const canContinue = step === 0 ? isValidChurchName(churchName) && isValidSlug(slug) : true;
 
     const next = () => {
         if (!canContinue) return;
-        setError(null);
         setStep((current) => Math.min(current + 1, lastStepIndex));
     };
     const back = () => {
-        if (submitting) return;
-        setError(null);
         setStep((current) => Math.max(current - 1, 0));
     };
 
@@ -62,18 +56,7 @@ export function ChurchSetupFlow() {
         setCurrency(defaults.currency);
     };
 
-    const submit = async () => {
-        if (submitting) return;
-        setSubmitting(true);
-        setError(null);
-        try {
-            await createOrg({ name: churchName, slug, timezone, country, currency });
-            await setActiveOrg({ organizationSlug: slug });
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Create organization failed.');
-            setSubmitting(false);
-            return;
-        }
+    const submit = () => {
         redirect(`/dashboard/${slug}`);
     };
 
@@ -100,8 +83,7 @@ export function ChurchSetupFlow() {
                 />
             )}
             {step === 2 && <ReadyStep churchName={churchName} slug={slug} country={country} timezone={timezone} currency={currency} />}
-            {error ? <p className="mt-6 text-sm text-destructive">{error}</p> : null}
-            <SetupNav step={step} canContinue={canContinue} isLoading={submitting} onBack={back} onNext={step < lastStepIndex ? next : submit} />
+            <SetupNav step={step} canContinue={canContinue} onBack={back} onNext={step < lastStepIndex ? next : submit} />
         </>
     );
 }

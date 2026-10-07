@@ -2,9 +2,8 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { setActiveOrg } from '@/lib/actions/org/set-active-org';
 import type { OrganizationCapabilities } from '@/lib/types/organization-capabilities';
-import type { WorkspaceOrganization, WorkspaceOrganizations } from '@/lib/actions/org/load-workspace-organizations';
+import type { WorkspaceOrganization, WorkspaceOrganizations } from '@/lib/stub/workspace';
 import { replaceDashboardOrgSlug } from '@/lib/utils/paths';
 
 type OrgContextValue = {
@@ -13,7 +12,7 @@ type OrgContextValue = {
     activeOrganizationId: string | null;
     activeOrganization: WorkspaceOrganization | null;
     capabilities: OrganizationCapabilities | null;
-    switchOrg: (organizationId: string) => Promise<void>;
+    switchOrg: (organizationId: string) => void;
 };
 
 const OrgContext = createContext<OrgContextValue | null>(null);
@@ -32,11 +31,10 @@ export function OrgProvider({ initial, orgSlug, capabilities, children }: OrgPro
     const activeOrganization = organizations.find((org) => org.slug === orgSlug) ?? null;
     const activeOrganizationId = activeOrganization?.id ?? null;
 
-    async function switchOrg(organizationId: string) {
+    function switchOrg(organizationId: string) {
         if (organizationId === activeOrganizationId) return;
         const organization = organizations.find((org) => org.id === organizationId);
         if (!organization) return;
-        await setActiveOrg({ organizationId });
         router.push(replaceDashboardOrgSlug(pathname, organization.slug));
     }
 

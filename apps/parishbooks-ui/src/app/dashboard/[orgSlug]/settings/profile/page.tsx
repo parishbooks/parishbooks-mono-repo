@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation';
 import { OrganizationProfileForm } from './organization-profile-form';
 import { loadOrganizationProfile } from './load-organization-profile';
 
@@ -8,8 +7,7 @@ type ProfilePageProps = {
 
 export default async function Page({ params }: ProfilePageProps) {
     const { orgSlug } = await params;
-    const profile = await loadOrganizationProfile(orgSlug);
-    if (!profile) redirect('/onboarding');
+    const profile = loadOrganizationProfile(orgSlug);
 
     return (
         <div className="mx-auto max-w-3xl">

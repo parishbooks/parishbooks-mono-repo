@@ -6,7 +6,7 @@ import { ChevronRight, Plus } from 'lucide-react';
 import { buttonVariants } from '@parishbooks/design-system/ui/button';
 import { Spinner } from '@parishbooks/design-system/ui/spinner';
 import { cn } from '@parishbooks/design-system/utils';
-import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
+import type { WorkspaceOrganization } from '@/lib/stub/workspace';
 import { DashboardSearch } from '../shell/dashboard-search';
 
 function orgInitial(name: string): string {

@@ -1,6 +1,5 @@
-import { getOrganizationApi } from '@/lib/api-client';
-import { loadWorkspaceOrganizations } from '@/lib/actions/org';
 import type { WorkspaceCountry, WorkspaceCurrency } from '@/components/church-setup-flow/constants';
+import { workspaceOrganization } from '@/lib/stub/workspace';
 import type { OrganizationProfileFormValues } from './organization-profile-form';
 
 export type LoadedOrganizationProfile = {
@@ -9,43 +8,22 @@ export type LoadedOrganizationProfile = {
     updatedAt: string | null;
 };
 
-function isCountry(value: unknown): value is WorkspaceCountry {
-    return value === 'IN' || value === 'US';
-}
+const defaultsBySlug: Record<string, { country: WorkspaceCountry; timezone: string; currency: WorkspaceCurrency }> = {
+    'grace-community-church': { country: 'US', timezone: 'America/New_York', currency: 'USD' },
+    'st-mary-parish': { country: 'US', timezone: 'America/Chicago', currency: 'USD' },
+};
 
-function isCurrency(value: unknown): value is WorkspaceCurrency {
-    return value === 'INR' || value === 'USD';
-}
-
-function organizationProfileFromResponse(organizationId: string, data: unknown): LoadedOrganizationProfile | null {
-    if (!data || typeof data !== 'object') return null;
-    const org = data as {
-        name?: unknown;
-        profile?: { country?: unknown; timezone?: unknown; currency?: unknown; updatedAt?: unknown };
-    };
-    if (typeof org.name !== 'string' || !org.name) return null;
-    const profile = org.profile;
-    if (!profile || !isCountry(profile.country) || !isCurrency(profile.currency)) return null;
-    if (typeof profile.timezone !== 'string' || !profile.timezone) return null;
-    const updatedAt = typeof profile.updatedAt === 'string' ? profile.updatedAt : profile.updatedAt instanceof Date ? profile.updatedAt.toISOString() : null;
+export function loadOrganizationProfile(orgSlug: string): LoadedOrganizationProfile {
+    const organization = workspaceOrganization(orgSlug);
+    const locale = defaultsBySlug[organization.slug] ?? { country: 'US' as const, timezone: 'America/New_York', currency: 'USD' as const };
     return {
-        organizationId,
+        organizationId: organization.id,
         defaults: {
-            organizationName: org.name,
-            country: profile.country,
-            timezone: profile.timezone,
-            currency: profile.currency,
+            organizationName: organization.name,
+            country: locale.country,
+            timezone: locale.timezone,
+            currency: locale.currency,
         },
-        updatedAt,
+        updatedAt: null,
     };
-}
-
-/** Load profile for the org identified by the URL slug. */
-export async function loadOrganizationProfile(orgSlug: string): Promise<LoadedOrganizationProfile | null> {
-    const workspace = await loadWorkspaceOrganizations();
-    const organization = workspace?.organizations.find((org) => org.slug === orgSlug);
-    if (!organization) return null;
-    const { data, error } = await getOrganizationApi({ path: { organizationId: organization.id } });
-    if (error || !data) return null;
-    return organizationProfileFromResponse(organization.id, data);
 }

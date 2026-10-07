@@ -6,36 +6,24 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@parishbooks/design-system/ui/form';
 import { Input } from '@parishbooks/design-system/ui/input';
-import { authInputClassName, FormError, PasswordToggle, Submit } from '@/components/auth/shared';
-import { signUp } from '@/lib/actions/auth';
+import { authInputClassName, PasswordToggle, Submit } from '@/components/auth/shared';
 import { signUpDtoSchema, type SignUpDto } from '@/lib/zod';
 
 export function SignUpForm() {
     const [showPassword, setShowPassword] = useState(false);
-    const [formError, setFormError] = useState<string | null>(null);
 
     const form = useForm<SignUpDto>({
         resolver: zodResolver(signUpDtoSchema),
         defaultValues: { name: '', email: '', password: '' },
     });
 
-    async function onSubmit(values: SignUpDto) {
-        setFormError(null);
-        let redirectTo;
-        try {
-            const data = await signUp(values);
-            redirectTo = data.redirectTo;
-        } catch (error) {
-            setFormError(error instanceof Error ? error.message : 'Sign up failed.');
-            return;
-        }
-        redirect(redirectTo);
+    function onSubmit(values: SignUpDto) {
+        redirect(`/verify-email?email=${encodeURIComponent(values.email)}`);
     }
 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
-                <FormError>{formError}</FormError>
                 <FormField
                     control={form.control}
                     name="name"

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { BarChart3, BookOpen, Building2, CalendarDays, CircleDollarSign, LayoutDashboard, Menu, Megaphone, Settings, Users, X } from 'lucide-react';
 import { SiteBrand } from '@parishbooks/site-ui';
 import { SignOutButton } from '@/components/auth/sign-out-button';
-import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
+import type { WorkspaceOrganization } from '@/lib/stub/workspace';
 import { dashboardPath } from '@/lib/utils/paths';
 import { DashboardHeaderActions } from './dashboard-header-actions';
 import { WorkspaceSwitcher } from './workspace-switcher';

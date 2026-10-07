@@ -6,7 +6,7 @@ Parish finance and operations platform for churches. This monorepo contains the 
 
 - **Apps**
     - `@parishbooks/parishbooks-svc` — NestJS API (Better Auth, TypeORM, OpenAPI)
-    - `@parishbooks/parishbooks-ui` — Next.js 16 App Router UI (hey-api client, server actions)
+    - `@parishbooks/parishbooks-ui` — Next.js 16 App Router UI (static pages with stub content)
 - **Packages**
     - `@parishbooks/iam` — Better Auth configuration and plugins
     - `@parishbooks/database` — TypeORM entities, migrations, Nest module
@@ -45,7 +45,6 @@ Parish finance and operations platform for churches. This monorepo contains the 
     | `DATABASE_URL`               | PostgreSQL connection string                                            |
     | `IAM_SECRET`                 | Better Auth secret                                                      |
     | `APP_UI_URL` / `APP_SVC_URL` | Local URLs (defaults `http://localhost:3000` / `http://localhost:8000`) |
-    | `NEXT_PUBLIC_APP_SVC_URL`    | Browser-reachable API URL for the UI client                             |
     | `SMTP_*`                     | Outbound email for OTP and password reset                               |
 
 3. **Run database migrations**
@@ -72,32 +71,21 @@ Parish finance and operations platform for churches. This monorepo contains the 
 
 ## Common commands
 
-| Command                                      | Description                                                   |
-| -------------------------------------------- | ------------------------------------------------------------- |
-| `bun run dev`                                | Serve UI + API                                                |
-| `bunx nx serve @parishbooks/parishbooks-ui`  | UI only                                                       |
-| `bunx nx serve @parishbooks/parishbooks-svc` | API only                                                      |
-| `bun run auth:migrate`                       | Apply Better Auth schema                                      |
-| `bun run db:migrate`                         | Apply TypeORM migrations                                      |
-| `bun run db:generate`                        | Generate a TypeORM migration from entity changes              |
-| `bun run openapi:generate`                   | Fetch OpenAPI from a running API and regenerate the UI client |
-| `bunx nx graph`                              | Visualize project dependencies                                |
-| `bun run format`                             | Prettier format                                               |
-| `bun run prepare`                            | Install Husky git hooks (runs after `bun install`)            |
+| Command                                      | Description                                        |
+| -------------------------------------------- | -------------------------------------------------- |
+| `bun run dev`                                | Serve UI + API                                     |
+| `bunx nx serve @parishbooks/parishbooks-ui`  | UI only                                            |
+| `bunx nx serve @parishbooks/parishbooks-svc` | API only                                           |
+| `bun run auth:migrate`                       | Apply Better Auth schema                           |
+| `bun run db:migrate`                         | Apply TypeORM migrations                           |
+| `bun run db:generate`                        | Generate a TypeORM migration from entity changes   |
+| `bunx nx graph`                              | Visualize project dependencies                     |
+| `bun run format`                             | Prettier format                                    |
+| `bun run prepare`                            | Install Husky git hooks (runs after `bun install`) |
 
 Pre-commit runs [lint-staged](https://github.com/lint-staged/lint-staged): ESLint `--fix` on staged JS/TS, then Prettier on staged JS/TS/JSON/MD/CSS.
 
-Regenerate the UI API client after controller changes (API must be running):
-
-```sh
-bun run openapi:generate
-```
-
-Or from a checked-in `apps/parishbooks-ui/openapi.json`:
-
-```sh
-bunx nx run @parishbooks/parishbooks-ui:generate-api
-```
+The UI does not call the API. Dashboard, auth, and onboarding pages render local stub content.
 
 ## Project layout
 
@@ -121,9 +109,8 @@ tools/                 Generators / workspace tools
 - Email/password sign-up and sign-in with email OTP verification
 - Session cookies: `pb_access_token`, `pb_refresh_token`, `pb_session_token`
 - Organizations via Better Auth organization plugin; create flow activates the org and remints the access JWT
-- UI calls the API through hey-api (`apps/parishbooks-ui/src/lib/api-client`, generated) and server actions
-- Protected UI routes (`/dashboard/[orgSlug]`, `/onboarding`) are gated in `apps/parishbooks-ui/src/proxy.ts` (local access-JWT verify; refresh via `POST /api/v1/auth/refresh` when expired)
-- Dashboard is multi-tenant by route: `/dashboard/{orgSlug}/...`; switching workspaces navigates between slugs and activates that org for API calls
+- The UI is static. Auth forms navigate between pages locally, and the dashboard reads stub organizations from `apps/parishbooks-ui/src/lib/stub/workspace.ts`
+- Dashboard routes are `/dashboard/{orgSlug}/...`; switching workspaces only changes the URL
 
 ## CI
 

@@ -12,8 +12,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@parishbooks/design-system/ui/dropdown-menu';
-import { setActiveOrg } from '@/lib/actions/org/set-active-org';
-import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
+import type { WorkspaceOrganization } from '@/lib/stub/workspace';
 import { orgSlugFromPathname, replaceDashboardOrgSlug } from '@/lib/utils/paths';
 
 export function WorkspaceSwitcher({ organizations }: { organizations: WorkspaceOrganization[] }) {
@@ -23,11 +22,10 @@ export function WorkspaceSwitcher({ organizations }: { organizations: WorkspaceO
     const activeOrganization = orgSlug ? (organizations.find((org) => org.slug === orgSlug) ?? null) : null;
     const label = activeOrganization?.name ?? 'Select organization';
 
-    async function switchOrg(organizationId: string) {
+    function switchOrg(organizationId: string) {
         if (organizationId === activeOrganization?.id) return;
         const organization = organizations.find((org) => org.id === organizationId);
         if (!organization) return;
-        await setActiveOrg({ organizationId });
         router.push(replaceDashboardOrgSlug(pathname, organization.slug));
     }
 

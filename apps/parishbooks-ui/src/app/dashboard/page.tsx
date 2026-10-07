@@ -1,13 +1,10 @@
 import { DashboardShell, OrganizationPicker } from '@/components/dashboard-shell';
-import { loadWorkspaceOrganizations } from '@/lib/actions/org';
+import { stubWorkspace } from '@/lib/stub/workspace';
 
-export default async function DashboardIndexPage() {
-    const workspace = await loadWorkspaceOrganizations();
-    if (!workspace) throw new Error('Could not load organizations');
-
+export default function DashboardIndexPage() {
     return (
         <DashboardShell>
-            <OrganizationPicker organizations={workspace.organizations} activeOrganizationId={workspace.activeOrganizationId} />
+            <OrganizationPicker organizations={stubWorkspace.organizations} activeOrganizationId={stubWorkspace.activeOrganizationId} />
         </DashboardShell>
     );
 }

@@ -15,10 +15,3 @@ export function replaceDashboardOrgSlug(pathname: string, orgSlug: string): stri
     segments[2] = orgSlug;
     return segments.join('/') || dashboardPath(orgSlug);
 }
-
-export function defaultOrgSlug(organizations: { id: string; slug?: string }[], activeOrganizationId: string | null): string | null {
-    const active = activeOrganizationId ? organizations.find((org) => org.id === activeOrganizationId) : undefined;
-    const chosen = active ?? organizations[0];
-    if (!chosen) return null;
-    return chosen.slug ?? chosen.id;
-}
