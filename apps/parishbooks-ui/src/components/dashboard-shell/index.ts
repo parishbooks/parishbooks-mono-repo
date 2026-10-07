@@ -5,6 +5,7 @@ export { OnlineGivingSoftGate } from './online-giving-soft-gate';
 export { RecordDonationButton } from './record-donation-button';
 export { SetupChecklist } from './setup-checklist';
 export { VerificationHub } from './verification-hub';
+export { DashboardOrgShell } from './dashboard-org-shell';
 export { DashboardShell } from './dashboard-shell';
 export { OrganizationPicker } from './organization-picker';
 export { OrganizationsCard } from './organizations-card';

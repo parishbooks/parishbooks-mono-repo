@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
-import DashboardShell from '@/components/dashboard-shell';
+import { DashboardOrgShell } from '@/components/dashboard-shell';
 import { ensureActiveOrganization, loadOrganizationCapabilities, loadWorkspaceOrganizations } from '@/lib/actions/org';
 import { OrgProvider } from '@/lib/context/org';
 import { dashboardPath, defaultOrgSlug } from '@/lib/utils/paths';
@@ -27,8 +27,10 @@ export default async function OrgDashboardLayout({ children, params }: OrgLayout
     ]);
 
     return (
-        <OrgProvider initial={workspace} orgSlug={organization.slug} capabilities={capabilities}>
-            <DashboardShell>{children}</DashboardShell>
-        </OrgProvider>
+        <DashboardOrgShell organizations={workspace.organizations} orgSlug={organization.slug}>
+            <OrgProvider initial={workspace} orgSlug={organization.slug} capabilities={capabilities}>
+                {children}
+            </OrgProvider>
+        </DashboardOrgShell>
     );
 }

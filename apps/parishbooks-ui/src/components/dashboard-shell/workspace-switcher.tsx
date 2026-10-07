@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Check, ChevronDown, Plus } from 'lucide-react';
 import {
     DropdownMenu,
@@ -11,11 +12,24 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@parishbooks/design-system/ui/dropdown-menu';
-import { useOrg } from '@/lib/context/org';
+import { setActiveOrg } from '@/lib/actions/org/set-active-org';
+import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
+import { orgSlugFromPathname, replaceDashboardOrgSlug } from '@/lib/utils/paths';
 
-export function WorkspaceSwitcher() {
-    const { organizations, activeOrganizationId, activeOrganization, switchOrg } = useOrg();
+export function WorkspaceSwitcher({ organizations }: { organizations: WorkspaceOrganization[] }) {
+    const pathname = usePathname();
+    const router = useRouter();
+    const orgSlug = orgSlugFromPathname(pathname);
+    const activeOrganization = orgSlug ? (organizations.find((org) => org.slug === orgSlug) ?? null) : null;
     const label = activeOrganization?.name ?? 'Select organization';
+
+    async function switchOrg(organizationId: string) {
+        if (organizationId === activeOrganization?.id) return;
+        const organization = organizations.find((org) => org.id === organizationId);
+        if (!organization) return;
+        await setActiveOrg({ organizationId });
+        router.push(replaceDashboardOrgSlug(pathname, organization.slug));
+    }
 
     return (
         <DropdownMenu>
@@ -28,7 +42,7 @@ export function WorkspaceSwitcher() {
                 <DropdownMenuGroup>
                     <DropdownMenuLabel>Organizations</DropdownMenuLabel>
                     {organizations.map((org) => {
-                        const isActive = org.id === activeOrganizationId;
+                        const isActive = org.id === activeOrganization?.id;
                         return (
                             <DropdownMenuItem key={org.id} onClick={() => switchOrg(org.id)}>
                                 <span className="flex-1 truncate">{org.name}</span>
