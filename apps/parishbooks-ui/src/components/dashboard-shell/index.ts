@@ -6,6 +6,7 @@ export { RecordDonationButton } from './record-donation-button';
 export { SetupChecklist } from './setup-checklist';
 export { VerificationHub } from './verification-hub';
 export { DashboardShell } from './dashboard-shell';
+export { OrganizationPicker } from './organization-picker';
 export { OrganizationsCard } from './organizations-card';
 export { WorkspaceSwitcher } from './workspace-switcher';
 export { StatCard } from './stat-card';

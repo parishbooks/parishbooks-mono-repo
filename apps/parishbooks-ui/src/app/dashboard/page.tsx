@@ -1,12 +1,17 @@
 import { getSession } from '@/lib/actions/auth/get-session';
-import { getOrganization } from '@/lib/actions/org/get-org';
-import { dashboardPath } from '@/lib/utils/paths';
-import { redirect } from 'next/navigation';
+import { loadWorkspaceOrganizations } from '@/lib/actions/org';
+import { OrganizationPicker } from '@/components/dashboard-shell';
 
-/** `/dashboard` → `/dashboard/{orgSlug}` for the active (or first) organization. */
+/** Post-sign-in home: pick an organization, or create the first one. */
 export default async function DashboardIndexPage() {
-    const session = await getSession();
-    if (!session.session.activeOrganizationId) redirect('/onboarding');
-    const org = await getOrganization(session.session.activeOrganizationId);
-    redirect(dashboardPath(org.slug));
+    const [session, workspace] = await Promise.all([getSession(), loadWorkspaceOrganizations()]);
+    if (!workspace) throw new Error('Could not load organizations');
+
+    return (
+        <OrganizationPicker
+            organizations={workspace.organizations}
+            activeOrganizationId={workspace.activeOrganizationId}
+            account={{ name: session.user.name, email: session.user.email }}
+        />
+    );
 }
