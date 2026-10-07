@@ -1,5 +1,10 @@
 export { ComingSoon } from './coming-soon';
 export { DashboardOverview } from './dashboard-overview';
+export { GivingPageContent } from './giving-page-content';
+export { OnlineGivingSoftGate } from './online-giving-soft-gate';
+export { RecordDonationButton } from './record-donation-button';
+export { SetupChecklist } from './setup-checklist';
+export { VerificationHub } from './verification-hub';
 export { DashboardShell } from './dashboard-shell';
 export { OrganizationsCard } from './organizations-card';
 export { WorkspaceSwitcher } from './workspace-switcher';

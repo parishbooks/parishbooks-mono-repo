@@ -14,6 +14,7 @@ import {
 import { ErrorResponseDto, Token } from '@parishbooks/core';
 import type { Response } from 'express';
 import { SESSION_TOKEN_NAME } from '../auth/constants';
+import { OrganizationCapabilitiesResponseDto } from './dto/organization-capabilities.dto';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { SetActiveOrganizationDto } from './dto/set-active-organization.dto';
 import { OrganizationService } from './organization.service';
@@ -41,6 +42,17 @@ export class OrganizationController {
     @ApiUnauthorizedResponse({ type: ErrorResponseDto })
     async getOrganizationProfile(@Param('organizationId') organizationId: string) {
         return this.organizationService.getOrganizationProfile(organizationId);
+    }
+
+    @Get(':organizationId/capabilities')
+    @ApiOperation({ operationId: 'getOrganizationCapabilities', summary: 'Get derived organization capabilities and verification status' })
+    @ApiCookieAuth(SESSION_TOKEN_NAME)
+    @ApiParam({ name: 'organizationId', description: 'Organization id' })
+    @ApiOkResponse({ type: OrganizationCapabilitiesResponseDto })
+    @ApiNotFoundResponse({ type: ErrorResponseDto })
+    @ApiUnauthorizedResponse({ type: ErrorResponseDto })
+    async getOrganizationCapabilities(@Param('organizationId') organizationId: string, @Token('session') sessionToken: string) {
+        return this.organizationService.getOrganizationCapabilities(organizationId, sessionToken);
     }
 
     @Get(':organizationId')

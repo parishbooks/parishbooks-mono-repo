@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateOrganizationData, CreateOrganizationErrors, CreateOrganizationResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetCurrentSessionData, GetCurrentSessionErrors, GetCurrentSessionResponses, GetOrganizationData, GetOrganizationErrors, GetOrganizationProfileData, GetOrganizationProfileErrors, GetOrganizationProfileResponses, GetOrganizationResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, ListOrganizationsData, ListOrganizationsErrors, ListOrganizationsResponses, RefreshAccessTokenData, RefreshAccessTokenErrors, RefreshAccessTokenResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, SendEmailOtpData, SendEmailOtpErrors, SendEmailOtpResponses, SetActiveOrganizationData, SetActiveOrganizationErrors, SetActiveOrganizationResponses, SignInData, SignInErrors, SignInResponses, SignOutData, SignOutErrors, SignOutResponses, SignUpData, SignUpErrors, SignUpResponses, VerifyEmailOtpData, VerifyEmailOtpErrors, VerifyEmailOtpResponses } from './types.gen';
+import type { CreateOrganizationData, CreateOrganizationErrors, CreateOrganizationResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetCurrentSessionData, GetCurrentSessionErrors, GetCurrentSessionResponses, GetOrganizationCapabilitiesData, GetOrganizationCapabilitiesErrors, GetOrganizationCapabilitiesResponses, GetOrganizationData, GetOrganizationErrors, GetOrganizationProfileData, GetOrganizationProfileErrors, GetOrganizationProfileResponses, GetOrganizationResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, ListOrganizationsData, ListOrganizationsErrors, ListOrganizationsResponses, RefreshAccessTokenData, RefreshAccessTokenErrors, RefreshAccessTokenResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, SendEmailOtpData, SendEmailOtpErrors, SendEmailOtpResponses, SetActiveOrganizationData, SetActiveOrganizationErrors, SetActiveOrganizationResponses, SignInData, SignInErrors, SignInResponses, SignOutData, SignOutErrors, SignOutResponses, SignUpData, SignUpErrors, SignUpResponses, VerifyEmailOtpData, VerifyEmailOtpErrors, VerifyEmailOtpResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -230,5 +230,18 @@ export const refreshAccessTokenApi = <ThrowOnError extends boolean = false>(opti
             type: 'apiKey'
         }],
     url: '/api/v1/auth/refresh',
+    ...options
+});
+
+/**
+ * Get derived organization capabilities and verification status
+ */
+export const getOrganizationCapabilitiesApi = <ThrowOnError extends boolean = false>(options: Options<GetOrganizationCapabilitiesData, ThrowOnError>): RequestResult<GetOrganizationCapabilitiesResponses, GetOrganizationCapabilitiesErrors, ThrowOnError> => (options.client ?? client).get<GetOrganizationCapabilitiesResponses, GetOrganizationCapabilitiesErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'pb_session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/v1/organization/{organizationId}/capabilities',
     ...options
 });

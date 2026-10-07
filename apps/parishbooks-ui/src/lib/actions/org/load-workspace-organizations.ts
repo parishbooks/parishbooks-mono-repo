@@ -1,3 +1,5 @@
+'use server';
+
 import { cache } from 'react';
 import { getCurrentSessionApi, listOrganizationsApi } from '@/lib/api-client';
 

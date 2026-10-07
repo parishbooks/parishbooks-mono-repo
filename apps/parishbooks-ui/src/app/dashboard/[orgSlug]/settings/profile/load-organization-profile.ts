@@ -1,5 +1,5 @@
 import { getOrganizationApi } from '@/lib/api-client';
-import { loadWorkspaceOrganizations } from '@/lib/utils/load-workspace-organizations';
+import { loadWorkspaceOrganizations } from '@/lib/actions/org';
 import type { WorkspaceCountry, WorkspaceCurrency } from '@/components/church-setup-flow/constants';
 import type { OrganizationProfileFormValues } from './organization-profile-form';
 

@@ -19,6 +19,9 @@ export function registerAuthInterceptors(): void {
     client.interceptors.response.use(async (response, options) => {
         if (response.status !== 401) return response;
         if (isPublicAuthApiRequest(options.url)) return response;
+        // RSC uses the request cookie jar; reminting cookies here triggers Next.js to reload the page.
+        // The dashboard proxy refreshes pb_access_token before render when needed.
+        if (typeof window === 'undefined') return response;
 
         const accessToken = await obtainAccessToken();
         if (!accessToken) {

@@ -1,7 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
 import DashboardShell from '@/components/dashboard-shell';
-import { ensureActiveOrganization } from '@/lib/utils/ensure-active-org';
-import { loadWorkspaceOrganizations } from '@/lib/utils/load-workspace-organizations';
+import { ensureActiveOrganization, loadOrganizationCapabilities, loadWorkspaceOrganizations } from '@/lib/actions/org';
 import { OrgProvider } from '@/lib/context/org';
 import { dashboardPath, defaultOrgSlug } from '@/lib/utils/paths';
 
@@ -22,10 +21,13 @@ export default async function OrgDashboardLayout({ children, params }: OrgLayout
         redirect(dashboardPath(fallback));
     }
 
-    await ensureActiveOrganization(organization.id, dashboardPath(organization.slug));
+    const [, capabilities] = await Promise.all([
+        ensureActiveOrganization(organization.id, dashboardPath(organization.slug)),
+        loadOrganizationCapabilities(organization.id),
+    ]);
 
     return (
-        <OrgProvider initial={workspace} orgSlug={organization.slug}>
+        <OrgProvider initial={workspace} orgSlug={organization.slug} capabilities={capabilities}>
             <DashboardShell>{children}</DashboardShell>
         </OrgProvider>
     );

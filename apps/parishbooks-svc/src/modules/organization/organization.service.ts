@@ -5,6 +5,7 @@ import { isAPIError } from 'better-auth/api';
 import type { Response } from 'express';
 import { ACCESS_TOKEN_MAX_AGE, ACCESS_TOKEN_NAME } from '../auth/constants';
 import { Utils } from '../../library/utils';
+import { OrganizationCapabilitiesResponseDto } from './dto/organization-capabilities.dto';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { SetActiveOrganizationDto } from './dto/set-active-organization.dto';
 import { OrganizationProfileRepository } from './repository/organization.repository';
@@ -73,5 +74,10 @@ export class OrganizationService {
         const organizationProfile = await this.organizationProfileRepository.findOne({ where: { organizationId } });
         if (!organizationProfile) throw new NotFoundException('Organization profile not found');
         return organizationProfile;
+    }
+
+    async getOrganizationCapabilities(organizationId: string, sessionToken: string): Promise<OrganizationCapabilitiesResponseDto> {
+        const organization = await this.getOrganization(organizationId, sessionToken);
+        return OrganizationCapabilitiesResponseDto.fromProfile(organizationId, organization.profile);
     }
 }

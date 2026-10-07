@@ -1,14 +1,16 @@
 'use client';
 
-import { BarChart3, CalendarDays, CircleDollarSign, FileText, Megaphone, Users } from 'lucide-react';
+import { BarChart3, CalendarDays, CircleDollarSign, Megaphone, Users } from 'lucide-react';
 import { useOrg } from '@/lib/context/org';
 import { dashboardPath } from '@/lib/utils/paths';
+import { OnlineGivingSoftGate } from './online-giving-soft-gate';
 import { OrganizationsCard } from './organizations-card';
+import { RecordDonationButton } from './record-donation-button';
+import { SetupChecklist } from './setup-checklist';
 import { StatCard } from './stat-card';
 
 export function DashboardOverview() {
-    const { orgSlug } = useOrg();
-
+    const { orgSlug, capabilities } = useOrg();
     return (
         <div className="mx-auto max-w-7xl">
             <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -17,8 +19,13 @@ export function DashboardOverview() {
                     <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">Good morning, James.</h1>
                     <p className="mt-2 text-muted-foreground">Here&apos;s what&apos;s happening with your parish today.</p>
                 </div>
-                <button className="h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm">Record donation</button>
+                <RecordDonationButton orgSlug={orgSlug} capabilities={capabilities} />
             </div>
+            {capabilities && !capabilities.capabilities.canCollectOnlineDonations ? (
+                <div className="mb-6">
+                    <OnlineGivingSoftGate orgSlug={orgSlug} capabilities={capabilities} />
+                </div>
+            ) : null}
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <StatCard label="Total giving" value="$0" note="No donations recorded yet" icon={CircleDollarSign} href={dashboardPath(orgSlug, 'giving')} />
                 <StatCard label="Active members" value="0" note="Build your community" icon={Users} href={dashboardPath(orgSlug, 'members')} />
@@ -47,19 +54,7 @@ export function DashboardOverview() {
                         </div>
                     </div>
                 </div>
-                <div className="rounded-2xl border bg-card p-6">
-                    <h2 className="text-lg font-semibold">Get started</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">Set up ParishBooks for your team.</p>
-                    <div className="mt-6 flex flex-col gap-4">
-                        {['Invite your team', 'Add your first fund', 'Record your first donation'].map((item, i) => (
-                            <div key={item} className="flex items-center gap-3 rounded-xl border p-3">
-                                <span className="flex size-7 items-center justify-center rounded-full bg-muted text-xs font-semibold">{i + 1}</span>
-                                <span className="text-sm font-medium">{item}</span>
-                                <FileText className="ml-auto size-4 text-muted-foreground" />
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                {capabilities ? <SetupChecklist orgSlug={orgSlug} capabilities={capabilities} /> : null}
             </div>
         </div>
     );

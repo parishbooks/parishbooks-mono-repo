@@ -81,6 +81,31 @@ export type SetActiveOrganizationDto = {
     organizationSlug?: string;
 };
 
+export type OrganizationVerificationStatus = 'not_started' | 'pending' | 'active' | 'rejected';
+
+export type OrganizationCapabilitiesFlagsDto = {
+    isKycVerified: boolean;
+    canCollectOnlineDonations: boolean;
+    canReceivePayouts: boolean;
+    canRecordDonationsManually: boolean;
+    canAddMembers: boolean;
+    canInviteTeam: boolean;
+    canManageFunds: boolean;
+    canSubmitVerification: boolean;
+};
+
+export type OrganizationVerificationSummaryDto = {
+    status: OrganizationVerificationStatus;
+    statusAt?: string | null;
+    rejectionReason?: string | null;
+};
+
+export type OrganizationCapabilitiesResponseDto = {
+    organizationId: string;
+    capabilities: OrganizationCapabilitiesFlagsDto;
+    verification: OrganizationVerificationSummaryDto;
+};
+
 export type GetCurrentSessionData = {
     body?: never;
     path?: never;
@@ -648,3 +673,31 @@ export type RefreshAccessTokenResponses = {
 };
 
 export type RefreshAccessTokenResponse = RefreshAccessTokenResponses[keyof RefreshAccessTokenResponses];
+
+export type GetOrganizationCapabilitiesData = {
+    body?: never;
+    path: {
+        /**
+         * Organization id
+         */
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/v1/organization/{organizationId}/capabilities';
+};
+
+export type GetOrganizationCapabilitiesErrors = {
+    401: ErrorResponseDto;
+    404: ErrorResponseDto;
+};
+
+export type GetOrganizationCapabilitiesError = GetOrganizationCapabilitiesErrors[keyof GetOrganizationCapabilitiesErrors];
+
+export type GetOrganizationCapabilitiesResponses = {
+    /**
+     * Organization capabilities
+     */
+    200: OrganizationCapabilitiesResponseDto;
+};
+
+export type GetOrganizationCapabilitiesResponse = GetOrganizationCapabilitiesResponses[keyof GetOrganizationCapabilitiesResponses];

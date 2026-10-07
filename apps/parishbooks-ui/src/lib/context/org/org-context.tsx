@@ -3,7 +3,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { setActiveOrg } from '@/lib/actions/org/set-active-org';
-import type { WorkspaceOrganization, WorkspaceOrganizations } from '@/lib/utils/load-workspace-organizations';
+import type { OrganizationCapabilities } from '@/lib/types/organization-capabilities';
+import type { WorkspaceOrganization, WorkspaceOrganizations } from '@/lib/actions/org/load-workspace-organizations';
 import { replaceDashboardOrgSlug } from '@/lib/utils/paths';
 
 type OrgContextValue = {
@@ -11,6 +12,7 @@ type OrgContextValue = {
     orgSlug: string;
     activeOrganizationId: string | null;
     activeOrganization: WorkspaceOrganization | null;
+    capabilities: OrganizationCapabilities | null;
     switchOrg: (organizationId: string) => Promise<void>;
 };
 
@@ -19,10 +21,11 @@ const OrgContext = createContext<OrgContextValue | null>(null);
 type OrgProviderProps = {
     initial: WorkspaceOrganizations;
     orgSlug: string;
+    capabilities: OrganizationCapabilities | null;
     children: ReactNode;
 };
 
-export function OrgProvider({ initial, orgSlug, children }: OrgProviderProps) {
+export function OrgProvider({ initial, orgSlug, capabilities, children }: OrgProviderProps) {
     const router = useRouter();
     const pathname = usePathname();
     const [organizations, setOrganizations] = useState(initial.organizations);
@@ -41,7 +44,11 @@ export function OrgProvider({ initial, orgSlug, children }: OrgProviderProps) {
         setOrganizations(initial.organizations);
     }, [initial.organizations]);
 
-    return <OrgContext.Provider value={{ organizations, orgSlug, activeOrganizationId, activeOrganization, switchOrg }}>{children}</OrgContext.Provider>;
+    return (
+        <OrgContext.Provider value={{ organizations, orgSlug, activeOrganizationId, activeOrganization, capabilities, switchOrg }}>
+            {children}
+        </OrgContext.Provider>
+    );
 }
 
 export function useOrg(): OrgContextValue {
