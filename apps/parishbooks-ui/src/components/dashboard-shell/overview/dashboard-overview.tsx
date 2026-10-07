@@ -6,7 +6,6 @@ import { dashboardPath } from '@/lib/utils/paths';
 import { OnlineGivingSoftGate } from '../giving/online-giving-soft-gate';
 import { RecordDonationButton } from '../giving/record-donation-button';
 import { StatCard } from '../shared/stat-card';
-import { OrganizationsCard } from './organizations-card';
 import { SetupChecklist } from './setup-checklist';
 
 export function DashboardOverview() {
@@ -31,9 +30,6 @@ export function DashboardOverview() {
                 <StatCard label="Active members" value="0" note="Build your community" icon={Users} href={dashboardPath(orgSlug, 'members')} />
                 <StatCard label="Upcoming events" value="0" note="Plan your next gathering" icon={CalendarDays} href={dashboardPath(orgSlug, 'events')} />
                 <StatCard label="Open campaigns" value="0" note="Create your first campaign" icon={Megaphone} href={dashboardPath(orgSlug, 'campaigns')} />
-            </div>
-            <div className="mt-6">
-                <OrganizationsCard />
             </div>
             <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
                 <div className="rounded-2xl border bg-card p-6">
