@@ -8,7 +8,6 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@parishbook
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
 import { Back, FormError, FormStatus, Submit } from '@/components/auth/shared';
 import { sendEmailOtp, verifyEmailOtp } from '@/lib/actions/auth';
-import { destinationForRedirect } from '@/lib/utils/redirect';
 import { verifyEmailDtoSchema, type VerifyEmailDto } from '@/lib/zod';
 
 export function VerifyEmailForm({ email }: { email: string }) {
@@ -43,7 +42,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
             setFormError(result.error);
             return;
         }
-        redirect(destinationForRedirect(result.data.redirectTo, { email }));
+        redirect(result.data.redirectTo);
     }
 
     if (!email) {

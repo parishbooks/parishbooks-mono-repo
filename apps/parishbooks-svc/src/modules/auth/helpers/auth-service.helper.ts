@@ -4,7 +4,8 @@ import { AuthService as BetterAuthService } from '@thallesp/nestjs-better-auth';
 import type { Response } from 'express';
 import { Utils } from '../../../library/utils';
 import { ACCESS_TOKEN_MAX_AGE, ACCESS_TOKEN_NAME, REFRESH_TOKEN_MAX_AGE, REFRESH_TOKEN_NAME, SESSION_TOKEN_MAX_AGE, SESSION_TOKEN_NAME } from '../constants';
-import { RedirectTo, SignInResponseDto } from '../dto/signin.dto';
+import { AuthRedirectHelper } from './auth-redirect.helper';
+import { SignInResponseDto } from '../dto/signin.dto';
 
 @Injectable()
 export class AuthServiceHelper {
@@ -31,12 +32,16 @@ export class AuthServiceHelper {
 
     async requireEmailVerification(email: string): Promise<SignInResponseDto> {
         await this.sendEmailVerificationOtp(email);
-        return new SignInResponseDto({ redirectTo: RedirectTo.EMAIL_VERIFICATION });
+        return new SignInResponseDto({ redirectTo: AuthRedirectHelper.verifyEmailPath(email) });
     }
 
-    determineRedirect(session: AuthUserSession): RedirectTo {
-        if (!session.session.activeOrganizationId) return RedirectTo.ORG_SETUP;
-        return RedirectTo.DASHBOARD;
+    async determineRedirect(session: AuthUserSession): Promise<string> {
+        if (!session.session.activeOrganizationId) return AuthRedirectHelper.onboardingPath();
+        const headers = Utils.getHeader(session.session.token);
+        const organizations = await this.auth.api.listOrganizations({ headers });
+        const active = organizations.find((organization) => organization.id === session.session.activeOrganizationId);
+        if (!active?.slug) return AuthRedirectHelper.dashboardPath();
+        return AuthRedirectHelper.organizationDashboardPath(active.slug);
     }
 
     setCookies(accessToken: string, refreshToken: string, sessionToken: string, response: Response): void {
@@ -58,6 +63,6 @@ export class AuthServiceHelper {
         const refreshToken = await this.mintRefreshToken(session);
         const sessionToken = this.mintSessionToken(session);
         this.setCookies(accessToken, refreshToken, sessionToken, response);
-        return new SignInResponseDto({ redirectTo: this.determineRedirect(session) });
+        return new SignInResponseDto({ redirectTo: await this.determineRedirect(session) });
     }
 }

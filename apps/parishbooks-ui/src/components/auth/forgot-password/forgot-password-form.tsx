@@ -9,7 +9,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, Back, FormError, Submit } from '@/components/auth/shared';
 import { forgotPassword } from '@/lib/actions/auth';
-import { pathForRedirect } from '@/lib/utils/redirect';
 import { forgotPasswordDtoSchema, type ForgotPasswordDto } from '@/lib/zod';
 
 export function ForgotPasswordForm() {
@@ -27,7 +26,11 @@ export function ForgotPasswordForm() {
             setFormError(result.error);
             return;
         }
-        redirect(pathForRedirect(result.data.redirectTo ?? 'password-reset', values.email));
+        if (!result.data.redirectTo) {
+            setFormError('Could not continue password reset.');
+            return;
+        }
+        redirect(result.data.redirectTo);
     }
 
     return (

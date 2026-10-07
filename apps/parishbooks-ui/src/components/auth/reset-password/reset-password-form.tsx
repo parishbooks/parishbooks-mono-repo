@@ -9,7 +9,6 @@ import { Input } from '@parishbooks/design-system/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
 import { authInputClassName, Back, FormError, Submit } from '@/components/auth/shared';
 import { resetPassword } from '@/lib/actions/auth';
-import { pathForRedirect } from '@/lib/utils/redirect';
 import { resetPasswordDtoSchema, type ResetPasswordDto } from '@/lib/zod';
 
 export function ResetPasswordForm({ email }: { email: string }) {
@@ -31,7 +30,11 @@ export function ResetPasswordForm({ email }: { email: string }) {
             setFormError(result.error);
             return;
         }
-        redirect(`${pathForRedirect(result.data.redirectTo ?? 'sign-in')}?reset=1`);
+        if (!result.data.redirectTo) {
+            setFormError('Could not finish resetting your password.');
+            return;
+        }
+        redirect(result.data.redirectTo);
     }
 
     if (!email) {

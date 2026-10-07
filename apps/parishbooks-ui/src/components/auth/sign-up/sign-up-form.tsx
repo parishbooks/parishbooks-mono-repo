@@ -8,7 +8,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@parishbooks/design-system/ui/input';
 import { authInputClassName, FormError, PasswordToggle, Submit } from '@/components/auth/shared';
 import { signUp } from '@/lib/actions/auth';
-import { pathForRedirect } from '@/lib/utils/redirect';
 import { signUpDtoSchema, type SignUpDto } from '@/lib/zod';
 
 export function SignUpForm() {
@@ -30,7 +29,7 @@ export function SignUpForm() {
             setFormError(error instanceof Error ? error.message : 'Sign up failed.');
             return;
         }
-        redirect(pathForRedirect(redirectTo, values.email));
+        redirect(redirectTo);
     }
 
     return (

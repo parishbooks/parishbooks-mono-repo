@@ -19,7 +19,8 @@ export type SignInDto = {
     rememberMe?: boolean;
 };
 
-export type RedirectTo = 'dashboard' | 'email-verification' | 'password-reset' | 'org-setup' | 'sign-in';
+/** UI path returned by auth actions, such as `/dashboard` or `/dashboard/grace-community-church`. */
+export type RedirectTo = string;
 
 export type SignInResponseDto = {
     redirectTo: RedirectTo;

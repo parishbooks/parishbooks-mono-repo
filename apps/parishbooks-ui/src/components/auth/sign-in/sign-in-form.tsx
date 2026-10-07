@@ -21,10 +21,7 @@ export function SignInForm() {
     const reset = searchParams.get('reset') === '1';
     const next = searchParams.get('next');
 
-    const form = useForm<SignInDto>({
-        resolver: zodResolver(signInDtoSchema),
-        defaultValues: { email: '', password: '' },
-    });
+    const form = useForm<SignInDto>({ resolver: zodResolver(signInDtoSchema), defaultValues: { email: '', password: '' } });
     const { errors } = form.formState;
 
     async function onSubmit(values: SignInDto) {
@@ -32,7 +29,7 @@ export function SignInForm() {
         let destination: string;
         try {
             const data = await signIn(values);
-            destination = destinationForRedirect(data.redirectTo, { email: values.email, next, orgSlug: data.orgSlug });
+            destination = destinationForRedirect(data.redirectTo, { next });
         } catch (error) {
             setFormError(error instanceof Error ? error.message : 'Sign in failed.');
             return;
