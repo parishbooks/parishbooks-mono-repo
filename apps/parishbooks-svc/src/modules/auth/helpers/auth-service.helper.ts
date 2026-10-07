@@ -39,18 +39,6 @@ export class AuthServiceHelper {
         return RedirectTo.DASHBOARD;
     }
 
-    /** Fresh sessions often omit activeOrganizationId even when the user already belongs to orgs. */
-    async ensureActiveOrganization(session: AuthUserSession): Promise<AuthUserSession> {
-        if (session.session.activeOrganizationId) return session;
-        const headers = Utils.getHeader(session.session.token);
-        const organizations = await this.auth.api.listOrganizations({ headers });
-        const organizationId = organizations?.[0]?.id;
-        if (!organizationId) return session;
-        await this.auth.api.setActiveOrganization({ body: { organizationId }, headers });
-        const result = await this.auth.api.getSession({ headers });
-        return result ?? session;
-    }
-
     setCookies(accessToken: string, refreshToken: string, sessionToken: string, response: Response): void {
         const options = Utils.getCookieOptions();
         response.cookie(ACCESS_TOKEN_NAME, accessToken, { ...options, maxAge: ACCESS_TOKEN_MAX_AGE });
@@ -66,11 +54,10 @@ export class AuthServiceHelper {
     }
 
     async establishSession(session: AuthUserSession, response: Response): Promise<SignInResponseDto> {
-        const activeSession = await this.ensureActiveOrganization(session);
-        const accessToken = await this.mintAccessToken(activeSession);
-        const refreshToken = await this.mintRefreshToken(activeSession);
-        const sessionToken = this.mintSessionToken(activeSession);
+        const accessToken = await this.mintAccessToken(session);
+        const refreshToken = await this.mintRefreshToken(session);
+        const sessionToken = this.mintSessionToken(session);
         this.setCookies(accessToken, refreshToken, sessionToken, response);
-        return new SignInResponseDto({ redirectTo: this.determineRedirect(activeSession) });
+        return new SignInResponseDto({ redirectTo: this.determineRedirect(session) });
     }
 }
