@@ -158,6 +158,7 @@
         "@hey-api/client-next": "^0.5.1",
         "@hookform/resolvers": "^5.9.1",
         "@parishbooks/design-system": "workspace:*",
+        "@parishbooks/iam": "workspace:*",
         "@parishbooks/site-ui": "workspace:*",
         "jose": "^6.2.12",
         "next": "~16.1.6",

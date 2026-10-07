@@ -81,6 +81,23 @@ export const signOutApi = <ThrowOnError extends boolean = false>(options?: Optio
 });
 
 /**
+ * Remint pb_access_token from a valid session cookie
+ */
+export const refreshAccessTokenApi = <ThrowOnError extends boolean = false>(options?: Options<RefreshAccessTokenData, ThrowOnError>): RequestResult<RefreshAccessTokenResponses, RefreshAccessTokenErrors, ThrowOnError> => (options?.client ?? client).post<RefreshAccessTokenResponses, RefreshAccessTokenErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'pb_refresh_token',
+            type: 'apiKey'
+        }, {
+            in: 'cookie',
+            name: 'pb_session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/v1/auth/refresh',
+    ...options
+});
+
+/**
  * Send an email OTP
  */
 export const sendEmailOtpApi = <ThrowOnError extends boolean = false>(options: Options<SendEmailOtpData, ThrowOnError>): RequestResult<SendEmailOtpResponses, SendEmailOtpErrors, ThrowOnError> => (options.client ?? client).post<SendEmailOtpResponses, SendEmailOtpErrors, ThrowOnError>({
@@ -172,6 +189,19 @@ export const getOrganizationProfileApi = <ThrowOnError extends boolean = false>(
 });
 
 /**
+ * Get derived organization capabilities and verification status
+ */
+export const getOrganizationCapabilitiesApi = <ThrowOnError extends boolean = false>(options: Options<GetOrganizationCapabilitiesData, ThrowOnError>): RequestResult<GetOrganizationCapabilitiesResponses, GetOrganizationCapabilitiesErrors, ThrowOnError> => (options.client ?? client).get<GetOrganizationCapabilitiesResponses, GetOrganizationCapabilitiesErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'pb_session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/v1/organization/{organizationId}/capabilities',
+    ...options
+});
+
+/**
  * Get an organization with its profile
  */
 export const getOrganizationApi = <ThrowOnError extends boolean = false>(options: Options<GetOrganizationData, ThrowOnError>): RequestResult<GetOrganizationResponses, GetOrganizationErrors, ThrowOnError> => (options.client ?? client).get<GetOrganizationResponses, GetOrganizationErrors, ThrowOnError>({
@@ -215,33 +245,3 @@ export const healthReadyApi = <ThrowOnError extends boolean = false>(options?: O
  * Combined health check
  */
 export const healthCheckApi = <ThrowOnError extends boolean = false>(options?: Options<HealthCheckData, ThrowOnError>): RequestResult<HealthCheckResponses, HealthCheckErrors, ThrowOnError> => (options?.client ?? client).get<HealthCheckResponses, HealthCheckErrors, ThrowOnError>({ url: '/api/health', ...options });
-
-/**
- * Remint pb_access_token from a valid session cookie
- */
-export const refreshAccessTokenApi = <ThrowOnError extends boolean = false>(options?: Options<RefreshAccessTokenData, ThrowOnError>): RequestResult<RefreshAccessTokenResponses, RefreshAccessTokenErrors, ThrowOnError> => (options?.client ?? client).post<RefreshAccessTokenResponses, RefreshAccessTokenErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'pb_session_token',
-            type: 'apiKey'
-        }, {
-            in: 'cookie',
-            name: 'pb_refresh_token',
-            type: 'apiKey'
-        }],
-    url: '/api/v1/auth/refresh',
-    ...options
-});
-
-/**
- * Get derived organization capabilities and verification status
- */
-export const getOrganizationCapabilitiesApi = <ThrowOnError extends boolean = false>(options: Options<GetOrganizationCapabilitiesData, ThrowOnError>): RequestResult<GetOrganizationCapabilitiesResponses, GetOrganizationCapabilitiesErrors, ThrowOnError> => (options.client ?? client).get<GetOrganizationCapabilitiesResponses, GetOrganizationCapabilitiesErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'pb_session_token',
-            type: 'apiKey'
-        }],
-    url: '/api/v1/organization/{organizationId}/capabilities',
-    ...options
-});

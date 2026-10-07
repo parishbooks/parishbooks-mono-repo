@@ -56,9 +56,91 @@ export type ResetPasswordDto = {
     password: string;
 };
 
+export type OrganizationCapabilitiesFlagsDto = {
+    isKycVerified: boolean;
+    canCollectOnlineDonations: boolean;
+    canReceivePayouts: boolean;
+    canRecordDonationsManually: boolean;
+    canAddMembers: boolean;
+    canInviteTeam: boolean;
+    canManageFunds: boolean;
+    canSubmitVerification: boolean;
+};
+
+export type OrganizationVerificationStatus = 'not_started' | 'pending' | 'active' | 'rejected';
+
+export type OrganizationVerificationSummaryDto = {
+    status: OrganizationVerificationStatus;
+    statusAt?: string | null;
+    rejectionReason?: {
+        [key: string]: unknown;
+    } | null;
+};
+
+export type OrganizationCapabilitiesResponseDto = {
+    organizationId: string;
+    capabilities: OrganizationCapabilitiesFlagsDto;
+    verification: OrganizationVerificationSummaryDto;
+};
+
 export type OrganizationCountry = 'IN' | 'US';
 
+export type OrganizationPlanTier = 'starter' | 'pro';
+
+export type OrganizationBillingStatus = 'active' | 'pastDue' | 'locked' | 'canceled';
+
+export type OrganizationBillingProvider = 'stripe' | 'cashfree';
+
 export type OrganizationCurrency = 'INR' | 'USD';
+
+export type CashfreeVendorStatus = 'not_started' | 'pending' | 'active' | 'rejected';
+
+export type OrganizationProfileResponseDto = {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt?: string | null;
+    organizationId: string;
+    country: OrganizationCountry;
+    /**
+     * Whether the organization is registered under FCRA
+     */
+    fcraRegistered: boolean;
+    planTier: OrganizationPlanTier;
+    billingStatus: OrganizationBillingStatus;
+    billingProvider?: OrganizationBillingProvider | null;
+    timezone: string;
+    currency: OrganizationCurrency;
+    registrationNumber?: string | null;
+    /**
+     * India 80G tax exemption number
+     */
+    taxExemptionNumber80g?: string | null;
+    /**
+     * US employer identification number
+     */
+    ein?: string | null;
+    cashfreeVendorId?: string | null;
+    cashfreeVendorStatus: CashfreeVendorStatus;
+    cashfreeVendorStatusAt?: string | null;
+    cashfreeVendorRejectionReason?: string | null;
+};
+
+export type OrganizationResponseDto = {
+    id: string;
+    name: string;
+    slug: string;
+    createdAt: string;
+    /**
+     * Organization logo URL
+     */
+    logo?: string | null;
+    /**
+     * JSON-encoded organization metadata (timezone, country, currency)
+     */
+    metadata?: string | null;
+    profile: OrganizationProfileResponseDto;
+};
 
 export type CreateOrganizationDto = {
     name: string;
@@ -79,31 +161,6 @@ export type SetActiveOrganizationDto = {
      * Organization slug to activate when organizationId is omitted
      */
     organizationSlug?: string;
-};
-
-export type OrganizationVerificationStatus = 'not_started' | 'pending' | 'active' | 'rejected';
-
-export type OrganizationCapabilitiesFlagsDto = {
-    isKycVerified: boolean;
-    canCollectOnlineDonations: boolean;
-    canReceivePayouts: boolean;
-    canRecordDonationsManually: boolean;
-    canAddMembers: boolean;
-    canInviteTeam: boolean;
-    canManageFunds: boolean;
-    canSubmitVerification: boolean;
-};
-
-export type OrganizationVerificationSummaryDto = {
-    status: OrganizationVerificationStatus;
-    statusAt?: string | null;
-    rejectionReason?: string | null;
-};
-
-export type OrganizationCapabilitiesResponseDto = {
-    organizationId: string;
-    capabilities: OrganizationCapabilitiesFlagsDto;
-    verification: OrganizationVerificationSummaryDto;
 };
 
 export type GetCurrentSessionData = {
@@ -188,6 +245,29 @@ export type SignOutResponses = {
 };
 
 export type SignOutResponse = SignOutResponses[keyof SignOutResponses];
+
+export type RefreshAccessTokenData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/refresh';
+};
+
+export type RefreshAccessTokenErrors = {
+    401: ErrorResponseDto;
+    429: ErrorResponseDto;
+};
+
+export type RefreshAccessTokenError = RefreshAccessTokenErrors[keyof RefreshAccessTokenErrors];
+
+export type RefreshAccessTokenResponses = {
+    /**
+     * Sets a fresh pb_access_token cookie
+     */
+    200: SuccessResponseDto;
+};
+
+export type RefreshAccessTokenResponse = RefreshAccessTokenResponses[keyof RefreshAccessTokenResponses];
 
 export type SendEmailOtpData = {
     body: SendEmailOtpDto;
@@ -337,6 +417,31 @@ export type GetOrganizationProfileResponses = {
     200: unknown;
 };
 
+export type GetOrganizationCapabilitiesData = {
+    body?: never;
+    path: {
+        /**
+         * Organization id
+         */
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/v1/organization/{organizationId}/capabilities';
+};
+
+export type GetOrganizationCapabilitiesErrors = {
+    401: ErrorResponseDto;
+    404: ErrorResponseDto;
+};
+
+export type GetOrganizationCapabilitiesError = GetOrganizationCapabilitiesErrors[keyof GetOrganizationCapabilitiesErrors];
+
+export type GetOrganizationCapabilitiesResponses = {
+    200: OrganizationCapabilitiesResponseDto;
+};
+
+export type GetOrganizationCapabilitiesResponse = GetOrganizationCapabilitiesResponses[keyof GetOrganizationCapabilitiesResponses];
+
 export type GetOrganizationData = {
     body?: never;
     path: {
@@ -360,8 +465,10 @@ export type GetOrganizationResponses = {
     /**
      * Organization with profile
      */
-    200: unknown;
+    200: OrganizationResponseDto;
 };
+
+export type GetOrganizationResponse = GetOrganizationResponses[keyof GetOrganizationResponses];
 
 export type SetActiveOrganizationData = {
     body: SetActiveOrganizationDto;
@@ -650,54 +757,3 @@ export type HealthCheckResponses = {
 };
 
 export type HealthCheckResponse = HealthCheckResponses[keyof HealthCheckResponses];
-
-export type RefreshAccessTokenData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/auth/refresh';
-};
-
-export type RefreshAccessTokenErrors = {
-    401: ErrorResponseDto;
-    429: ErrorResponseDto;
-};
-
-export type RefreshAccessTokenError = RefreshAccessTokenErrors[keyof RefreshAccessTokenErrors];
-
-export type RefreshAccessTokenResponses = {
-    /**
-     * Sets a fresh pb_access_token cookie
-     */
-    200: SuccessResponseDto;
-};
-
-export type RefreshAccessTokenResponse = RefreshAccessTokenResponses[keyof RefreshAccessTokenResponses];
-
-export type GetOrganizationCapabilitiesData = {
-    body?: never;
-    path: {
-        /**
-         * Organization id
-         */
-        organizationId: string;
-    };
-    query?: never;
-    url: '/api/v1/organization/{organizationId}/capabilities';
-};
-
-export type GetOrganizationCapabilitiesErrors = {
-    401: ErrorResponseDto;
-    404: ErrorResponseDto;
-};
-
-export type GetOrganizationCapabilitiesError = GetOrganizationCapabilitiesErrors[keyof GetOrganizationCapabilitiesErrors];
-
-export type GetOrganizationCapabilitiesResponses = {
-    /**
-     * Organization capabilities
-     */
-    200: OrganizationCapabilitiesResponseDto;
-};
-
-export type GetOrganizationCapabilitiesResponse = GetOrganizationCapabilitiesResponses[keyof GetOrganizationCapabilitiesResponses];

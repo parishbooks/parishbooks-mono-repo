@@ -15,6 +15,7 @@ import { ErrorResponseDto, Token } from '@parishbooks/core';
 import type { Response } from 'express';
 import { SESSION_TOKEN_NAME } from '../auth/constants';
 import { OrganizationCapabilitiesResponseDto } from './dto/organization-capabilities.dto';
+import { OrganizationResponseDto } from './dto/organization-response.dto';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { SetActiveOrganizationDto } from './dto/set-active-organization.dto';
 import { OrganizationService } from './organization.service';
@@ -59,7 +60,7 @@ export class OrganizationController {
     @ApiOperation({ operationId: 'getOrganization', summary: 'Get an organization with its profile' })
     @ApiCookieAuth(SESSION_TOKEN_NAME)
     @ApiParam({ name: 'organizationId', description: 'Organization id' })
-    @ApiOkResponse({ description: 'Organization with profile' })
+    @ApiOkResponse({ type: OrganizationResponseDto, description: 'Organization with profile' })
     @ApiNotFoundResponse({ type: ErrorResponseDto })
     @ApiUnauthorizedResponse({ type: ErrorResponseDto })
     async getOrganization(@Param('organizationId') organizationId: string, @Token('session') sessionToken: string) {

@@ -1,12 +1,12 @@
+import { getSession } from '@/lib/actions/auth/get-session';
+import { getOrganization } from '@/lib/actions/org/get-org';
+import { dashboardPath } from '@/lib/utils/paths';
 import { redirect } from 'next/navigation';
-import { loadWorkspaceOrganizations } from '@/lib/actions/org';
-import { dashboardPath, defaultOrgSlug } from '@/lib/utils/paths';
 
 /** `/dashboard` → `/dashboard/{orgSlug}` for the active (or first) organization. */
 export default async function DashboardIndexPage() {
-    const workspace = await loadWorkspaceOrganizations();
-    if (!workspace || workspace.organizations.length === 0) redirect('/onboarding');
-    const slug = defaultOrgSlug(workspace.organizations, workspace.activeOrganizationId);
-    if (!slug) redirect('/onboarding');
-    redirect(dashboardPath(slug));
+    const session = await getSession();
+    if (!session.session.activeOrganizationId) redirect('/onboarding');
+    const org = await getOrganization(session.session.activeOrganizationId);
+    redirect(dashboardPath(org.slug));
 }
