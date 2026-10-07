@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, BookOpen, CalendarDays, CircleDollarSign, LayoutDashboard, Menu, Megaphone, Settings, Users, X } from 'lucide-react';
+import { BarChart3, BookOpen, Building2, CalendarDays, CircleDollarSign, LayoutDashboard, Menu, Megaphone, Settings, Users, X } from 'lucide-react';
 import { SiteBrand } from '@parishbooks/site-ui';
 import { SignOutButton } from '@/components/auth/sign-out-button';
 import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
@@ -26,6 +26,7 @@ export function DashboardOrgShell({ children, organizations, orgSlug }: Dashboar
     const settingsActive = pathname.startsWith(dashboardPath(orgSlug, 'settings'));
 
     const nav = [
+        ['My Orgs', '/dashboard', Building2],
         ['Overview', homeHref, LayoutDashboard],
         ['Giving', dashboardPath(orgSlug, 'giving'), CircleDollarSign],
         ['Members', dashboardPath(orgSlug, 'members'), Users],
