@@ -3,11 +3,11 @@
 import { BarChart3, CalendarDays, CircleDollarSign, Megaphone, Users } from 'lucide-react';
 import { useOrg } from '@/lib/context/org';
 import { dashboardPath } from '@/lib/utils/paths';
-import { OnlineGivingSoftGate } from './online-giving-soft-gate';
+import { OnlineGivingSoftGate } from '../giving/online-giving-soft-gate';
+import { RecordDonationButton } from '../giving/record-donation-button';
+import { StatCard } from '../shared/stat-card';
 import { OrganizationsCard } from './organizations-card';
-import { RecordDonationButton } from './record-donation-button';
 import { SetupChecklist } from './setup-checklist';
-import { StatCard } from './stat-card';
 
 export function DashboardOverview() {
     const { orgSlug, capabilities } = useOrg();

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BarChart3, BookOpen, CalendarDays, CircleDollarSign, LayoutDashboard, Menu, Megaphone, Settings, Users, X } from 'lucide-react';
+import { SiteBrand } from '@parishbooks/site-ui';
 import { SignOutButton } from '@/components/auth/sign-out-button';
 import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
 import { dashboardPath } from '@/lib/utils/paths';
@@ -40,10 +41,7 @@ export function DashboardOrgShell({ children, organizations, orgSlug }: Dashboar
                 className={`fixed inset-y-0 left-0 z-40 flex h-full w-72 flex-col border-r bg-card p-5 transition-transform lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 <div className="flex items-center justify-between px-2 pb-8">
-                    <Link href={homeHref} className="flex items-center gap-3 font-semibold tracking-tight">
-                        <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">pb</span>
-                        <span className="text-lg">ParishBooks</span>
-                    </Link>
+                    <SiteBrand href={homeHref} />
                     <button className="lg:hidden" onClick={() => setOpen(false)} aria-label="Close navigation">
                         <X />
                     </button>

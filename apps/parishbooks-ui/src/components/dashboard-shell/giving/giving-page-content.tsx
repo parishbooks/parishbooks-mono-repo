@@ -4,7 +4,7 @@ import { CircleDollarSign, Repeat, Receipt, TrendingUp } from 'lucide-react';
 import { useOrg } from '@/lib/context/org';
 import { OnlineGivingSoftGate } from './online-giving-soft-gate';
 import { RecordDonationButton } from './record-donation-button';
-import { StatCard } from './stat-card';
+import { StatCard } from '../shared/stat-card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@parishbooks/design-system/ui/table';
 import { Badge } from '@parishbooks/design-system/ui/badge';
 

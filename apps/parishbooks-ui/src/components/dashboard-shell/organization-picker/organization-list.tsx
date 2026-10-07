@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, Plus } from 'lucide-react';
 import { buttonVariants } from '@parishbooks/design-system/ui/button';
 import { Spinner } from '@parishbooks/design-system/ui/spinner';
 import { cn } from '@parishbooks/design-system/utils';
 import type { WorkspaceOrganization } from '@/lib/actions/org/load-workspace-organizations';
+import { DashboardSearch } from '../shell/dashboard-search';
 
 function orgInitial(name: string): string {
     const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -29,6 +31,12 @@ export function OrganizationList({
     error: string | null;
     onOpen: (organization: WorkspaceOrganization) => void;
 }) {
+    const [query, setQuery] = useState('');
+    const normalized = query.trim().toLowerCase();
+    const visibleOrganizations = normalized
+        ? organizations.filter((organization) => organization.name.toLowerCase().includes(normalized) || organization.slug.toLowerCase().includes(normalized))
+        : organizations;
+
     return (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -42,44 +50,50 @@ export function OrganizationList({
                 </Link>
             </div>
 
+            <DashboardSearch className="w-full" placeholder="Search organizations" value={query} onChange={setQuery} />
+
             {error ? (
                 <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
                     {error}
                 </p>
             ) : null}
 
-            <ul className="grid gap-3 sm:grid-cols-2">
-                {organizations.map((organization) => {
-                    const isCurrent = organization.id === activeOrganizationId;
-                    const isPending = pendingId === organization.id;
-                    return (
-                        <li key={organization.id}>
-                            <button
-                                type="button"
-                                disabled={pendingId !== null}
-                                aria-busy={isPending || undefined}
-                                onClick={() => onOpen(organization)}
-                                className={cn(
-                                    'flex h-full w-full items-center gap-4 rounded-xl border bg-card px-4 py-3 text-left transition-colors outline-none',
-                                    'hover:bg-accent focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
-                                    'disabled:pointer-events-none disabled:opacity-60',
-                                    isCurrent && 'border-primary/40',
-                                )}
-                            >
-                                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-sm font-semibold">
-                                    {orgInitial(organization.name)}
-                                </span>
-                                <span className="min-w-0 flex-1">
-                                    <span className="block truncate text-sm font-medium">{organization.name}</span>
-                                    <span className="mt-0.5 block truncate text-xs text-muted-foreground">{organization.slug}</span>
-                                </span>
-                                {isCurrent ? <span className="text-xs font-medium text-primary">Current</span> : null}
-                                {isPending ? <Spinner /> : <ChevronRight className="size-4 shrink-0 text-muted-foreground" />}
-                            </button>
-                        </li>
-                    );
-                })}
-            </ul>
+            {visibleOrganizations.length > 0 ? (
+                <ul className="grid gap-3 sm:grid-cols-2">
+                    {visibleOrganizations.map((organization) => {
+                        const isCurrent = organization.id === activeOrganizationId;
+                        const isPending = pendingId === organization.id;
+                        return (
+                            <li key={organization.id}>
+                                <button
+                                    type="button"
+                                    disabled={pendingId !== null}
+                                    aria-busy={isPending || undefined}
+                                    onClick={() => onOpen(organization)}
+                                    className={cn(
+                                        'flex h-full w-full items-center gap-4 rounded-xl border bg-card px-4 py-3 text-left transition-colors outline-none',
+                                        'hover:bg-accent focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                                        'disabled:pointer-events-none disabled:opacity-60',
+                                        isCurrent && 'border-primary/40',
+                                    )}
+                                >
+                                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-sm font-semibold">
+                                        {orgInitial(organization.name)}
+                                    </span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block truncate text-sm font-medium">{organization.name}</span>
+                                        <span className="mt-0.5 block truncate text-xs text-muted-foreground">{organization.slug}</span>
+                                    </span>
+                                    {isCurrent ? <span className="text-xs font-medium text-primary">Current</span> : null}
+                                    {isPending ? <Spinner /> : <ChevronRight className="size-4 shrink-0 text-muted-foreground" />}
+                                </button>
+                            </li>
+                        );
+                    })}
+                </ul>
+            ) : (
+                <p className="text-sm text-muted-foreground">No organizations match that search.</p>
+            )}
         </div>
     );
 }

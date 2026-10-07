@@ -1,13 +1,11 @@
 import { ModeToggle } from '@parishbooks/design-system/mode-toggle';
-import { Bell, Search } from 'lucide-react';
+import { Bell } from 'lucide-react';
+import { DashboardSearch } from './dashboard-search';
 
-export function DashboardHeaderActions() {
+export function DashboardHeaderActions({ showSearch = true }: { showSearch?: boolean }) {
     return (
         <div className="ml-auto flex items-center gap-3">
-            <div className="hidden h-10 w-64 items-center gap-2 rounded-xl border bg-background px-3 md:flex">
-                <Search className="size-4 text-muted-foreground" />
-                <input className="w-full bg-transparent text-sm outline-none" placeholder="Search anything..." />
-            </div>
+            {showSearch ? <DashboardSearch className="hidden w-64 md:flex" /> : null}
             <button
                 className="flex size-10 items-center justify-center rounded-xl border bg-background text-muted-foreground hover:text-foreground"
                 aria-label="Notifications"
