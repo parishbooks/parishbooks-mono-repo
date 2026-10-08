@@ -173,6 +173,13 @@
       "name": "@parishbooks/parishbooks-ui-e2e",
       "version": "0.0.1",
     },
+    "packages/api-sdk": {
+      "name": "@parishbooks/api-sdk",
+      "version": "0.0.1",
+      "dependencies": {
+        "tslib": "^2.3.0",
+      },
+    },
     "packages/communications": {
       "name": "@parishbooks/communications",
       "version": "0.0.1",
@@ -1017,6 +1024,8 @@
     "@parcel/watcher-win32-arm64": ["@parcel/watcher-win32-arm64@2.6.0", "", { "os": "win32", "cpu": "arm64" }, "sha512-gIZAP23jaHjGWasY/TY6yL7NHFClf0Ga7FN+iINvk+KN94rhm94lYZhFsbYFNcA04/onvGD9kKmiJLJB2HbNwQ=="],
 
     "@parcel/watcher-win32-x64": ["@parcel/watcher-win32-x64@2.6.0", "", { "os": "win32", "cpu": "x64" }, "sha512-cA+/pXV2YkfxlIcXOQ5fSWqAzzPyD78/x5qbK/I0vUkrlYHA8TIz+MXjAbGouguKVSI4bOmkTSJ1/poVSsgt+A=="],
+
+    "@parishbooks/api-sdk": ["@parishbooks/api-sdk@workspace:packages/api-sdk"],
 
     "@parishbooks/communications": ["@parishbooks/communications@workspace:packages/communications"],
 

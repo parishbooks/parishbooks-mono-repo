@@ -10,6 +10,7 @@
         "auth:migrate": "bun nx run @parishbooks/iam:migrate",
         "db:generate": "bun nx run @parishbooks/database:db-generate",
         "db:migrate": "bun nx run @parishbooks/database:db-migrate",
+        "openapi:generate": "bun nx run @parishbooks/api-sdk:generate:openapi",
         "prepare": "husky",
         "lint-staged": "lint-staged"
     },

@@ -5,7 +5,15 @@ export default [
     ...nx.configs['flat/typescript'],
     ...nx.configs['flat/javascript'],
     {
-        ignores: ['**/dist', '**/out-tsc', '**/vitest.config.*.timestamp*', '**/test-output', '**/api-client/**', '**/next-env.d.ts'],
+        ignores: [
+            '**/dist',
+            '**/out-tsc',
+            '**/vitest.config.*.timestamp*',
+            '**/test-output',
+            '**/api-client/**',
+            'packages/api-sdk/src/lib/**',
+            '**/next-env.d.ts',
+        ],
     },
     {
         files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],

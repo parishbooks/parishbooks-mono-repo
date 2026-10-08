@@ -1,0 +1,17 @@
+{
+    "name": "@parishbooks/api-sdk",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/api-sdk/src",
+    "projectType": "library",
+    "tags": [],
+    "// targets": "to see all targets run: nx show project @parishbooks/api-sdk --web",
+    "targets": {
+        "generate:openapi": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "packages/api-sdk",
+                "command": "bunx openapi-ts --file openapi-ts.config.ts"
+            }
+        }
+    }
+}

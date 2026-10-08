@@ -32,6 +32,9 @@
         },
         {
             "path": "./packages/database"
+        },
+        {
+            "path": "./packages/api-sdk"
         }
     ]
 }
