@@ -10,7 +10,6 @@ export type ErrorResponseDto = {
     error?: string;
     timestamp: string;
     path: string;
-    correlationId?: string;
 };
 
 export type SignInDto = {

@@ -1,10 +1,11 @@
-import { Module, type MiddlewareConsumer, type NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule as BetterAuthModule } from '@thallesp/nestjs-better-auth';
 import { CommunicationsModule, EmailService } from '@parishbooks/communications';
-import { AllExceptionsFilter, AuthGuardModule, CorrelationMiddleware, defineLogger, defineThrottler, HealthModule, LoggerModule } from '@parishbooks/core';
+import { ClsModule } from 'nestjs-cls';
+import { AllExceptionsFilter, AuthGuardModule, defineLogger, defineThrottler, HealthModule, LoggerModule } from '@parishbooks/core';
 import { DatabaseModule } from '@parishbooks/database';
 import { AUTH_BASE_PATH, defineAuth } from '@parishbooks/iam';
 import { validateEnv } from '../config/env.validation';
@@ -13,6 +14,7 @@ import { OrganizationModule } from './organization/organization.module';
 
 @Module({
     imports: [
+        ClsModule.forRoot({ global: true, middleware: { mount: true, generateId: true, saveReq: true } }),
         ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
         LoggerModule.forRootAsync({
             inject: [ConfigService],
@@ -80,8 +82,4 @@ import { OrganizationModule } from './organization/organization.module';
         { provide: APP_GUARD, useClass: ThrottlerGuard },
     ],
 })
-export class AppModule implements NestModule {
-    configure(consumer: MiddlewareConsumer): void {
-        consumer.apply(CorrelationMiddleware).forRoutes('*path');
-    }
-}
+export class AppModule {}

@@ -1,5 +1,4 @@
 export * from './lib/application/index.js';
-export * from './lib/correlation/index.js';
 export * from './lib/decorators/index.js';
 export * from './lib/env/index.js';
 export * from './lib/errors/index.js';
