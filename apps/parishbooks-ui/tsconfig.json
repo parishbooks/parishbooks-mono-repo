@@ -68,6 +68,9 @@
     ],
     "references": [
         {
+            "path": "../../packages/api-sdk"
+        },
+        {
             "path": "../../packages/site-ui"
         },
         {

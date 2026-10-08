@@ -25,6 +25,22 @@ export default [
                     allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
                     depConstraints: [
                         {
+                            sourceTag: 'scope:parishbooks-ui',
+                            onlyDependOnLibsWithTags: ['*'],
+                        },
+                        {
+                            sourceTag: 'scope:server',
+                            notDependOnLibsWithTags: ['scope:parishbooks-ui'],
+                        },
+                        {
+                            sourceTag: 'scope:shared',
+                            notDependOnLibsWithTags: ['scope:parishbooks-ui'],
+                        },
+                        {
+                            sourceTag: 'type:ui',
+                            notDependOnLibsWithTags: ['scope:parishbooks-ui'],
+                        },
+                        {
                             sourceTag: '*',
                             onlyDependOnLibsWithTags: ['*'],
                         },
@@ -36,14 +52,13 @@ export default [
     {
         files: ['**/*.ts', '**/*.tsx', '**/*.cts', '**/*.mts'],
         rules: {
-            // Ban TypeScript/JSX extensions in relative imports. Allow .js/.mjs/.cjs for NodeNext.
             'no-restricted-imports': [
                 'error',
                 {
                     patterns: [
                         {
                             regex: String.raw`^\.\.?/.+\.(?:[cm]?ts|tsx|jsx)$`,
-                            message: 'Use extensionless or .js relative imports (not .ts/.tsx).',
+                            message: 'Use extensionless relative imports (not .ts/.tsx).',
                         },
                     ],
                 },

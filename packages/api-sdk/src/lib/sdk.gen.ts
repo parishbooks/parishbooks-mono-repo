@@ -77,301 +77,354 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
 
-/**
- * Get the current session
- */
-export const getCurrentSession = <ThrowOnError extends boolean = false>(
-    options?: Options<GetCurrentSessionData, ThrowOnError>,
-): RequestResult<GetCurrentSessionResponses, GetCurrentSessionErrors, ThrowOnError> =>
-    (options?.client ?? client).get<GetCurrentSessionResponses, GetCurrentSessionErrors, ThrowOnError>({
-        security: [
-            {
-                in: 'cookie',
-                name: 'pb_session_token',
-                type: 'apiKey',
+class HeyApiClient {
+    protected client: Client;
+
+    constructor(args?: { client?: Client }) {
+        this.client = args?.client ?? client;
+    }
+}
+
+class HeyApiRegistry<T> {
+    private readonly defaultKey = 'default';
+
+    private readonly instances: Map<string, T> = new Map();
+
+    get(key?: string): T {
+        const instance = this.instances.get(key ?? this.defaultKey);
+        if (!instance) {
+            throw new Error(`No SDK client found. Create one with "new ApiSdk()" to fix this error.`);
+        }
+        return instance;
+    }
+
+    set(value: T, key?: string): void {
+        this.instances.set(key ?? this.defaultKey, value);
+    }
+}
+
+export class ApiSdk extends HeyApiClient {
+    public static readonly __registry: HeyApiRegistry<ApiSdk> = new HeyApiRegistry<ApiSdk>();
+
+    constructor(args?: { client?: Client; key?: string }) {
+        super(args);
+        ApiSdk.__registry.set(this, args?.key);
+    }
+
+    /**
+     * Get the current session
+     */
+    public getCurrentSession<ThrowOnError extends boolean = false>(
+        options?: Options<GetCurrentSessionData, ThrowOnError>,
+    ): RequestResult<GetCurrentSessionResponses, GetCurrentSessionErrors, ThrowOnError> {
+        return (options?.client ?? this.client).get<GetCurrentSessionResponses, GetCurrentSessionErrors, ThrowOnError>({
+            security: [
+                {
+                    in: 'cookie',
+                    name: 'pb_session_token',
+                    type: 'apiKey',
+                },
+            ],
+            url: '/api/v1/auth/session',
+            ...options,
+        });
+    }
+
+    /**
+     * Sign in with email and password
+     */
+    public signIn<ThrowOnError extends boolean = false>(
+        options: Options<SignInData, ThrowOnError>,
+    ): RequestResult<SignInResponses, SignInErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<SignInResponses, SignInErrors, ThrowOnError>({
+            url: '/api/v1/auth/sign-in',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
             },
-        ],
-        url: '/api/v1/auth/session',
-        ...options,
-    });
+        });
+    }
 
-/**
- * Sign in with email and password
- */
-export const signIn = <ThrowOnError extends boolean = false>(
-    options: Options<SignInData, ThrowOnError>,
-): RequestResult<SignInResponses, SignInErrors, ThrowOnError> =>
-    (options.client ?? client).post<SignInResponses, SignInErrors, ThrowOnError>({
-        url: '/api/v1/auth/sign-in',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
-
-/**
- * Create an account and start email verification
- */
-export const signUp = <ThrowOnError extends boolean = false>(
-    options: Options<SignUpData, ThrowOnError>,
-): RequestResult<SignUpResponses, SignUpErrors, ThrowOnError> =>
-    (options.client ?? client).post<SignUpResponses, SignUpErrors, ThrowOnError>({
-        url: '/api/v1/auth/sign-up',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
-
-/**
- * Sign out and clear auth cookies
- */
-export const signOut = <ThrowOnError extends boolean = false>(
-    options?: Options<SignOutData, ThrowOnError>,
-): RequestResult<SignOutResponses, SignOutErrors, ThrowOnError> =>
-    (options?.client ?? client).post<SignOutResponses, SignOutErrors, ThrowOnError>({
-        security: [
-            {
-                in: 'cookie',
-                name: 'pb_session_token',
-                type: 'apiKey',
+    /**
+     * Create an account and start email verification
+     */
+    public signUp<ThrowOnError extends boolean = false>(
+        options: Options<SignUpData, ThrowOnError>,
+    ): RequestResult<SignUpResponses, SignUpErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<SignUpResponses, SignUpErrors, ThrowOnError>({
+            url: '/api/v1/auth/sign-up',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
             },
-            {
-                in: 'cookie',
-                name: 'pb_refresh_token',
-                type: 'apiKey',
+        });
+    }
+
+    /**
+     * Sign out and clear auth cookies
+     */
+    public signOut<ThrowOnError extends boolean = false>(
+        options?: Options<SignOutData, ThrowOnError>,
+    ): RequestResult<SignOutResponses, SignOutErrors, ThrowOnError> {
+        return (options?.client ?? this.client).post<SignOutResponses, SignOutErrors, ThrowOnError>({
+            security: [
+                {
+                    in: 'cookie',
+                    name: 'pb_session_token',
+                    type: 'apiKey',
+                },
+                {
+                    in: 'cookie',
+                    name: 'pb_refresh_token',
+                    type: 'apiKey',
+                },
+                {
+                    in: 'cookie',
+                    name: 'pb_access_token',
+                    type: 'apiKey',
+                },
+            ],
+            url: '/api/v1/auth/sign-out',
+            ...options,
+        });
+    }
+
+    /**
+     * Remint pb_access_token from a valid session cookie
+     */
+    public refreshAccessToken<ThrowOnError extends boolean = false>(
+        options?: Options<RefreshAccessTokenData, ThrowOnError>,
+    ): RequestResult<RefreshAccessTokenResponses, RefreshAccessTokenErrors, ThrowOnError> {
+        return (options?.client ?? this.client).post<RefreshAccessTokenResponses, RefreshAccessTokenErrors, ThrowOnError>({
+            security: [
+                {
+                    in: 'cookie',
+                    name: 'pb_refresh_token',
+                    type: 'apiKey',
+                },
+                {
+                    in: 'cookie',
+                    name: 'pb_session_token',
+                    type: 'apiKey',
+                },
+            ],
+            url: '/api/v1/auth/refresh',
+            ...options,
+        });
+    }
+
+    /**
+     * Send an email OTP
+     */
+    public sendEmailOtp<ThrowOnError extends boolean = false>(
+        options: Options<SendEmailOtpData, ThrowOnError>,
+    ): RequestResult<SendEmailOtpResponses, SendEmailOtpErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<SendEmailOtpResponses, SendEmailOtpErrors, ThrowOnError>({
+            url: '/api/v1/auth/email-otp/send',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
             },
-            {
-                in: 'cookie',
-                name: 'pb_access_token',
-                type: 'apiKey',
+        });
+    }
+
+    /**
+     * Verify email with OTP and establish session cookies
+     */
+    public verifyEmailOtp<ThrowOnError extends boolean = false>(
+        options: Options<VerifyEmailOtpData, ThrowOnError>,
+    ): RequestResult<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError>({
+            url: '/api/v1/auth/email-otp/verify',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
             },
-        ],
-        url: '/api/v1/auth/sign-out',
-        ...options,
-    });
+        });
+    }
 
-/**
- * Remint pb_access_token from a valid session cookie
- */
-export const refreshAccessToken = <ThrowOnError extends boolean = false>(
-    options?: Options<RefreshAccessTokenData, ThrowOnError>,
-): RequestResult<RefreshAccessTokenResponses, RefreshAccessTokenErrors, ThrowOnError> =>
-    (options?.client ?? client).post<RefreshAccessTokenResponses, RefreshAccessTokenErrors, ThrowOnError>({
-        security: [
-            {
-                in: 'cookie',
-                name: 'pb_refresh_token',
-                type: 'apiKey',
+    /**
+     * Request a password reset OTP
+     */
+    public forgotPassword<ThrowOnError extends boolean = false>(
+        options: Options<ForgotPasswordData, ThrowOnError>,
+    ): RequestResult<ForgotPasswordResponses, ForgotPasswordErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<ForgotPasswordResponses, ForgotPasswordErrors, ThrowOnError>({
+            url: '/api/v1/auth/forgot-password',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
             },
-            {
-                in: 'cookie',
-                name: 'pb_session_token',
-                type: 'apiKey',
+        });
+    }
+
+    /**
+     * Reset password with email OTP
+     */
+    public resetPassword<ThrowOnError extends boolean = false>(
+        options: Options<ResetPasswordData, ThrowOnError>,
+    ): RequestResult<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError>({
+            url: '/api/v1/auth/reset-password',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
             },
-        ],
-        url: '/api/v1/auth/refresh',
-        ...options,
-    });
+        });
+    }
 
-/**
- * Send an email OTP
- */
-export const sendEmailOtp = <ThrowOnError extends boolean = false>(
-    options: Options<SendEmailOtpData, ThrowOnError>,
-): RequestResult<SendEmailOtpResponses, SendEmailOtpErrors, ThrowOnError> =>
-    (options.client ?? client).post<SendEmailOtpResponses, SendEmailOtpErrors, ThrowOnError>({
-        url: '/api/v1/auth/email-otp/send',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
+    /**
+     * List organizations for the current user
+     */
+    public listOrganizations<ThrowOnError extends boolean = false>(
+        options?: Options<ListOrganizationsData, ThrowOnError>,
+    ): RequestResult<ListOrganizationsResponses, ListOrganizationsErrors, ThrowOnError> {
+        return (options?.client ?? this.client).get<ListOrganizationsResponses, ListOrganizationsErrors, ThrowOnError>({
+            security: [
+                {
+                    in: 'cookie',
+                    name: 'pb_session_token',
+                    type: 'apiKey',
+                },
+            ],
+            url: '/api/v1/organization',
+            ...options,
+        });
+    }
 
-/**
- * Verify email with OTP and establish session cookies
- */
-export const verifyEmailOtp = <ThrowOnError extends boolean = false>(
-    options: Options<VerifyEmailOtpData, ThrowOnError>,
-): RequestResult<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError> =>
-    (options.client ?? client).post<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError>({
-        url: '/api/v1/auth/email-otp/verify',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
-
-/**
- * Request a password reset OTP
- */
-export const forgotPassword = <ThrowOnError extends boolean = false>(
-    options: Options<ForgotPasswordData, ThrowOnError>,
-): RequestResult<ForgotPasswordResponses, ForgotPasswordErrors, ThrowOnError> =>
-    (options.client ?? client).post<ForgotPasswordResponses, ForgotPasswordErrors, ThrowOnError>({
-        url: '/api/v1/auth/forgot-password',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
-
-/**
- * Reset password with email OTP
- */
-export const resetPassword = <ThrowOnError extends boolean = false>(
-    options: Options<ResetPasswordData, ThrowOnError>,
-): RequestResult<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError> =>
-    (options.client ?? client).post<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError>({
-        url: '/api/v1/auth/reset-password',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
-
-/**
- * List organizations for the current user
- */
-export const listOrganizations = <ThrowOnError extends boolean = false>(
-    options?: Options<ListOrganizationsData, ThrowOnError>,
-): RequestResult<ListOrganizationsResponses, ListOrganizationsErrors, ThrowOnError> =>
-    (options?.client ?? client).get<ListOrganizationsResponses, ListOrganizationsErrors, ThrowOnError>({
-        security: [
-            {
-                in: 'cookie',
-                name: 'pb_session_token',
-                type: 'apiKey',
+    /**
+     * Create an organization and profile
+     */
+    public createOrganization<ThrowOnError extends boolean = false>(
+        options: Options<CreateOrganizationData, ThrowOnError>,
+    ): RequestResult<CreateOrganizationResponses, CreateOrganizationErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<CreateOrganizationResponses, CreateOrganizationErrors, ThrowOnError>({
+            security: [
+                {
+                    in: 'cookie',
+                    name: 'pb_session_token',
+                    type: 'apiKey',
+                },
+            ],
+            url: '/api/v1/organization',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
             },
-        ],
-        url: '/api/v1/organization',
-        ...options,
-    });
+        });
+    }
 
-/**
- * Create an organization and profile
- */
-export const createOrganization = <ThrowOnError extends boolean = false>(
-    options: Options<CreateOrganizationData, ThrowOnError>,
-): RequestResult<CreateOrganizationResponses, CreateOrganizationErrors, ThrowOnError> =>
-    (options.client ?? client).post<CreateOrganizationResponses, CreateOrganizationErrors, ThrowOnError>({
-        security: [
-            {
-                in: 'cookie',
-                name: 'pb_session_token',
-                type: 'apiKey',
+    /**
+     * Get an organization profile
+     */
+    public getOrganizationProfile<ThrowOnError extends boolean = false>(
+        options: Options<GetOrganizationProfileData, ThrowOnError>,
+    ): RequestResult<GetOrganizationProfileResponses, GetOrganizationProfileErrors, ThrowOnError> {
+        return (options.client ?? this.client).get<GetOrganizationProfileResponses, GetOrganizationProfileErrors, ThrowOnError>({
+            security: [
+                {
+                    in: 'cookie',
+                    name: 'pb_session_token',
+                    type: 'apiKey',
+                },
+            ],
+            url: '/api/v1/organization/{organizationId}/profile',
+            ...options,
+        });
+    }
+
+    /**
+     * Get derived organization capabilities and verification status
+     */
+    public getOrganizationCapabilities<ThrowOnError extends boolean = false>(
+        options: Options<GetOrganizationCapabilitiesData, ThrowOnError>,
+    ): RequestResult<GetOrganizationCapabilitiesResponses, GetOrganizationCapabilitiesErrors, ThrowOnError> {
+        return (options.client ?? this.client).get<GetOrganizationCapabilitiesResponses, GetOrganizationCapabilitiesErrors, ThrowOnError>({
+            security: [
+                {
+                    in: 'cookie',
+                    name: 'pb_session_token',
+                    type: 'apiKey',
+                },
+            ],
+            url: '/api/v1/organization/{organizationId}/capabilities',
+            ...options,
+        });
+    }
+
+    /**
+     * Get an organization with its profile
+     */
+    public getOrganization<ThrowOnError extends boolean = false>(
+        options: Options<GetOrganizationData, ThrowOnError>,
+    ): RequestResult<GetOrganizationResponses, GetOrganizationErrors, ThrowOnError> {
+        return (options.client ?? this.client).get<GetOrganizationResponses, GetOrganizationErrors, ThrowOnError>({
+            security: [
+                {
+                    in: 'cookie',
+                    name: 'pb_session_token',
+                    type: 'apiKey',
+                },
+            ],
+            url: '/api/v1/organization/{organizationId}',
+            ...options,
+        });
+    }
+
+    /**
+     * Set the active organization for the current session
+     */
+    public setActiveOrganization<ThrowOnError extends boolean = false>(
+        options: Options<SetActiveOrganizationData, ThrowOnError>,
+    ): RequestResult<SetActiveOrganizationResponses, SetActiveOrganizationErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<SetActiveOrganizationResponses, SetActiveOrganizationErrors, ThrowOnError>({
+            security: [
+                {
+                    in: 'cookie',
+                    name: 'pb_session_token',
+                    type: 'apiKey',
+                },
+            ],
+            url: '/api/v1/organization/activate',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
             },
-        ],
-        url: '/api/v1/organization',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
+        });
+    }
 
-/**
- * Get an organization profile
- */
-export const getOrganizationProfile = <ThrowOnError extends boolean = false>(
-    options: Options<GetOrganizationProfileData, ThrowOnError>,
-): RequestResult<GetOrganizationProfileResponses, GetOrganizationProfileErrors, ThrowOnError> =>
-    (options.client ?? client).get<GetOrganizationProfileResponses, GetOrganizationProfileErrors, ThrowOnError>({
-        security: [
-            {
-                in: 'cookie',
-                name: 'pb_session_token',
-                type: 'apiKey',
-            },
-        ],
-        url: '/api/v1/organization/{organizationId}/profile',
-        ...options,
-    });
+    /**
+     * Liveness probe
+     */
+    public healthLive<ThrowOnError extends boolean = false>(
+        options?: Options<HealthLiveData, ThrowOnError>,
+    ): RequestResult<HealthLiveResponses, HealthLiveErrors, ThrowOnError> {
+        return (options?.client ?? this.client).get<HealthLiveResponses, HealthLiveErrors, ThrowOnError>({ url: '/api/health/live', ...options });
+    }
 
-/**
- * Get derived organization capabilities and verification status
- */
-export const getOrganizationCapabilities = <ThrowOnError extends boolean = false>(
-    options: Options<GetOrganizationCapabilitiesData, ThrowOnError>,
-): RequestResult<GetOrganizationCapabilitiesResponses, GetOrganizationCapabilitiesErrors, ThrowOnError> =>
-    (options.client ?? client).get<GetOrganizationCapabilitiesResponses, GetOrganizationCapabilitiesErrors, ThrowOnError>({
-        security: [
-            {
-                in: 'cookie',
-                name: 'pb_session_token',
-                type: 'apiKey',
-            },
-        ],
-        url: '/api/v1/organization/{organizationId}/capabilities',
-        ...options,
-    });
+    /**
+     * Readiness probe
+     */
+    public healthReady<ThrowOnError extends boolean = false>(
+        options?: Options<HealthReadyData, ThrowOnError>,
+    ): RequestResult<HealthReadyResponses, HealthReadyErrors, ThrowOnError> {
+        return (options?.client ?? this.client).get<HealthReadyResponses, HealthReadyErrors, ThrowOnError>({ url: '/api/health/ready', ...options });
+    }
 
-/**
- * Get an organization with its profile
- */
-export const getOrganization = <ThrowOnError extends boolean = false>(
-    options: Options<GetOrganizationData, ThrowOnError>,
-): RequestResult<GetOrganizationResponses, GetOrganizationErrors, ThrowOnError> =>
-    (options.client ?? client).get<GetOrganizationResponses, GetOrganizationErrors, ThrowOnError>({
-        security: [
-            {
-                in: 'cookie',
-                name: 'pb_session_token',
-                type: 'apiKey',
-            },
-        ],
-        url: '/api/v1/organization/{organizationId}',
-        ...options,
-    });
-
-/**
- * Set the active organization for the current session
- */
-export const setActiveOrganization = <ThrowOnError extends boolean = false>(
-    options: Options<SetActiveOrganizationData, ThrowOnError>,
-): RequestResult<SetActiveOrganizationResponses, SetActiveOrganizationErrors, ThrowOnError> =>
-    (options.client ?? client).post<SetActiveOrganizationResponses, SetActiveOrganizationErrors, ThrowOnError>({
-        security: [
-            {
-                in: 'cookie',
-                name: 'pb_session_token',
-                type: 'apiKey',
-            },
-        ],
-        url: '/api/v1/organization/activate',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
-
-/**
- * Liveness probe
- */
-export const healthLive = <ThrowOnError extends boolean = false>(
-    options?: Options<HealthLiveData, ThrowOnError>,
-): RequestResult<HealthLiveResponses, HealthLiveErrors, ThrowOnError> =>
-    (options?.client ?? client).get<HealthLiveResponses, HealthLiveErrors, ThrowOnError>({ url: '/api/health/live', ...options });
-
-/**
- * Readiness probe
- */
-export const healthReady = <ThrowOnError extends boolean = false>(
-    options?: Options<HealthReadyData, ThrowOnError>,
-): RequestResult<HealthReadyResponses, HealthReadyErrors, ThrowOnError> =>
-    (options?.client ?? client).get<HealthReadyResponses, HealthReadyErrors, ThrowOnError>({ url: '/api/health/ready', ...options });
-
-/**
- * Combined health check
- */
-export const healthCheck = <ThrowOnError extends boolean = false>(
-    options?: Options<HealthCheckData, ThrowOnError>,
-): RequestResult<HealthCheckResponses, HealthCheckErrors, ThrowOnError> =>
-    (options?.client ?? client).get<HealthCheckResponses, HealthCheckErrors, ThrowOnError>({ url: '/api/health', ...options });
+    /**
+     * Combined health check
+     */
+    public healthCheck<ThrowOnError extends boolean = false>(
+        options?: Options<HealthCheckData, ThrowOnError>,
+    ): RequestResult<HealthCheckResponses, HealthCheckErrors, ThrowOnError> {
+        return (options?.client ?? this.client).get<HealthCheckResponses, HealthCheckErrors, ThrowOnError>({ url: '/api/health', ...options });
+    }
+}

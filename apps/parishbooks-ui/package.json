@@ -6,6 +6,7 @@
         "@hookform/resolvers": "^5.9.1",
         "@parishbooks/design-system": "workspace:*",
         "@parishbooks/site-ui": "workspace:*",
+        "@parishbooks/api-sdk": "workspace:*",
         "next": "~16.1.6",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",

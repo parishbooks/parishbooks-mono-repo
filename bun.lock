@@ -156,6 +156,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@hookform/resolvers": "^5.9.1",
+        "@parishbooks/api-sdk": "workspace:*",
         "@parishbooks/design-system": "workspace:*",
         "@parishbooks/site-ui": "workspace:*",
         "next": "~16.1.6",
