@@ -9,13 +9,13 @@ export type LoadedOrganizationProfile = {
 };
 
 const defaultsBySlug: Record<string, { country: WorkspaceCountry; timezone: string; currency: WorkspaceCurrency }> = {
-    'grace-community-church': { country: 'US', timezone: 'America/New_York', currency: 'USD' },
-    'st-mary-parish': { country: 'US', timezone: 'America/Chicago', currency: 'USD' },
+    'grace-community-church': { country: 'IN', timezone: 'Asia/Kolkata', currency: 'INR' },
+    'st-mary-parish': { country: 'IN', timezone: 'Asia/Kolkata', currency: 'INR' },
 };
 
 export function loadOrganizationProfile(orgSlug: string): LoadedOrganizationProfile {
     const organization = workspaceOrganization(orgSlug);
-    const locale = defaultsBySlug[organization.slug] ?? { country: 'US' as const, timezone: 'America/New_York', currency: 'USD' as const };
+    const locale = defaultsBySlug[organization.slug] ?? { country: 'IN' as const, timezone: 'Asia/Kolkata', currency: 'INR' as const };
     return {
         organizationId: organization.id,
         defaults: {

@@ -1,6 +1,6 @@
 import { Banknote, ChevronDown, Clock } from 'lucide-react';
 import { countryOptions, currencyHint, currencyOptions, timezonesForCountry, type WorkspaceCountry, type WorkspaceCurrency } from '../constants';
-import { Choice, Field, IndiaFlag, StepShell, UsaFlag } from '../shared';
+import { Choice, Field, IndiaFlag, StepShell } from '../shared';
 
 export function WorkspaceStep({
     country,
@@ -34,7 +34,7 @@ export function WorkspaceStep({
                                 key={option.value}
                                 active={country === option.value}
                                 onClick={() => onCountryChange(option.value)}
-                                leading={option.value === 'IN' ? <IndiaFlag className="block size-full" /> : <UsaFlag className="block size-full" />}
+                                leading={<IndiaFlag className="block size-full" />}
                                 title={option.title}
                                 description={option.description}
                             />
@@ -69,7 +69,7 @@ export function WorkspaceStep({
                                 onClick={() => onCurrencyChange(option.value)}
                                 icon={Banknote}
                                 title={option.title}
-                                description={currencyHint(option.value, country)}
+                                description={currencyHint(option.value)}
                             />
                         ))}
                     </div>

@@ -1,6 +1,9 @@
 import 'reflect-metadata';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { config as loadEnv } from 'dotenv';
+
+const dataSourceDir = dirname(fileURLToPath(import.meta.url));
 import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Account } from './lib/entities/account.entity.js';
@@ -17,7 +20,7 @@ import { Receipt } from './lib/entities/receipt.entity.js';
 
 // Used by the TypeORM CLI only (db:generate / db:migrate). DatabaseModule is
 // what services import at runtime. namingStrategy must match DatabaseModule.
-loadEnv({ path: join(__dirname, '../../../.env') });
+loadEnv({ path: join(dataSourceDir, '../../../.env') });
 
 const ENTITIES = [
     OrganizationProfile,
@@ -37,7 +40,7 @@ export default new DataSource({
     type: 'postgres',
     url: process.env.DATABASE_URL,
     entities: ENTITIES,
-    migrations: [join(__dirname, 'lib', 'migrations', '*.{ts,js}')],
+    migrations: [join(dataSourceDir, 'lib', 'migrations', '*.{ts,js}')],
     namingStrategy: new SnakeNamingStrategy(),
     synchronize: false,
 });

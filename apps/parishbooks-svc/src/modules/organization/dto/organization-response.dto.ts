@@ -5,6 +5,8 @@ import {
     OrganizationBillingStatus,
     OrganizationCountry,
     OrganizationCurrency,
+    OrganizationFiscalYear,
+    OrganizationLanguage,
     OrganizationPlanTier,
 } from '@parishbooks/database';
 
@@ -24,7 +26,10 @@ export class OrganizationProfileResponseDto {
     @ApiProperty({ format: 'uuid' })
     organizationId!: string;
 
-    @ApiProperty({ enum: OrganizationCountry, enumName: 'OrganizationCountry', example: OrganizationCountry.IN })
+    @ApiProperty({ example: 'St. Mary Parish Trust', description: 'Legal organization name' })
+    legalName!: string;
+
+    @ApiProperty({ enum: OrganizationCountry, enumName: 'OrganizationCountry', example: OrganizationCountry.IN, description: 'Business location' })
     country!: OrganizationCountry;
 
     @ApiProperty({ description: 'Whether the organization is registered under FCRA' })
@@ -42,8 +47,14 @@ export class OrganizationProfileResponseDto {
     @ApiProperty({ example: 'Asia/Kolkata' })
     timezone!: string;
 
-    @ApiProperty({ enum: OrganizationCurrency, enumName: 'OrganizationCurrency', example: OrganizationCurrency.INR })
+    @ApiProperty({ enum: OrganizationCurrency, enumName: 'OrganizationCurrency', example: OrganizationCurrency.INR, description: 'Base currency' })
     currency!: OrganizationCurrency;
+
+    @ApiProperty({ enum: OrganizationLanguage, enumName: 'OrganizationLanguage', example: OrganizationLanguage.EN })
+    language!: OrganizationLanguage;
+
+    @ApiProperty({ enum: OrganizationFiscalYear, enumName: 'OrganizationFiscalYear', example: OrganizationFiscalYear.APR_MAR })
+    fiscalYear!: OrganizationFiscalYear;
 
     @ApiPropertyOptional({ type: String, nullable: true })
     registrationNumber?: string | null;
@@ -86,8 +97,8 @@ export class OrganizationResponseDto {
     @ApiPropertyOptional({
         type: String,
         nullable: true,
-        description: 'JSON-encoded organization metadata (timezone, country, currency)',
-        example: '{"timezone":"Asia/Kolkata","country":"IN","currency":"INR"}',
+        description: 'JSON-encoded organization metadata (timezone, country, currency, legalName, language, fiscalYear)',
+        example: '{"timezone":"Asia/Kolkata","country":"IN","currency":"INR","legalName":"St. Mary Parish Trust","language":"en","fiscalYear":"apr_mar"}',
     })
     metadata?: string | null;
 

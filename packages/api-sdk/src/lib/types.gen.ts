@@ -87,7 +87,7 @@ export type OrganizationCapabilitiesResponseDto = {
     verification: OrganizationVerificationSummaryDto;
 };
 
-export type OrganizationCountry = 'IN' | 'US';
+export type OrganizationCountry = 'IN';
 
 export type OrganizationPlanTier = 'starter' | 'pro';
 
@@ -95,7 +95,11 @@ export type OrganizationBillingStatus = 'active' | 'pastDue' | 'locked' | 'cance
 
 export type OrganizationBillingProvider = 'stripe' | 'cashfree';
 
-export type OrganizationCurrency = 'INR' | 'USD';
+export type OrganizationCurrency = 'INR';
+
+export type OrganizationLanguage = 'en';
+
+export type OrganizationFiscalYear = 'jan_dec' | 'apr_mar' | 'jul_jun';
 
 export type CashfreeVendorStatus = 'not_started' | 'pending' | 'active' | 'rejected';
 
@@ -105,6 +109,13 @@ export type OrganizationProfileResponseDto = {
     updatedAt: string;
     deletedAt?: string | null;
     organizationId: string;
+    /**
+     * Legal organization name
+     */
+    legalName: string;
+    /**
+     * Business location
+     */
     country: OrganizationCountry;
     /**
      * Whether the organization is registered under FCRA
@@ -114,7 +125,12 @@ export type OrganizationProfileResponseDto = {
     billingStatus: OrganizationBillingStatus;
     billingProvider?: OrganizationBillingProvider | null;
     timezone: string;
+    /**
+     * Base currency
+     */
     currency: OrganizationCurrency;
+    language: OrganizationLanguage;
+    fiscalYear: OrganizationFiscalYear;
     registrationNumber?: string | null;
     /**
      * India 80G tax exemption number
@@ -147,11 +163,29 @@ export type OrganizationResponseDto = {
 };
 
 export type CreateOrganizationDto = {
+    /**
+     * Display name for the workspace
+     */
     name: string;
     slug: string;
-    timezone: string;
+    /**
+     * Legal organization name
+     */
+    legalName: string;
+    /**
+     * Business location
+     */
     country: OrganizationCountry;
+    /**
+     * Base currency
+     */
     currency: OrganizationCurrency;
+    language: OrganizationLanguage;
+    fiscalYear: OrganizationFiscalYear;
+    /**
+     * Time zone
+     */
+    timezone: string;
 };
 
 export type SetActiveOrganizationDto = {

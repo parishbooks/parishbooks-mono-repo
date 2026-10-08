@@ -59,6 +59,8 @@ export type {
     OrganizationCapabilitiesResponseDto,
     OrganizationCountry,
     OrganizationCurrency,
+    OrganizationFiscalYear,
+    OrganizationLanguage,
     OrganizationPlanTier,
     OrganizationProfileResponseDto,
     OrganizationResponseDto,
