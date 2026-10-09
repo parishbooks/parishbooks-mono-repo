@@ -5,7 +5,7 @@ Shared Nest platform primitives for ParishBooks services.
 ## Includes
 
 - `Application.init` / `Application.bootstrap` — common service bootstrap
-- Logger (`defineLogger`, `LoggerModule`) + correlation IDs
+- Logger (`defineLogger`, `LoggerModule`)
 - Helmet (`defineHelmet`), Swagger (`setupSwagger`), throttling (`defineThrottler`)
 - Health module, global exception filter, shared env schema fragments
 

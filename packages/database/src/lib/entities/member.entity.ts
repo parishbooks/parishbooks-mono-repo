@@ -1,5 +1,5 @@
 import { Column, Entity, Index, Unique } from 'typeorm';
-import { TenantEntity } from './tenant.entity.js';
+import { TenantEntity } from './tenant.entity';
 
 // Minimal donor-identity slice for Phase 1 receipting — see
 // docs/architecture/phase1-giving-ledger-schema-design.md. Does not carry

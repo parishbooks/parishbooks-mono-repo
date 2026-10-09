@@ -19,6 +19,7 @@ export default defineConfig(() => ({
     include: [
       '{src,app,pages,specs}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
+    passWithNoTests: true,
     reporters: ['default'],
     coverage: {
       reportsDirectory: './test-output/vitest/coverage',

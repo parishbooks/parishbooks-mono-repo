@@ -1,5 +1,5 @@
 import { Column, Entity, Index, Unique } from 'typeorm';
-import { TenantEntity } from './tenant.entity.js';
+import { TenantEntity } from './tenant.entity';
 
 export enum AccountType {
     ASSET = 'asset',

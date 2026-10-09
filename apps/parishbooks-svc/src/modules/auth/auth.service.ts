@@ -4,9 +4,9 @@ import { auth as authInstance, AuthUserSession } from '@parishbooks/iam';
 import { AuthService as BetterAuthService } from '@thallesp/nestjs-better-auth';
 import type { Request, Response } from 'express';
 import { ACCESS_TOKEN_MAX_AGE, ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME, SESSION_TOKEN_NAME } from './constants';
+import { AuthRedirectHelper } from './helpers/auth-redirect.helper';
 import {
     ForgotPasswordDto,
-    RedirectTo,
     ResetPasswordDto,
     SendEmailOtpDto,
     SignInDto,
@@ -41,7 +41,7 @@ export class AuthService {
     async signUp({ name, email, password }: SignUpDto): Promise<SignInResponseDto> {
         try {
             await this.auth.api.signUpEmail({ body: { name, email, password } });
-            return new SignInResponseDto({ redirectTo: RedirectTo.EMAIL_VERIFICATION });
+            return new SignInResponseDto({ redirectTo: AuthRedirectHelper.verifyEmailPath(email) });
         } catch (error) {
             if (isAPIError(error)) throw new BadRequestException(error.body?.message ?? 'Sign up failed');
             throw error;
@@ -70,7 +70,7 @@ export class AuthService {
         try {
             const result = await this.auth.api.verifyEmailOTP({ body: { email, otp } });
             if (!result.status) throw new UnauthorizedException('Email verification failed');
-            if (!result.token) return new SignInResponseDto({ redirectTo: RedirectTo.SIGN_IN });
+            if (!result.token) return new SignInResponseDto({ redirectTo: AuthRedirectHelper.signInPath() });
             const session = await this.auth.api.getSession({ headers: Utils.getHeader(result.token) });
             if (!session) throw new UnauthorizedException('Email verification failed');
             return await this.helper.establishSession(session, response);
@@ -84,7 +84,7 @@ export class AuthService {
         try {
             const result = await this.auth.api.requestPasswordResetEmailOTP({ body: { email } });
             if (!result.success) throw new BadRequestException('Failed to send password reset OTP');
-            return new SuccessResponseDto({ success: true, redirectTo: RedirectTo.PASSWORD_RESET });
+            return new SuccessResponseDto({ success: true, redirectTo: AuthRedirectHelper.resetPasswordPath(email) });
         } catch (error) {
             if (isAPIError(error)) throw new BadRequestException(error.body?.message ?? 'Failed to send password reset OTP');
             throw error;
@@ -95,7 +95,7 @@ export class AuthService {
         try {
             const result = await this.auth.api.resetPasswordEmailOTP({ body: { email, otp, password } });
             if (!result.success) throw new BadRequestException('Failed to reset password');
-            return new SuccessResponseDto({ success: true, redirectTo: RedirectTo.SIGN_IN });
+            return new SuccessResponseDto({ success: true, redirectTo: AuthRedirectHelper.signInAfterResetPath() });
         } catch (error) {
             if (isAPIError(error)) throw new BadRequestException(error.body?.message ?? 'Failed to reset password');
             throw error;

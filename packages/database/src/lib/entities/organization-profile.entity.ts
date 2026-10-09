@@ -1,9 +1,8 @@
 import { Column, Entity, Unique } from 'typeorm';
-import { BaseEntity } from './base.entity.js';
+import { BaseEntity } from './base.entity';
 
 export enum OrganizationCountry {
     IN = 'IN',
-    US = 'US',
 }
 
 export enum OrganizationPlanTier {
@@ -13,7 +12,16 @@ export enum OrganizationPlanTier {
 
 export enum OrganizationCurrency {
     INR = 'INR',
-    USD = 'USD',
+}
+
+export enum OrganizationLanguage {
+    EN = 'en',
+}
+
+export enum OrganizationFiscalYear {
+    JAN_DEC = 'jan_dec',
+    APR_MAR = 'apr_mar',
+    JUL_JUN = 'jul_jun',
 }
 
 export enum OrganizationBillingStatus {
@@ -41,6 +49,9 @@ export class OrganizationProfile extends BaseEntity {
     @Column({ type: 'uuid' })
     organizationId!: string;
 
+    @Column({ type: 'text' })
+    legalName!: string;
+
     @Column({ type: 'enum', enum: OrganizationCountry, default: OrganizationCountry.IN })
     country!: OrganizationCountry;
 
@@ -61,6 +72,12 @@ export class OrganizationProfile extends BaseEntity {
 
     @Column({ type: 'enum', enum: OrganizationCurrency, default: OrganizationCurrency.INR })
     currency!: OrganizationCurrency;
+
+    @Column({ type: 'enum', enum: OrganizationLanguage, default: OrganizationLanguage.EN })
+    language!: OrganizationLanguage;
+
+    @Column({ type: 'enum', enum: OrganizationFiscalYear, default: OrganizationFiscalYear.JAN_DEC })
+    fiscalYear!: OrganizationFiscalYear;
 
     @Column({ type: 'text', nullable: true })
     registrationNumber?: string;

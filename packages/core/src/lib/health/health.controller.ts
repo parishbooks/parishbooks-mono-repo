@@ -2,9 +2,9 @@ import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckService, MemoryHealthIndicator } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
-import { Public } from '../decorators/public/public.decorator.js';
-import { HealthCheckResponseDto } from './dto/health-check-response.dto.js';
-import { PostgresHealthIndicator } from './postgres.health.js';
+import { Public } from '../decorators/public/public.decorator';
+import { HealthCheckResponseDto } from './dto/health-check-response.dto';
+import { PostgresHealthIndicator } from './postgres.health';
 
 @ApiTags('health')
 @Public()

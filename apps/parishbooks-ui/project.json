@@ -2,7 +2,7 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "name": "@parishbooks/parishbooks-ui",
     "projectType": "application",
-    "tags": ["type:app"],
+    "tags": ["type:app", "scope:parishbooks-ui"],
     "sourceRoot": "apps/parishbooks-ui/src",
     "targets": {
         "serve": {
@@ -12,18 +12,6 @@
                 "cwd": "apps/parishbooks-ui",
                 "envFile": "{workspaceRoot}/.env",
                 "command": "sh -c 'next dev --port ${APP_UI_PORT:-3000}'"
-            }
-        },
-        "generate-api": {
-            "executor": "nx:run-commands",
-            "options": {
-                "cwd": "apps/parishbooks-ui",
-                "command": "bunx openapi-ts"
-            },
-            "configurations": {
-                "from-svc": {
-                    "command": "sh -c 'curl -fsS \"${OPENAPI_URL:-http://localhost:8000/api/docs-json}\" -o openapi.json && bunx openapi-ts'"
-                }
             }
         }
     }

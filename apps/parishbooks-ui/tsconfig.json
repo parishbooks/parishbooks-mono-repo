@@ -30,7 +30,6 @@
         },
         "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"],
         "outDir": "dist",
-        "rootDir": "src",
         "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
     },
     "include": [
@@ -67,6 +66,9 @@
         "eslint.config.mjs"
     ],
     "references": [
+        {
+            "path": "../../packages/api-sdk"
+        },
         {
             "path": "../../packages/site-ui"
         },

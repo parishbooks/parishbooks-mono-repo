@@ -1,14 +1,9 @@
-export { ComingSoon } from './coming-soon';
-export { DashboardOverview } from './dashboard-overview';
-export { GivingPageContent } from './giving-page-content';
-export { OnlineGivingSoftGate } from './online-giving-soft-gate';
-export { RecordDonationButton } from './record-donation-button';
-export { SetupChecklist } from './setup-checklist';
-export { VerificationHub } from './verification-hub';
-export { DashboardShell } from './dashboard-shell';
-export { OrganizationsCard } from './organizations-card';
-export { WorkspaceSwitcher } from './workspace-switcher';
-export { StatCard } from './stat-card';
+export { GivingPageContent, OnlineGivingSoftGate, RecordDonationButton } from './giving';
+export { OrganizationPicker } from './organization-picker';
+export { DashboardOverview, SetupChecklist } from './overview';
+export { ComingSoon, StatCard } from './shared';
+export { DashboardOrgShell, DashboardShell, WorkspaceSwitcher } from './shell';
+export { VerificationHub } from './verification';
 export { SignOutButton } from '@/components/auth/sign-out-button';
 
-export { DashboardShell as default } from './dashboard-shell';
+export { DashboardShell as default } from './shell';

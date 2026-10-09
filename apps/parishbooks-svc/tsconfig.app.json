@@ -22,7 +22,7 @@
             "@parishbooks/database/*": ["../../packages/database/src/*"]
         }
     },
-    "include": ["src/**/*.ts"],
+    "include": ["cls.d.ts", "src/**/*.ts"],
     "exclude": [
         "out-tsc",
         "dist",

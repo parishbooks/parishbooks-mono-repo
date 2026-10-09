@@ -2,18 +2,18 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'node:path';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import type { DatabaseModuleAsyncOptions, DatabaseModuleOptions } from './database.types.js';
-import { Account } from './entities/account.entity.js';
-import { Donation } from './entities/donation.entity.js';
-import { Family } from './entities/family.entity.js';
-import { Fund } from './entities/fund.entity.js';
-import { JournalEntry } from './entities/journal-entry.entity.js';
-import { JournalLine } from './entities/journal-line.entity.js';
-import { Member } from './entities/member.entity.js';
-import { OrganizationOnboardingSubmission } from './entities/organization-onboarding-submission.entity.js';
-import { OrganizationProfile } from './entities/organization-profile.entity.js';
-import { ProcessedWebhookEvent } from './entities/processed-webhook-event.entity.js';
-import { Receipt } from './entities/receipt.entity.js';
+import type { DatabaseModuleAsyncOptions, DatabaseModuleOptions } from './database.types';
+import { Account } from './entities/account.entity';
+import { Donation } from './entities/donation.entity';
+import { Family } from './entities/family.entity';
+import { Fund } from './entities/fund.entity';
+import { JournalEntry } from './entities/journal-entry.entity';
+import { JournalLine } from './entities/journal-line.entity';
+import { Member } from './entities/member.entity';
+import { OrganizationOnboardingSubmission } from './entities/organization-onboarding-submission.entity';
+import { OrganizationProfile } from './entities/organization-profile.entity';
+import { ProcessedWebhookEvent } from './entities/processed-webhook-event.entity';
+import { Receipt } from './entities/receipt.entity';
 
 // Explicit list — webpack/Nx bundles leave no loose `entities/` files for globs.
 const ENTITIES = [

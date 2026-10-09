@@ -17,6 +17,8 @@ export const defineAuth = (config: AuthConfig) => {
         baseURL: config.baseURL,
         secret: config.secret,
         appName: 'ParishBooks',
+        hooks: {},
+        databaseHooks: {},
         database: getDatabaseConfig(config),
         trustedOrigins: config.trustedOrigins,
         advanced: { database: { joins: true, generateId: 'uuid' } },

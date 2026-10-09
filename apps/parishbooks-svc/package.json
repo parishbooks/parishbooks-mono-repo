@@ -10,6 +10,7 @@
         "@nestjs/swagger": "^11",
         "@nestjs/terminus": "^12.1.0",
         "@nestjs/throttler": "^6.7.1",
+        "nestjs-cls": "^7.0.1",
         "@parishbooks/communications": "workspace:*",
         "@parishbooks/core": "workspace:*",
         "@parishbooks/database": "workspace:*",

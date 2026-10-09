@@ -15,21 +15,16 @@ import {
     type WorkspaceCountry,
     type WorkspaceCurrency,
 } from '@/components/church-setup-flow/constants';
-import { Choice, IndiaFlag, UsaFlag } from '@/components/church-setup-flow/shared';
+import { Choice, IndiaFlag } from '@/components/church-setup-flow/shared';
 
 const organizationProfileSchema = z.object({
     organizationName: z.string().min(1, 'Organization name is required.'),
-    country: z.enum(['IN', 'US']),
+    country: z.enum(['IN']),
     timezone: z.string().min(1, 'Timezone is required.'),
-    currency: z.enum(['INR', 'USD']),
+    currency: z.enum(['INR']),
 });
 
 export type OrganizationProfileFormValues = z.infer<typeof organizationProfileSchema>;
-
-function countryFlag(country: WorkspaceCountry) {
-    if (country === 'IN') return <IndiaFlag className="block size-full" />;
-    return <UsaFlag className="block size-full" />;
-}
 
 function currencyLabel(value: WorkspaceCurrency) {
     const option = currencyOptions.find((item) => item.value === value);
@@ -98,7 +93,7 @@ export function OrganizationProfileForm({ defaultValues, updatedAt }: Organizati
                                             key={option.value}
                                             active={field.value === option.value}
                                             onClick={() => applyCountry(option.value)}
-                                            leading={countryFlag(option.value)}
+                                            leading={<IndiaFlag className="block size-full" />}
                                             title={option.title}
                                             description={option.description}
                                         />

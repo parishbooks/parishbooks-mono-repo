@@ -2,14 +2,6 @@ import { IsBoolean, IsEmail, IsIn, IsOptional, MaxLength, MinLength, IsString } 
 import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export enum RedirectTo {
-    DASHBOARD = 'dashboard',
-    EMAIL_VERIFICATION = 'email-verification',
-    PASSWORD_RESET = 'password-reset',
-    ORG_SETUP = 'org-setup',
-    SIGN_IN = 'sign-in',
-}
-
 export class SignInDto {
     @ApiProperty({ example: 'admin@parishbooks.com' })
     @IsEmail()
@@ -29,8 +21,9 @@ export class SignInDto {
 }
 
 export class SignInResponseDto {
-    @ApiProperty({ enum: RedirectTo, enumName: 'RedirectTo' })
-    redirectTo: RedirectTo;
+    @ApiProperty({ example: '/dashboard/grace-community-church', description: 'UI path to open after this action' })
+    @IsString()
+    redirectTo: string;
 
     constructor(data: SignInResponseDto) {
         Object.assign(this, data);
@@ -107,8 +100,10 @@ export class SuccessResponseDto {
     @ApiProperty({ example: true })
     success: boolean;
 
-    @ApiPropertyOptional({ enum: RedirectTo, enumName: 'RedirectTo' })
-    redirectTo?: RedirectTo;
+    @ApiPropertyOptional({ example: '/sign-in?reset=1', description: 'UI path to open after this action' })
+    @IsOptional()
+    @IsString()
+    redirectTo?: string;
 
     constructor(data: SuccessResponseDto) {
         Object.assign(this, data);

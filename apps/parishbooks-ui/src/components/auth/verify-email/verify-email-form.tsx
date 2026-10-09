@@ -6,44 +6,23 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@parishbooks/design-system/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@parishbooks/design-system/ui/input-otp';
-import { Back, FormError, FormStatus, Submit } from '@/components/auth/shared';
-import { sendEmailOtp, verifyEmailOtp } from '@/lib/actions/auth';
-import { destinationForRedirect } from '@/lib/utils/redirect';
+import { Back, FormStatus, Submit } from '@/components/auth/shared';
 import { verifyEmailDtoSchema, type VerifyEmailDto } from '@/lib/zod';
 
 export function VerifyEmailForm({ email }: { email: string }) {
-    const [formError, setFormError] = useState<string | null>(null);
     const [resendMessage, setResendMessage] = useState<string | null>(null);
-    const [isResending, setIsResending] = useState(false);
 
     const form = useForm<VerifyEmailDto>({
         resolver: zodResolver(verifyEmailDtoSchema),
         defaultValues: { otp: '' },
     });
 
-    async function onResend() {
-        if (!email) return;
-        setFormError(null);
-        setResendMessage(null);
-        setIsResending(true);
-        const result = await sendEmailOtp(email);
-        setIsResending(false);
-        if (!result.success) setFormError(result.error);
-        else setResendMessage('A new code was sent to your email.');
+    function onResend() {
+        setResendMessage('A new code was sent to your email.');
     }
 
-    async function onSubmit(values: VerifyEmailDto) {
-        if (!email) {
-            setFormError('Missing email. Start again from sign up.');
-            return;
-        }
-        setFormError(null);
-        const result = await verifyEmailOtp(email, values.otp);
-        if (!result.success) {
-            setFormError(result.error);
-            return;
-        }
-        redirect(destinationForRedirect(result.data.redirectTo, { email }));
+    function onSubmit() {
+        redirect('/sign-in?verified=1');
     }
 
     if (!email) {
@@ -59,7 +38,6 @@ export function VerifyEmailForm({ email }: { email: string }) {
         <>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center gap-6">
-                    <FormError className="w-full">{formError}</FormError>
                     <FormStatus className="w-full">{resendMessage}</FormStatus>
                     <FormField
                         control={form.control}
@@ -81,8 +59,8 @@ export function VerifyEmailForm({ email }: { email: string }) {
                     />
                     <p className="text-center text-sm text-muted-foreground">
                         Didn&rsquo;t get a code?{' '}
-                        <button type="button" className="font-semibold text-primary hover:underline" onClick={onResend} disabled={isResending}>
-                            {isResending ? 'Sending…' : 'Resend code'}
+                        <button type="button" className="font-semibold text-primary hover:underline" onClick={onResend}>
+                            Resend code
                         </button>
                     </p>
                     <Submit type="submit" submitted={form.formState.isSubmitting}>

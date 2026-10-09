@@ -1,7 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { Logger } from 'nestjs-pino';
-import { getCorrelationId } from '../correlation/correlation.context.js';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -10,20 +9,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
     catch(exception: unknown, host: ArgumentsHost): void {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        const request = ctx.getRequest<Request & { correlationId?: string }>();
+        const request = ctx.getRequest<Request>();
         const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
         const exceptionResponse = exception instanceof HttpException ? exception.getResponse() : null;
         const message = this.resolveMessage(exceptionResponse, status);
         const error = this.resolveError(exceptionResponse, status);
-        const correlationId = getCorrelationId() ?? request.correlationId;
 
         if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
             this.logger.error(
-                { err: exception, path: request.url, method: request.method, correlationId },
+                { err: exception, path: request.url, method: request.method },
                 exception instanceof Error ? exception.message : 'Unhandled exception',
             );
         } else {
-            this.logger.warn({ path: request.url, method: request.method, correlationId, status, message }, 'Request failed');
+            this.logger.warn({ path: request.url, method: request.method, status, message }, 'Request failed');
         }
 
         response.status(status).json({
@@ -32,7 +30,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
             error,
             timestamp: new Date().toISOString(),
             path: request.url,
-            correlationId,
         });
     }
 

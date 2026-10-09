@@ -3,7 +3,7 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "packages/communications/src",
     "projectType": "library",
-    "tags": [],
+    "tags": ["scope:server"],
     "// targets": "to see all targets run: nx show project @parishbooks/communications --web",
     "targets": {}
 }

@@ -15,7 +15,4 @@ export class ErrorResponseDto {
 
     @ApiProperty({ example: '/api/v1/auth/sign-in' })
     path: string;
-
-    @ApiPropertyOptional({ example: '550e8400-e29b-41d4-a716-446655440000' })
-    correlationId?: string;
 }

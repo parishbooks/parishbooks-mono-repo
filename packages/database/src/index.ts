@@ -1,3 +1,3 @@
-export * from './lib/database.module.js';
-export * from './lib/database.types.js';
-export * from './lib/entities/index.js';
+export * from './lib/database.module';
+export * from './lib/database.types';
+export * from './lib/entities/index';
