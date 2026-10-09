@@ -1,2 +1,2 @@
-export * from './token.constants.js';
-export * from './token.decorator.js';
+export * from './token.constants';
+export * from './token.decorator';

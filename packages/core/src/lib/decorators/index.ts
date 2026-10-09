@@ -1,3 +1,4 @@
-export * from './public/index.js';
-export * from './session/index.js';
-export * from './token/index.js';
+export * from './public';
+export * from './session';
+export * from './token';
+export * from './swagger';

@@ -1,1 +1,1 @@
-export { createEnvValidator, databaseEnvSchema, nodeEnvSchema, smtpEnvSchema, throttleEnvSchema } from './env.fragments.js';
+export { createEnvValidator, databaseEnvSchema, nodeEnvSchema, smtpEnvSchema, throttleEnvSchema } from './env.fragments';

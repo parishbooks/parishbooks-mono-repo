@@ -5,8 +5,8 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
-import { defineHelmet } from '../helmet/helmet.config.js';
-import { setupSwagger, type DefineSwaggerProps } from '../swagger/swagger.config.js';
+import { defineHelmet } from '../helmet/helmet.config';
+import { setupSwagger, type DefineSwaggerProps } from '../swagger/swagger.config';
 
 export type ApplicationInitProps = {
     module: Type<unknown>;

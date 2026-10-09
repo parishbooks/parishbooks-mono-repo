@@ -1,1 +1,1 @@
-export { defineThrottler, type DefineThrottlerProps } from './throttler.config.js';
+export { defineThrottler, type DefineThrottlerProps } from './throttler.config';

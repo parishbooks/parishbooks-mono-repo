@@ -1,7 +1,7 @@
 import { createParamDecorator, UnauthorizedException, type ExecutionContext } from '@nestjs/common';
 import type { Request } from 'express';
-import type { RequestTokens, TokenKind } from '../../guards/auth/auth.types.js';
-import { TOKEN_REQUEST_KEYS } from './token.constants.js';
+import type { RequestTokens, TokenKind } from '../../guards/auth/auth.types';
+import { TOKEN_REQUEST_KEYS } from './token.constants';
 
 export const Token = createParamDecorator((kind: TokenKind, ctx: ExecutionContext): string => {
     const request = ctx.switchToHttp().getRequest<Request & { tokens?: RequestTokens }>();

@@ -1,1 +1,1 @@
-export { Application, type ApplicationInitProps } from './application.js';
+export { Application, type ApplicationInitProps } from './application';

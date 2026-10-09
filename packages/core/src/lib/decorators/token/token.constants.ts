@@ -1,5 +1,5 @@
-import type { RequestTokens, TokenKind } from '../../guards/auth/auth.types.js';
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_TOKEN_COOKIE } from '../../guards/auth/auth.constants.js';
+import type { RequestTokens, TokenKind } from '../../guards/auth/auth.types';
+import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_TOKEN_COOKIE } from '../../guards/auth/auth.constants';
 
 export type { TokenKind };
 export { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_TOKEN_COOKIE };
