@@ -14,10 +14,6 @@
         "paths": {
             "@parishbooks/core": ["../../packages/core/src/index.ts"],
             "@parishbooks/core/*": ["../../packages/core/src/*"],
-            "@parishbooks/iam": ["../../packages/iam/src/index.ts"],
-            "@parishbooks/iam/*": ["../../packages/iam/src/*"],
-            "@parishbooks/communications": ["../../packages/communications/src/index.ts"],
-            "@parishbooks/communications/*": ["../../packages/communications/src/*"],
             "@parishbooks/database": ["../../packages/database/src/index.ts"],
             "@parishbooks/database/*": ["../../packages/database/src/*"]
         }
@@ -44,16 +40,10 @@
     ],
     "references": [
         {
-            "path": "../../packages/iam"
-        },
-        {
             "path": "../../packages/database/tsconfig.lib.json"
         },
         {
             "path": "../../packages/core/tsconfig.lib.json"
-        },
-        {
-            "path": "../../packages/communications"
         }
     ]
 }
