@@ -1,5 +1,5 @@
 import { Column, Entity, Index, Unique } from 'typeorm';
-import { TenantEntity } from './tenant.entity';
+import { OrganizationScopedEntity } from './organization-scoped.entity';
 
 // 1:1 with Donation. fundFcraSnapshot is copied from Fund.fcraFlag at issue
 // time so a later fund reclassification never alters an already-issued
@@ -8,7 +8,7 @@ import { TenantEntity } from './tenant.entity';
 @Index(['organizationId', 'id'])
 @Unique(['donationId'])
 @Unique(['organizationId', 'financialYear', 'receiptNumber'])
-export class Receipt extends TenantEntity {
+export class Receipt extends OrganizationScopedEntity {
     @Column({ type: 'uuid' })
     donationId!: string;
 

@@ -1,5 +1,5 @@
 import { Check, Column, Entity, Index } from 'typeorm';
-import { TenantEntity } from './tenant.entity';
+import { OrganizationScopedEntity } from './organization-scoped.entity';
 
 // Append-only, same as JournalEntry (see its immutability-trigger note).
 // The CHECK constraint is a DB-level backstop against writes that bypass
@@ -10,7 +10,7 @@ import { TenantEntity } from './tenant.entity';
 @Index(['organizationId', 'id'])
 @Index(['organizationId', 'journalEntryId'])
 @Check(`("debit" > 0 AND "credit" = 0) OR ("credit" > 0 AND "debit" = 0)`)
-export class JournalLine extends TenantEntity {
+export class JournalLine extends OrganizationScopedEntity {
     @Column({ type: 'uuid' })
     journalEntryId!: string;
 

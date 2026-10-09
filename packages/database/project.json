@@ -21,6 +21,14 @@
                 "envFile": "{workspaceRoot}/.env",
                 "command": "bun scripts/db-migrate.ts"
             }
+        },
+        "db-reset": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "packages/database",
+                "envFile": "{workspaceRoot}/.env",
+                "command": "bun scripts/db-reset.ts"
+            }
         }
     }
 }

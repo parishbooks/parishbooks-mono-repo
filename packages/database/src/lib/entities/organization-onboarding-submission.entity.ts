@@ -1,5 +1,5 @@
 import { Column, Entity, Index } from 'typeorm';
-import { TenantEntity } from './tenant.entity';
+import { OrganizationScopedEntity } from './organization-scoped.entity';
 
 // KYC submission audit trail for vendor onboarding
 // (docs/superpowers/specs/2026-09-22-vendor-onboarding-kyc-design.md §4).
@@ -9,7 +9,7 @@ import { TenantEntity } from './tenant.entity';
 // (docs/quality-ops/security-observability.md §4).
 @Entity('organization_onboarding_submission')
 @Index(['organizationId', 'id'])
-export class OrganizationOnboardingSubmission extends TenantEntity {
+export class OrganizationOnboardingSubmission extends OrganizationScopedEntity {
     @Column({ type: 'text' })
     businessName!: string;
 

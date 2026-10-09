@@ -1,5 +1,5 @@
 import { Column, Entity, Index } from 'typeorm';
-import { TenantEntity } from './tenant.entity';
+import { OrganizationScopedEntity } from './organization-scoped.entity';
 
 export enum DonationStatus {
     PENDING = 'pending',
@@ -33,7 +33,7 @@ export enum DonationPaymentProvider {
 @Index(['organizationId', 'fundId'])
 @Index(['organizationId', 'idempotencyKey'], { unique: true, where: '"deleted_at" IS NULL' })
 @Index(['providerPaymentId'], { unique: true, where: '"deleted_at" IS NULL' })
-export class Donation extends TenantEntity {
+export class Donation extends OrganizationScopedEntity {
     @Column({ type: 'uuid', nullable: true })
     memberId?: string;
 

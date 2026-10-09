@@ -1,40 +1,20 @@
 import 'reflect-metadata';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { config as loadEnv } from 'dotenv';
-
-const dataSourceDir = dirname(fileURLToPath(import.meta.url));
 import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Account } from './lib/entities/account.entity';
-import { Donation } from './lib/entities/donation.entity';
-import { Family } from './lib/entities/family.entity';
-import { Fund } from './lib/entities/fund.entity';
-import { JournalEntry } from './lib/entities/journal-entry.entity';
-import { JournalLine } from './lib/entities/journal-line.entity';
-import { Member } from './lib/entities/member.entity';
-import { OrganizationOnboardingSubmission } from './lib/entities/organization-onboarding-submission.entity';
+import { Organization } from './lib/entities/organization.entity';
+import { OrganizationMember } from './lib/entities/organization-member.entity';
 import { OrganizationProfile } from './lib/entities/organization-profile.entity';
-import { ProcessedWebhookEvent } from './lib/entities/processed-webhook-event.entity';
-import { Receipt } from './lib/entities/receipt.entity';
+import { Tenant } from './lib/entities/tenant.entity';
+import { User } from './lib/entities/user.entity';
 
-// Used by the TypeORM CLI only (db:generate / db:migrate). DatabaseModule is
-// what services import at runtime. namingStrategy must match DatabaseModule.
+const dataSourceDir = __dirname;
+
 loadEnv({ path: join(dataSourceDir, '../../../.env') });
 
-const ENTITIES = [
-    OrganizationProfile,
-    OrganizationOnboardingSubmission,
-    Family,
-    Member,
-    Fund,
-    Account,
-    JournalEntry,
-    JournalLine,
-    Donation,
-    Receipt,
-    ProcessedWebhookEvent,
-];
+const ENTITIES = [Tenant, Organization, User, Account, OrganizationMember, OrganizationProfile];
 
 export default new DataSource({
     type: 'postgres',

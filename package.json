@@ -11,6 +11,7 @@
         "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
         "db:generate": "bun nx run @parishbooks/database:db-generate",
         "db:migrate": "bun nx run @parishbooks/database:db-migrate",
+        "db:reset": "bun nx run @parishbooks/database:db-reset",
         "openapi:generate": "bun nx run @parishbooks/api-sdk:generate:openapi",
         "prepare": "husky",
         "lint-staged": "lint-staged"

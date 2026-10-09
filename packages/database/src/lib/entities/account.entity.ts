@@ -1,32 +1,29 @@
-import { Column, Entity, Index, Unique } from 'typeorm';
-import { TenantEntity } from './tenant.entity';
+import { Column, Entity, Index, JoinColumn, ManyToOne, Unique } from 'typeorm';
+import { BaseEntity } from './base.entity';
+import { User } from './user.entity';
 
-export enum AccountType {
-    ASSET = 'asset',
-    LIABILITY = 'liability',
-    EQUITY = 'equity',
-    INCOME = 'income',
-    EXPENSE = 'expense',
+export enum AccountProviderId {
+    CREDENTIAL = 'credential',
+    EMAIL = 'email',
 }
 
-// Chart of accounts — docs/specs/double-entry-ledger.md §2. Accounts are
-// retired via isActive, never deleted once a JournalLine references them.
 @Entity('account')
-@Index(['organizationId', 'id'])
-@Unique(['organizationId', 'code'])
-export class Account extends TenantEntity {
-    @Column({ type: 'text' })
-    code!: string;
+@Index(['userId', 'id'])
+@Unique(['providerId', 'accountId'])
+export class Account extends BaseEntity {
+    @Column({ type: 'uuid' })
+    userId!: string;
+
+    @ManyToOne(() => User, (user) => user.accounts, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' })
+    user!: User;
 
     @Column({ type: 'text' })
-    name!: string;
+    providerId!: AccountProviderId | string;
 
-    @Column({ type: 'enum', enum: AccountType })
-    type!: AccountType;
+    @Column({ type: 'text', nullable: true })
+    accountId?: string;
 
-    @Column({ type: 'uuid', nullable: true })
-    parentAccountId?: string;
-
-    @Column({ type: 'boolean', default: true })
-    isActive!: boolean;
+    @Column({ type: 'text', nullable: true })
+    password?: string;
 }

@@ -1,5 +1,5 @@
 import { Column, Entity, Index } from 'typeorm';
-import { TenantEntity } from './tenant.entity';
+import { OrganizationScopedEntity } from './organization-scoped.entity';
 
 export enum FundType {
     GENERAL = 'general',
@@ -10,7 +10,7 @@ export enum FundType {
 
 @Entity('fund')
 @Index(['organizationId', 'id'])
-export class Fund extends TenantEntity {
+export class Fund extends OrganizationScopedEntity {
     @Column({ type: 'text' })
     name!: string;
 

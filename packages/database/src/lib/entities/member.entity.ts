@@ -1,5 +1,5 @@
 import { Column, Entity, Index, Unique } from 'typeorm';
-import { TenantEntity } from './tenant.entity';
+import { OrganizationScopedEntity } from './organization-scoped.entity';
 
 // Minimal donor-identity slice for Phase 1 receipting — see
 // docs/architecture/phase1-giving-ledger-schema-design.md. Does not carry
@@ -14,7 +14,7 @@ import { TenantEntity } from './tenant.entity';
 @Entity('member')
 @Index(['organizationId', 'id'])
 @Unique(['organizationId', 'betterAuthUserId'])
-export class Member extends TenantEntity {
+export class Member extends OrganizationScopedEntity {
     @Column({ type: 'uuid', nullable: true })
     familyId?: string;
 
