@@ -10,10 +10,4 @@ export class AuthService {
         this.clsService.set('userId', payload.sub);
         return payload;
     }
-
-    async signIn(email: string, password: string): Promise<JwtPayload> {
-        void email;
-        void password;
-        throw new Error('Method not implemented.');
-    }
 }

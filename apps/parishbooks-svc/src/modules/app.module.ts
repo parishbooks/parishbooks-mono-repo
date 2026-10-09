@@ -6,6 +6,7 @@ import { ClsModule } from 'nestjs-cls';
 import { AllExceptionsFilter, defineLogger, defineThrottler, HealthModule, LoggerModule } from '@parishbooks/core';
 import { DatabaseModule } from '@parishbooks/database';
 import { config } from '../config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [
@@ -32,6 +33,7 @@ import { config } from '../config';
             }),
         }),
         HealthModule,
+        AuthModule,
     ],
     providers: [
         { provide: APP_FILTER, useClass: AllExceptionsFilter },

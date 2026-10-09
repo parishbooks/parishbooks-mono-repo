@@ -7,6 +7,12 @@ import { AuthConfig } from '../../config/auth';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { AuthRepository } from './repository/auth.repository';
+import { SignInService } from './services/signin.service';
+import { SignUpService } from './services/signup.service';
+import { AuthController } from './auth.controller';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '@parishbooks/core';
 
 @Module({
     imports: [
@@ -23,7 +29,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
             },
         }),
     ],
-    controllers: [],
-    providers: [AuthService, LocalStrategy, JwtStrategy],
+    controllers: [AuthController],
+    providers: [AuthService, LocalStrategy, JwtStrategy, AuthRepository, SignInService, SignUpService, { provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AuthModule {}
