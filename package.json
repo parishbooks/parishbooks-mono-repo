@@ -6,6 +6,8 @@
         "dev": "nx run-many -t serve -p tag:type:app --parallel",
         "generate": "bun tools/generate/index.ts",
         "reset-workspace": "bunx nx reset",
+        "lint": "bun nx run-many -t lint",
+        "lint:fix": "bun nx run-many -t lint --fix",
         "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
         "auth:migrate": "bun nx run @parishbooks/iam:migrate",
         "db:generate": "bun nx run @parishbooks/database:db-generate",

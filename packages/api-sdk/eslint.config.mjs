@@ -1,6 +1,9 @@
 import baseConfig from '../../eslint.config.mjs';
 
 export default [
+    {
+        ignores: ['**/out-tsc', 'src/lib/**'],
+    },
     ...baseConfig,
     {
         files: ['**/*.json'],
@@ -15,8 +18,5 @@ export default [
         languageOptions: {
             parser: await import('jsonc-eslint-parser'),
         },
-    },
-    {
-        ignores: ['**/out-tsc'],
     },
 ];
