@@ -8,7 +8,7 @@
         "emitDeclarationOnly": false,
         "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"],
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": false
     },
     "include": [
         "vite.config.ts",

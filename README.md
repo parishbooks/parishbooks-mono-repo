@@ -43,7 +43,7 @@ Parish finance and operations platform for churches. This monorepo contains the 
     | Variable                     | Purpose                                                                 |
     | ---------------------------- | ----------------------------------------------------------------------- |
     | `DATABASE_URL`               | PostgreSQL connection string                                            |
-    | `IAM_SECRET`                 | Better Auth secret                                                      |
+    | `AUTH_SECRET`                | Auth signing secret (JWT / session)                                     |
     | `APP_UI_URL` / `APP_SVC_URL` | Local URLs (defaults `http://localhost:3000` / `http://localhost:8000`) |
     | `SMTP_*`                     | Outbound email for OTP and password reset                               |
 

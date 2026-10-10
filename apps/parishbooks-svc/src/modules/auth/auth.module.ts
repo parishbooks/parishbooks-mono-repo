@@ -13,6 +13,7 @@ import { SignUpService } from './services/signup.service';
 import { AuthController } from './auth.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '@parishbooks/core';
+import { PasswordService } from './services/password.service';
 
 @Module({
     imports: [
@@ -30,6 +31,15 @@ import { JwtAuthGuard } from '@parishbooks/core';
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, LocalStrategy, JwtStrategy, AuthRepository, SignInService, SignUpService, { provide: APP_GUARD, useClass: JwtAuthGuard }],
+    providers: [
+        AuthService,
+        LocalStrategy,
+        JwtStrategy,
+        AuthRepository,
+        SignInService,
+        SignUpService,
+        PasswordService,
+        { provide: APP_GUARD, useClass: JwtAuthGuard },
+    ],
 })
 export class AuthModule {}

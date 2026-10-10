@@ -1,4 +1,4 @@
-import { User } from '@parishbooks/database';
+import { AccountProviderId, User } from '@parishbooks/database';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Injectable, NotImplementedException } from '@nestjs/common';
@@ -12,6 +12,14 @@ export class AuthRepository {
         const user = this.dataSource.getRepository(User);
         const userExists = await user.findOne({ where: { email } });
         return userExists !== null;
+    }
+
+    async getUserByEmail(email: string) {
+        const userRepository = this.dataSource.getRepository(User);
+        return await userRepository.findOne({
+            where: { email, accounts: { providerId: AccountProviderId.CREDENTIAL } },
+            relations: { accounts: true },
+        });
     }
 
     createUserAccount(dto: CreateUserAccountDto) {

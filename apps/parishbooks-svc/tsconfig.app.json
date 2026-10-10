@@ -3,7 +3,7 @@
     "compilerOptions": {
         "types": ["node"],
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
+        "emitDecoratorMetadata": false,
         "target": "es2021",
         "composite": false,
         "declaration": false,
