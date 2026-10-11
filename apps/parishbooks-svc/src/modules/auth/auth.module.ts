@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { JWT_AUDIENCE, JWT_ISSUER, JWT_STRATEGY_NAME } from './constants';
+import { JWT_AUDIENCE, JWT_ISSUER, JWT_STRATEGY_NAME } from './constants/jwt.constant';
 import { AuthConfig } from '../../config/auth';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
