@@ -40,6 +40,15 @@ export class User extends BaseEntity {
     @OneToMany(() => OrganizationMember, (membership) => membership.user)
     organizationMemberships!: OrganizationMember[];
 
+    @Column({ type: 'boolean', default: false })
+    banned!: boolean;
+
+    @Column({ type: 'timestamptz', nullable: true })
+    bannedAt?: Date;
+
+    @Column({ type: 'text', nullable: true })
+    bannedReason?: string;
+
     @BeforeInsert()
     assignUsernameFromEmail(): void {
         if (this.username?.trim()) return;

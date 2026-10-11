@@ -4,7 +4,7 @@ import { SignUpDto } from './dto/signup.dto';
 import { SignUpService } from './services/signup.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { AuthUser } from './interfaces';
+import { AuthUser } from './dto/auth-user.dto';
 import { SignInService } from './services/signin.service';
 
 @Controller('auth')

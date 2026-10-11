@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from './password.service';
 import { AccountProviderId } from '@parishbooks/database';
-import { AuthUser } from '../interfaces';
+import { AuthUser } from '../dto/auth-user.dto';
 
 @Injectable()
 export class SignInService {
@@ -18,18 +18,18 @@ export class SignInService {
         if (!credentialAccount || !credentialAccount.password) throw new NotFoundException('Credential account not found');
         const isPasswordValid = await this.passwordService.comparePasswords(password, credentialAccount.password);
         if (!isPasswordValid) throw new UnauthorizedException('Invalid password');
-        return {
+        return new AuthUser({
             id: user.id,
             email: user.email,
             tenantId: user.tenantId,
-            activeOrganizationId: null,
             emailVerified: user.emailVerified,
             username: user.username,
             roles: [],
-        };
+        });
     }
 
-    async validateUser(user: AuthUser) {
+    validateUser(user: AuthUser) {
+        if (!user.emailVerified) throw new UnauthorizedException('Email not verified');
         return user;
     }
 }
