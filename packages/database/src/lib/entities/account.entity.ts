@@ -25,5 +25,5 @@ export class Account extends BaseEntity {
     accountId?: string;
 
     @Column({ type: 'text', nullable: true })
-    password?: string;
+    password!: string;
 }
