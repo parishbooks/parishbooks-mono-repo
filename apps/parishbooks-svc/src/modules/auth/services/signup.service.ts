@@ -25,7 +25,7 @@ export class SignUpService {
     }
 
     private async determineRedirect(user: User): Promise<string> {
-        if (!user.emailVerified) return '/verify-email?token=' + user.email;
+        if (!user.emailVerified) return '/verify-email?token=' + encodeURIComponent(user.email);
         if (user.banned) return '/banned';
         return '/dashboard';
     }

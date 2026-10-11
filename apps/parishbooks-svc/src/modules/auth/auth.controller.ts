@@ -6,6 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { AuthUser } from './dto/auth-user.dto';
 import { SignInService } from './services/signin.service';
+import { Public } from '@parishbooks/core';
 
 @Controller('auth')
 export class AuthController {
@@ -14,6 +15,7 @@ export class AuthController {
         private readonly signInService: SignInService,
     ) {}
 
+    @Public()
     @Post('signin')
     @ApiOperation({ summary: 'Sign in a user' })
     @ApiResponse({ status: 200, description: 'Sign-in successful' })
@@ -23,6 +25,7 @@ export class AuthController {
         return this.signInService.validateUser(request.user);
     }
 
+    @Public()
     @Post('signup')
     @ApiOperation({ summary: 'Sign up a new user' })
     @ApiBody({ type: SignUpDto })
