@@ -4,17 +4,18 @@ export type ClientOptions = {
     baseUrl: string;
 };
 
-export type ErrorResponseDto = {
-    statusCode: number;
-    message: string | Array<string>;
-    error?: string;
-    timestamp: string;
-    path: string;
-};
-
 export type SignInDto = {
-    email: string;
+    /**
+     * User password
+     */
     password: string;
+    /**
+     * User email address
+     */
+    email: string;
+    /**
+     * Whether to keep the user signed in for a longer period (remember me).
+     */
     rememberMe?: boolean;
 };
 
@@ -23,12 +24,37 @@ export type SignInResponseDto = {
      * UI path to open after this action
      */
     redirectTo: string;
+    /**
+     * JWT access token (also set as pb_access_token httpOnly cookie)
+     */
+    accessToken: string;
+    /**
+     * JWT refresh token (also set as pb_refresh_token httpOnly cookie)
+     */
+    refreshToken: string;
 };
 
-export type SignUpDto = {
-    name: string;
-    email: string;
-    password: string;
+export type ErrorResponseDto = {
+    statusCode: number;
+    /**
+     * Human-readable message, or a list of validation errors
+     */
+    message: string;
+    error?: string;
+    /**
+     * Stable machine-readable error code
+     */
+    code?: string;
+    /**
+     * UI path when the client should redirect
+     */
+    redirectTo?: string;
+    /**
+     * Context for verification or recovery flows
+     */
+    email?: string;
+    timestamp: string;
+    path: string;
 };
 
 export type RefreshResponseDto = {
@@ -39,493 +65,32 @@ export type RefreshResponseDto = {
     redirectTo?: string;
 };
 
-export type SendEmailOtpDto = {
+export type SignUpDto = {
+    /**
+     * User email address
+     */
     email: string;
-    type?: 'email-verification' | 'sign-in' | 'forget-password';
-};
-
-export type VerifyEmailOtpDto = {
-    email: string;
-    otp: string;
-};
-
-export type ForgotPasswordDto = {
-    email: string;
-};
-
-export type ResetPasswordDto = {
-    email: string;
-    otp: string;
+    /**
+     * User password
+     */
     password: string;
-};
-
-export type OrganizationCapabilitiesFlagsDto = {
-    isKycVerified: boolean;
-    canCollectOnlineDonations: boolean;
-    canReceivePayouts: boolean;
-    canRecordDonationsManually: boolean;
-    canAddMembers: boolean;
-    canInviteTeam: boolean;
-    canManageFunds: boolean;
-    canSubmitVerification: boolean;
-};
-
-export type OrganizationVerificationStatus = 'not_started' | 'pending' | 'active' | 'rejected';
-
-export type OrganizationVerificationSummaryDto = {
-    status: OrganizationVerificationStatus;
-    statusAt?: string | null;
-    rejectionReason?: {
-        [key: string]: unknown;
-    } | null;
-};
-
-export type OrganizationCapabilitiesResponseDto = {
-    organizationId: string;
-    capabilities: OrganizationCapabilitiesFlagsDto;
-    verification: OrganizationVerificationSummaryDto;
-};
-
-export type OrganizationCountry = 'IN';
-
-export type OrganizationPlanTier = 'starter' | 'pro';
-
-export type OrganizationBillingStatus = 'active' | 'pastDue' | 'locked' | 'canceled';
-
-export type OrganizationBillingProvider = 'stripe' | 'cashfree';
-
-export type OrganizationCurrency = 'INR';
-
-export type OrganizationLanguage = 'en';
-
-export type OrganizationFiscalYear = 'jan_dec' | 'apr_mar' | 'jul_jun';
-
-export type CashfreeVendorStatus = 'not_started' | 'pending' | 'active' | 'rejected';
-
-export type OrganizationProfileResponseDto = {
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt?: string | null;
-    organizationId: string;
     /**
-     * Legal organization name
+     * User first name
      */
-    legalName: string;
+    firstName: string;
     /**
-     * Business location
+     * User last name
      */
-    country: OrganizationCountry;
+    lastName: string;
+};
+
+export type SignUpResponseDto = {
     /**
-     * Whether the organization is registered under FCRA
+     * UI path to open after sign-up (e.g. email verification)
      */
-    fcraRegistered: boolean;
-    planTier: OrganizationPlanTier;
-    billingStatus: OrganizationBillingStatus;
-    billingProvider?: OrganizationBillingProvider | null;
-    timezone: string;
-    /**
-     * Base currency
-     */
-    currency: OrganizationCurrency;
-    language: OrganizationLanguage;
-    fiscalYear: OrganizationFiscalYear;
-    registrationNumber?: string | null;
-    /**
-     * India 80G tax exemption number
-     */
-    taxExemptionNumber80g?: string | null;
-    /**
-     * US employer identification number
-     */
-    ein?: string | null;
-    cashfreeVendorId?: string | null;
-    cashfreeVendorStatus: CashfreeVendorStatus;
-    cashfreeVendorStatusAt?: string | null;
-    cashfreeVendorRejectionReason?: string | null;
-};
-
-export type OrganizationResponseDto = {
-    id: string;
-    name: string;
-    slug: string;
-    createdAt: string;
-    /**
-     * Organization logo URL
-     */
-    logo?: string | null;
-    /**
-     * JSON-encoded organization metadata (timezone, country, currency)
-     */
-    metadata?: string | null;
-    profile: OrganizationProfileResponseDto;
-};
-
-export type CreateOrganizationDto = {
-    /**
-     * Display name for the workspace
-     */
-    name: string;
-    slug: string;
-    /**
-     * Legal organization name
-     */
-    legalName: string;
-    /**
-     * Business location
-     */
-    country: OrganizationCountry;
-    /**
-     * Base currency
-     */
-    currency: OrganizationCurrency;
-    language: OrganizationLanguage;
-    fiscalYear: OrganizationFiscalYear;
-    /**
-     * Time zone
-     */
-    timezone: string;
-};
-
-export type SetActiveOrganizationDto = {
-    /**
-     * Organization id to activate, or null to unset
-     */
-    organizationId?: {
-        [key: string]: unknown;
-    } | null;
-    /**
-     * Organization slug to activate when organizationId is omitted
-     */
-    organizationSlug?: string;
-};
-
-export type GetCurrentSessionData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/auth/session';
-};
-
-export type GetCurrentSessionErrors = {
-    401: ErrorResponseDto;
-};
-
-export type GetCurrentSessionError = GetCurrentSessionErrors[keyof GetCurrentSessionErrors];
-
-export type GetCurrentSessionResponses = {
-    /**
-     * Current user session
-     */
-    200: unknown;
-};
-
-export type SignInData = {
-    body: SignInDto;
-    path?: never;
-    query?: never;
-    url: '/api/v1/auth/sign-in';
-};
-
-export type SignInErrors = {
-    400: ErrorResponseDto;
-    401: ErrorResponseDto;
-    429: ErrorResponseDto;
-};
-
-export type SignInError = SignInErrors[keyof SignInErrors];
-
-export type SignInResponses = {
-    /**
-     * Sets pb_access_token, pb_refresh_token, and pb_session_token cookies when email is verified
-     */
-    200: SignInResponseDto;
-};
-
-export type SignInResponse = SignInResponses[keyof SignInResponses];
-
-export type SignUpData = {
-    body: SignUpDto;
-    path?: never;
-    query?: never;
-    url: '/api/v1/auth/sign-up';
-};
-
-export type SignUpErrors = {
-    400: ErrorResponseDto;
-    429: ErrorResponseDto;
-};
-
-export type SignUpError = SignUpErrors[keyof SignUpErrors];
-
-export type SignUpResponses = {
-    200: SignInResponseDto;
-};
-
-export type SignUpResponse = SignUpResponses[keyof SignUpResponses];
-
-export type SignOutData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/auth/sign-out';
-};
-
-export type SignOutErrors = {
-    400: ErrorResponseDto;
-};
-
-export type SignOutError = SignOutErrors[keyof SignOutErrors];
-
-export type SignOutResponses = {
-    200: RefreshResponseDto;
-};
-
-export type SignOutResponse = SignOutResponses[keyof SignOutResponses];
-
-export type RefreshAccessTokenData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/auth/refresh';
-};
-
-export type RefreshAccessTokenErrors = {
-    401: ErrorResponseDto;
-    429: ErrorResponseDto;
-};
-
-export type RefreshAccessTokenError = RefreshAccessTokenErrors[keyof RefreshAccessTokenErrors];
-
-export type RefreshAccessTokenResponses = {
-    /**
-     * Sets a fresh pb_access_token cookie
-     */
-    200: RefreshResponseDto;
-};
-
-export type RefreshAccessTokenResponse = RefreshAccessTokenResponses[keyof RefreshAccessTokenResponses];
-
-export type SendEmailOtpData = {
-    body: SendEmailOtpDto;
-    path?: never;
-    query?: never;
-    url: '/api/v1/auth/email-otp/send';
-};
-
-export type SendEmailOtpErrors = {
-    400: ErrorResponseDto;
-    429: ErrorResponseDto;
-};
-
-export type SendEmailOtpError = SendEmailOtpErrors[keyof SendEmailOtpErrors];
-
-export type SendEmailOtpResponses = {
-    200: RefreshResponseDto;
-};
-
-export type SendEmailOtpResponse = SendEmailOtpResponses[keyof SendEmailOtpResponses];
-
-export type VerifyEmailOtpData = {
-    body: VerifyEmailOtpDto;
-    path?: never;
-    query?: never;
-    url: '/api/v1/auth/email-otp/verify';
-};
-
-export type VerifyEmailOtpErrors = {
-    400: ErrorResponseDto;
-    401: ErrorResponseDto;
-    429: ErrorResponseDto;
-};
-
-export type VerifyEmailOtpError = VerifyEmailOtpErrors[keyof VerifyEmailOtpErrors];
-
-export type VerifyEmailOtpResponses = {
-    200: SignInResponseDto;
-};
-
-export type VerifyEmailOtpResponse = VerifyEmailOtpResponses[keyof VerifyEmailOtpResponses];
-
-export type ForgotPasswordData = {
-    body: ForgotPasswordDto;
-    path?: never;
-    query?: never;
-    url: '/api/v1/auth/forgot-password';
-};
-
-export type ForgotPasswordErrors = {
-    400: ErrorResponseDto;
-    429: ErrorResponseDto;
-};
-
-export type ForgotPasswordError = ForgotPasswordErrors[keyof ForgotPasswordErrors];
-
-export type ForgotPasswordResponses = {
-    200: RefreshResponseDto;
-};
-
-export type ForgotPasswordResponse = ForgotPasswordResponses[keyof ForgotPasswordResponses];
-
-export type ResetPasswordData = {
-    body: ResetPasswordDto;
-    path?: never;
-    query?: never;
-    url: '/api/v1/auth/reset-password';
-};
-
-export type ResetPasswordErrors = {
-    400: ErrorResponseDto;
-    429: ErrorResponseDto;
-};
-
-export type ResetPasswordError = ResetPasswordErrors[keyof ResetPasswordErrors];
-
-export type ResetPasswordResponses = {
-    200: RefreshResponseDto;
-};
-
-export type ResetPasswordResponse = ResetPasswordResponses[keyof ResetPasswordResponses];
-
-export type ListOrganizationsData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/organization';
-};
-
-export type ListOrganizationsErrors = {
-    401: ErrorResponseDto;
-};
-
-export type ListOrganizationsError = ListOrganizationsErrors[keyof ListOrganizationsErrors];
-
-export type ListOrganizationsResponses = {
-    /**
-     * Organizations the current user belongs to
-     */
-    200: unknown;
-};
-
-export type CreateOrganizationData = {
-    body: CreateOrganizationDto;
-    path?: never;
-    query?: never;
-    url: '/api/v1/organization';
-};
-
-export type CreateOrganizationErrors = {
-    400: ErrorResponseDto;
-    401: ErrorResponseDto;
-};
-
-export type CreateOrganizationError = CreateOrganizationErrors[keyof CreateOrganizationErrors];
-
-export type CreateOrganizationResponses = {
-    /**
-     * Organization profile created
-     */
-    201: unknown;
-};
-
-export type GetOrganizationProfileData = {
-    body?: never;
-    path: {
-        /**
-         * Organization id
-         */
-        organizationId: string;
-    };
-    query?: never;
-    url: '/api/v1/organization/{organizationId}/profile';
-};
-
-export type GetOrganizationProfileErrors = {
-    401: ErrorResponseDto;
-    404: ErrorResponseDto;
-};
-
-export type GetOrganizationProfileError = GetOrganizationProfileErrors[keyof GetOrganizationProfileErrors];
-
-export type GetOrganizationProfileResponses = {
-    /**
-     * Organization profile
-     */
-    200: unknown;
-};
-
-export type GetOrganizationCapabilitiesData = {
-    body?: never;
-    path: {
-        /**
-         * Organization id
-         */
-        organizationId: string;
-    };
-    query?: never;
-    url: '/api/v1/organization/{organizationId}/capabilities';
-};
-
-export type GetOrganizationCapabilitiesErrors = {
-    401: ErrorResponseDto;
-    404: ErrorResponseDto;
-};
-
-export type GetOrganizationCapabilitiesError = GetOrganizationCapabilitiesErrors[keyof GetOrganizationCapabilitiesErrors];
-
-export type GetOrganizationCapabilitiesResponses = {
-    200: OrganizationCapabilitiesResponseDto;
-};
-
-export type GetOrganizationCapabilitiesResponse = GetOrganizationCapabilitiesResponses[keyof GetOrganizationCapabilitiesResponses];
-
-export type GetOrganizationData = {
-    body?: never;
-    path: {
-        /**
-         * Organization id
-         */
-        organizationId: string;
-    };
-    query?: never;
-    url: '/api/v1/organization/{organizationId}';
-};
-
-export type GetOrganizationErrors = {
-    401: ErrorResponseDto;
-    404: ErrorResponseDto;
-};
-
-export type GetOrganizationError = GetOrganizationErrors[keyof GetOrganizationErrors];
-
-export type GetOrganizationResponses = {
-    /**
-     * Organization with profile
-     */
-    200: OrganizationResponseDto;
-};
-
-export type GetOrganizationResponse = GetOrganizationResponses[keyof GetOrganizationResponses];
-
-export type SetActiveOrganizationData = {
-    body: SetActiveOrganizationDto;
-    path?: never;
-    query?: never;
-    url: '/api/v1/organization/activate';
-};
-
-export type SetActiveOrganizationErrors = {
-    400: ErrorResponseDto;
-    401: ErrorResponseDto;
-};
-
-export type SetActiveOrganizationError = SetActiveOrganizationErrors[keyof SetActiveOrganizationErrors];
-
-export type SetActiveOrganizationResponses = {
-    /**
-     * Active organization updated; pb_access_token reminted with the new organizationId
-     */
-    200: unknown;
+    redirectTo: string;
+    tenantId: string;
+    userId: string;
 };
 
 export type HealthLiveData = {
@@ -794,3 +359,73 @@ export type HealthCheckResponses = {
 };
 
 export type HealthCheckResponse = HealthCheckResponses[keyof HealthCheckResponses];
+
+export type SignInData = {
+    body: SignInDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/sign-in';
+};
+
+export type SignInErrors = {
+    /**
+     * Invalid credentials
+     */
+    401: ErrorResponseDto;
+    /**
+     * Email not verified or account banned
+     */
+    403: ErrorResponseDto;
+};
+
+export type SignInError = SignInErrors[keyof SignInErrors];
+
+export type SignInResponses = {
+    200: SignInResponseDto;
+};
+
+export type SignInResponse = SignInResponses[keyof SignInResponses];
+
+export type RefreshAccessTokenData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/refresh';
+};
+
+export type RefreshAccessTokenErrors = {
+    /**
+     * Refresh token invalid or expired
+     */
+    401: ErrorResponseDto;
+};
+
+export type RefreshAccessTokenError = RefreshAccessTokenErrors[keyof RefreshAccessTokenErrors];
+
+export type RefreshAccessTokenResponses = {
+    200: RefreshResponseDto;
+};
+
+export type RefreshAccessTokenResponse = RefreshAccessTokenResponses[keyof RefreshAccessTokenResponses];
+
+export type SignUpData = {
+    body: SignUpDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/sign-up';
+};
+
+export type SignUpErrors = {
+    /**
+     * User already exists
+     */
+    400: ErrorResponseDto;
+};
+
+export type SignUpError = SignUpErrors[keyof SignUpErrors];
+
+export type SignUpResponses = {
+    201: SignUpResponseDto;
+};
+
+export type SignUpResponse = SignUpResponses[keyof SignUpResponses];
