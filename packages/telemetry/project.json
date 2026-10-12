@@ -1,0 +1,9 @@
+{
+    "name": "@parishbooks/telemetry",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/telemetry/src",
+    "projectType": "library",
+    "tags": [],
+    "// targets": "to see all targets run: nx show project telemetry --web",
+    "targets": {}
+}
