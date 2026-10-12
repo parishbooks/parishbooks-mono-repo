@@ -19,6 +19,9 @@ export class AuthUser {
     @ApiProperty({ type: [String] })
     roles: string[];
 
+    @ApiProperty({ type: Boolean })
+    banned: boolean;
+
     constructor(user: AuthUser) {
         this.id = user.id;
         this.email = user.email;
@@ -26,5 +29,6 @@ export class AuthUser {
         this.emailVerified = user.emailVerified;
         this.username = user.username;
         this.roles = user.roles;
+        this.banned = user.banned;
     }
 }

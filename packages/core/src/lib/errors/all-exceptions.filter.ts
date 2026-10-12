@@ -24,13 +24,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
             this.logger.warn({ path: request.url, method: request.method, status, message }, 'Request failed');
         }
 
-        response.status(status).json({
+        const body: Record<string, unknown> = {
             statusCode: status,
             message,
             error,
             timestamp: new Date().toISOString(),
             path: request.url,
-        });
+        };
+        if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+            const extra = exceptionResponse as Record<string, unknown>;
+            if (typeof extra.code === 'string') body.code = extra.code;
+            if (typeof extra.redirectTo === 'string') body.redirectTo = extra.redirectTo;
+            if (typeof extra.email === 'string') body.email = extra.email;
+        }
+        response.status(status).json(body);
     }
 
     private resolveMessage(exceptionResponse: string | object | null, status: number): string | string[] {

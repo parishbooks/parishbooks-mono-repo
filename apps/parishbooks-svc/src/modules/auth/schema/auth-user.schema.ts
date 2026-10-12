@@ -7,4 +7,5 @@ export const AuthUserSchema = z.object({
     emailVerified: z.boolean(),
     username: z.string(),
     roles: z.array(z.string()),
+    banned: z.boolean(),
 });

@@ -10,6 +10,15 @@ export class ErrorResponseDto {
     @ApiPropertyOptional({ example: 'Bad Request' })
     error?: string;
 
+    @ApiPropertyOptional({ example: 'EMAIL_NOT_VERIFIED', description: 'Stable machine-readable error code' })
+    code?: string;
+
+    @ApiPropertyOptional({ example: '/verify-email?email=user@example.com', description: 'UI path when the client should redirect' })
+    redirectTo?: string;
+
+    @ApiPropertyOptional({ example: 'user@example.com', description: 'Context for verification or recovery flows' })
+    email?: string;
+
     @ApiProperty({ example: '2026-10-05T04:00:00.000Z' })
     timestamp: string;
 
