@@ -1,2 +1,2 @@
 export * from './lib/telemetry.module';
-export * from './lib/instrumentation';
+export { shutdownNodeTelemetry, startNodeTelemetry } from './lib/telemetry-node';

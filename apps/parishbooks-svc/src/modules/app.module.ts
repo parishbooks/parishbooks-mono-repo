@@ -5,11 +5,13 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ClsModule } from 'nestjs-cls';
 import { AllExceptionsFilter, defineLogger, defineThrottler, HealthModule, LoggerModule } from '@parishbooks/core';
 import { DatabaseModule } from '@parishbooks/database';
+import { TelemetryModule } from '@parishbooks/telemetry';
 import { config } from '../config';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [
+        TelemetryModule,
         ClsModule.forRoot({ global: true, middleware: { mount: true, generateId: true, saveReq: true } }),
         ConfigModule.forRoot({ isGlobal: true, load: config }),
         LoggerModule.forRootAsync({

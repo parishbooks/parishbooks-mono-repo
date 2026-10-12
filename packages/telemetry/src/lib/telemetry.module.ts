@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, OnApplicationShutdown } from '@nestjs/common';
+import { shutdownNodeTelemetry } from './telemetry-node';
 
-@Module({
-    controllers: [],
-    providers: [],
-    exports: [],
-})
-export class TelemetryModule {}
+@Module({})
+export class TelemetryModule implements OnApplicationShutdown {
+    async onApplicationShutdown(): Promise<void> {
+        await shutdownNodeTelemetry();
+    }
+}

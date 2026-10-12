@@ -16,7 +16,9 @@
             "@parishbooks/core": ["../../packages/core/src/index.ts"],
             "@parishbooks/core/*": ["../../packages/core/src/*"],
             "@parishbooks/database": ["../../packages/database/src/index.ts"],
-            "@parishbooks/database/*": ["../../packages/database/src/*"]
+            "@parishbooks/database/*": ["../../packages/database/src/*"],
+            "@parishbooks/telemetry": ["../../packages/telemetry/src/index.ts"],
+            "@parishbooks/telemetry/instrumentation": ["../../packages/telemetry/src/lib/instrumentation.ts"]
         }
     },
     "include": ["cls.d.ts", "src/**/*.ts"],
@@ -45,6 +47,9 @@
         },
         {
             "path": "../../packages/core/tsconfig.lib.json"
+        },
+        {
+            "path": "../../packages/telemetry/tsconfig.lib.json"
         }
     ]
 }

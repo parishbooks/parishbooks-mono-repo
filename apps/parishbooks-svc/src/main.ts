@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import '@parishbooks/telemetry/instrumentation';
 import 'reflect-metadata';
 import { Application } from '@parishbooks/core';
 import { AppModule } from './modules/app.module';
