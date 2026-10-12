@@ -26,11 +26,11 @@
         "tslib": "^2.3.0",
         "typeorm": "0.3.28",
         "typeorm-naming-strategies": "^4.1.0",
-        "pg": "^8.23.1",
         "reflect-metadata": "^0.2.0"
     },
     "devDependencies": {
         "@types/node": "^22.0.0",
-        "@types/pg": "^8.23.1"
+        "@types/pg": "^8.23.1",
+        "pg": "^8.23.1"
     }
 }
