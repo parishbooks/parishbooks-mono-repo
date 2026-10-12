@@ -4,8 +4,10 @@ import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import { Logger } from 'nestjs-pino';
+import { WINSTON_MODULE_NEST_PROVIDER, WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import type { Logger } from 'winston';
 import { defineHelmet } from '../helmet/helmet.config';
+import { createHttpLoggingMiddleware } from '../logger/logger.config';
 import { setupSwagger, type DefineSwaggerProps } from '../swagger/swagger.config';
 
 export type ApplicationInitProps = {
@@ -22,6 +24,7 @@ export type ApplicationInitProps = {
     cookieParser?: boolean;
     helmet?: boolean;
     swagger?: DefineSwaggerProps | false;
+    httpLogIgnorePaths?: string[];
     onReady?: (app: NestExpressApplication, urls: { api: string; swagger?: string; openApiJson?: string }) => void;
 };
 
@@ -39,12 +42,15 @@ export class Application {
             cookieParser: useCookieParser = true,
             helmet: useHelmet = true,
             swagger,
+            httpLogIgnorePaths = ['/health'],
         } = props;
 
         const app = await NestFactory.create<NestExpressApplication>(module, { bufferLogs });
         const swaggerConfig = typeof swagger === 'object' ? swagger : undefined;
+        const winstonLogger = app.get<Logger>(WINSTON_MODULE_PROVIDER);
 
-        app.useLogger(app.get(Logger));
+        app.use(createHttpLoggingMiddleware(winstonLogger, { ignorePaths: httpLogIgnorePaths }));
+        app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
         if (enableShutdownHooks) app.enableShutdownHooks();
         if (trustProxy !== false) app.set('trust proxy', trustProxy);
 
@@ -65,6 +71,7 @@ export class Application {
 
         const app = await Application.create(props);
         const swaggerConfig = typeof swagger === 'object' ? swagger : undefined;
+        const nestLogger = app.get(WINSTON_MODULE_NEST_PROVIDER);
 
         await app.listen(port);
 
@@ -74,10 +81,9 @@ export class Application {
         const openApiJsonUrl = swaggerPath ? `http://localhost:${port}/${swaggerConfig?.jsonDocumentUrl ?? `${swaggerPath}-json`}` : undefined;
         const urls = { api: apiUrl, swagger: swaggerUrl, openApiJson: openApiJsonUrl };
 
-        const logger = app.get(Logger);
-        logger.log(`Application is running on: ${urls.api}`);
-        if (urls.swagger) logger.log(`Swagger UI: ${urls.swagger}`);
-        if (urls.openApiJson) logger.log(`OpenAPI JSON: ${urls.openApiJson}`);
+        nestLogger.log(`Application is running on: ${urls.api}`);
+        if (urls.swagger) nestLogger.log(`Swagger UI: ${urls.swagger}`);
+        if (urls.openApiJson) nestLogger.log(`OpenAPI JSON: ${urls.openApiJson}`);
         onReady?.(app, urls);
 
         return app;

@@ -3,7 +3,7 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ClsModule } from 'nestjs-cls';
-import { AllExceptionsFilter, defineLogger, defineThrottler, HealthModule, LoggerModule } from '@parishbooks/core';
+import { AllExceptionsFilter, defineLogger, defineThrottler, HealthModule, WinstonModule } from '@parishbooks/core';
 import { DatabaseModule } from '@parishbooks/database';
 import { TelemetryModule } from '@parishbooks/telemetry';
 import { config } from '../config';
@@ -14,7 +14,7 @@ import { AuthModule } from './auth/auth.module';
         TelemetryModule,
         ClsModule.forRoot({ global: true, middleware: { mount: true, generateId: true, saveReq: true } }),
         ConfigModule.forRoot({ isGlobal: true, load: config }),
-        LoggerModule.forRootAsync({
+        WinstonModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => defineLogger({ isProd: configService.get<string>('app.env') === 'production' }),
         }),

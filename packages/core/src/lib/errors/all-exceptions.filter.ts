@@ -1,11 +1,12 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { Logger } from 'nestjs-pino';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import type { Logger } from 'winston';
 
 @Injectable()
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-    constructor(private readonly logger: Logger) {}
+    constructor(@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {}
 
     catch(exception: unknown, host: ArgumentsHost): void {
         const ctx = host.switchToHttp();
@@ -17,12 +18,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const error = this.resolveError(exceptionResponse, status);
 
         if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
-            this.logger.error(
-                { err: exception, path: request.url, method: request.method },
-                exception instanceof Error ? exception.message : 'Unhandled exception',
-            );
+            this.logger.error(exception instanceof Error ? exception.message : 'Unhandled exception', {
+                err: exception,
+                path: request.url,
+                method: request.method,
+            });
         } else {
-            this.logger.warn({ path: request.url, method: request.method, status, message }, 'Request failed');
+            this.logger.warn('Request failed', { path: request.url, method: request.method, status, message });
         }
 
         const body: Record<string, unknown> = { statusCode: status, message, error, timestamp: new Date().toISOString(), path: request.url };
