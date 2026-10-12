@@ -15,6 +15,7 @@
         "db:migrate": "bun nx run @parishbooks/database:db-migrate",
         "db:reset": "bun nx run @parishbooks/database:db-reset",
         "openapi:generate": "bun nx run @parishbooks/api-sdk:generate:openapi",
+        "e2e:svc": "bun nx run @parishbooks/parishbooks-svc-e2e:e2e",
         "prepare": "husky",
         "lint-staged": "lint-staged"
     },
@@ -125,6 +126,7 @@
         "@types/pg": "^8.23.1",
         "@types/react": "^19.0.0",
         "@types/react-dom": "^19.0.0",
+        "@types/supertest": "^7.2.1",
         "@vitejs/plugin-react": "^6.0.0",
         "@vitest/coverage-v8": "~4.1.0",
         "@vitest/ui": "~4.1.0",
@@ -144,6 +146,7 @@
         "nx": "23.2.1",
         "pino-pretty": "^13.2.0",
         "prettier": "~3.6.2",
+        "supertest": "^7.3.1",
         "tailwindcss": "^4",
         "tslib": "^2.3.0",
         "typescript": "~6.0.3",

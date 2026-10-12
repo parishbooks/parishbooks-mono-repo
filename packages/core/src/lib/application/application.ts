@@ -26,10 +26,9 @@ export type ApplicationInitProps = {
 };
 
 export class Application {
-    static async init(props: ApplicationInitProps): Promise<NestExpressApplication> {
+    static async create(props: ApplicationInitProps): Promise<NestExpressApplication> {
         const {
             module,
-            port,
             globalPrefix = 'api',
             defaultVersion = '1',
             isProd = process.env.NODE_ENV === 'production',
@@ -40,7 +39,6 @@ export class Application {
             cookieParser: useCookieParser = true,
             helmet: useHelmet = true,
             swagger,
-            onReady,
         } = props;
 
         const app = await NestFactory.create<NestExpressApplication>(module, { bufferLogs });
@@ -57,6 +55,16 @@ export class Application {
         if (useHelmet) app.use(helmet(defineHelmet({ isProd })));
         if (useCookieParser) app.use(cookieParser());
         if (swaggerConfig) setupSwagger(app, swaggerConfig);
+
+        await app.init();
+        return app;
+    }
+
+    static async init(props: ApplicationInitProps): Promise<NestExpressApplication> {
+        const { port, defaultVersion = '1', globalPrefix = 'api', swagger, onReady } = props;
+
+        const app = await Application.create(props);
+        const swaggerConfig = typeof swagger === 'object' ? swagger : undefined;
 
         await app.listen(port);
 

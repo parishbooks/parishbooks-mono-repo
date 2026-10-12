@@ -7,7 +7,7 @@
         "emitDeclarationOnly": false,
         "forceConsistentCasingInFileNames": true,
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": false,
+        "emitDecoratorMetadata": true,
         "strictPropertyInitialization": false,
         "types": ["node"]
     },
