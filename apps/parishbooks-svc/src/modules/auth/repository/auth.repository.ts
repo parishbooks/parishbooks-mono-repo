@@ -22,6 +22,11 @@ export class AuthRepository {
         });
     }
 
+    async getUserById(id: string, em: EntityManager = this.dataSource.createEntityManager()) {
+        const user = em.getRepository(User);
+        return await user.findOne({ where: { id } });
+    }
+
     private async createTenant(name: string, em: EntityManager = this.dataSource.createEntityManager()) {
         const tenant = em.create(Tenant, { name });
         return await em.save(tenant);

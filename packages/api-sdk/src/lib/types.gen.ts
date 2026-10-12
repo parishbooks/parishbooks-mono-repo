@@ -31,7 +31,7 @@ export type SignUpDto = {
     password: string;
 };
 
-export type SuccessResponseDto = {
+export type RefreshResponseDto = {
     success: boolean;
     /**
      * UI path to open after this action
@@ -278,7 +278,7 @@ export type SignOutErrors = {
 export type SignOutError = SignOutErrors[keyof SignOutErrors];
 
 export type SignOutResponses = {
-    200: SuccessResponseDto;
+    200: RefreshResponseDto;
 };
 
 export type SignOutResponse = SignOutResponses[keyof SignOutResponses];
@@ -301,7 +301,7 @@ export type RefreshAccessTokenResponses = {
     /**
      * Sets a fresh pb_access_token cookie
      */
-    200: SuccessResponseDto;
+    200: RefreshResponseDto;
 };
 
 export type RefreshAccessTokenResponse = RefreshAccessTokenResponses[keyof RefreshAccessTokenResponses];
@@ -321,7 +321,7 @@ export type SendEmailOtpErrors = {
 export type SendEmailOtpError = SendEmailOtpErrors[keyof SendEmailOtpErrors];
 
 export type SendEmailOtpResponses = {
-    200: SuccessResponseDto;
+    200: RefreshResponseDto;
 };
 
 export type SendEmailOtpResponse = SendEmailOtpResponses[keyof SendEmailOtpResponses];
@@ -362,7 +362,7 @@ export type ForgotPasswordErrors = {
 export type ForgotPasswordError = ForgotPasswordErrors[keyof ForgotPasswordErrors];
 
 export type ForgotPasswordResponses = {
-    200: SuccessResponseDto;
+    200: RefreshResponseDto;
 };
 
 export type ForgotPasswordResponse = ForgotPasswordResponses[keyof ForgotPasswordResponses];
@@ -382,7 +382,7 @@ export type ResetPasswordErrors = {
 export type ResetPasswordError = ResetPasswordErrors[keyof ResetPasswordErrors];
 
 export type ResetPasswordResponses = {
-    200: SuccessResponseDto;
+    200: RefreshResponseDto;
 };
 
 export type ResetPasswordResponse = ResetPasswordResponses[keyof ResetPasswordResponses];

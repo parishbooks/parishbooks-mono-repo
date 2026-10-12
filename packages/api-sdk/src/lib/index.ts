@@ -106,7 +106,7 @@ export type {
     SignUpErrors,
     SignUpResponse,
     SignUpResponses,
-    SuccessResponseDto,
+    RefreshResponseDto,
     VerifyEmailOtpData,
     VerifyEmailOtpDto,
     VerifyEmailOtpError,

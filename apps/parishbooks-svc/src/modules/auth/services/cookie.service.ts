@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { CookieOptions, Response } from 'express';
+import type { Request } from 'express';
 import {
     ACCESS_TOKEN_MAX_AGE_MS,
     AUTH_COOKIE_NAMES,
@@ -35,6 +36,10 @@ export class CookieService {
 
     clearAuthCookies(response: Response): void {
         for (const name of AUTH_COOKIE_NAMES) response.clearCookie(name, this.baseCookieOptions());
+    }
+
+    getRefreshTokenFromRequest(request: Request): string | undefined {
+        return request.cookies?.[PB_REFRESH_TOKEN_COOKIE];
     }
 
     private authCookieOptions(maxAgeMs: number): CookieOptions {

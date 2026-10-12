@@ -15,6 +15,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '@parishbooks/core';
 import { PasswordService } from './services/password.service';
 import { CookieService } from './services/cookie.service';
+import { TokenService } from './services/token.service';
 
 @Module({
     imports: [
@@ -41,6 +42,7 @@ import { CookieService } from './services/cookie.service';
         SignUpService,
         PasswordService,
         CookieService,
+        TokenService,
         { provide: APP_GUARD, useClass: JwtAuthGuard },
     ],
 })

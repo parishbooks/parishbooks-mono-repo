@@ -25,3 +25,9 @@ export class UserAlreadyExistsException extends BadRequestException {
         super({ message, code: ErrorCode.USER_ALREADY_EXISTS });
     }
 }
+
+export class RefreshTokenInvalidException extends UnauthorizedException {
+    constructor(message = 'Refresh token is invalid or expired.') {
+        super({ message, code: ErrorCode.REFRESH_INVALID });
+    }
+}

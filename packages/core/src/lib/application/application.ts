@@ -34,7 +34,6 @@ export class Application {
             defaultVersion = '1',
             isProd = process.env.NODE_ENV === 'production',
             corsOrigin,
-            bodyParser = false,
             trustProxy = 1,
             enableShutdownHooks = true,
             bufferLogs = true,
@@ -44,7 +43,7 @@ export class Application {
             onReady,
         } = props;
 
-        const app = await NestFactory.create<NestExpressApplication>(module, { bodyParser, bufferLogs });
+        const app = await NestFactory.create<NestExpressApplication>(module, { bufferLogs });
         const swaggerConfig = typeof swagger === 'object' ? swagger : undefined;
 
         app.useLogger(app.get(Logger));
@@ -63,11 +62,9 @@ export class Application {
 
         const apiUrl = `http://localhost:${port}/${globalPrefix}${defaultVersion ? `/v${defaultVersion}` : ''}`;
         const swaggerPath = swaggerConfig ? (swaggerConfig.path ?? 'api/docs') : undefined;
-        const urls = {
-            api: apiUrl,
-            swagger: swaggerPath ? `http://localhost:${port}/${swaggerPath}` : undefined,
-            openApiJson: swaggerPath ? `http://localhost:${port}/${swaggerConfig?.jsonDocumentUrl ?? `${swaggerPath}-json`}` : undefined,
-        };
+        const swaggerUrl = swaggerPath ? `http://localhost:${port}/${swaggerPath}` : undefined;
+        const openApiJsonUrl = swaggerPath ? `http://localhost:${port}/${swaggerConfig?.jsonDocumentUrl ?? `${swaggerPath}-json`}` : undefined;
+        const urls = { api: apiUrl, swagger: swaggerUrl, openApiJson: openApiJsonUrl };
 
         const logger = app.get(Logger);
         logger.log(`Application is running on: ${urls.api}`);

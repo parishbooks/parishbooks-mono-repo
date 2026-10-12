@@ -3,15 +3,18 @@ import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse }
 import { SignUpDto } from './dto/signup.dto';
 import { SignUpService } from './services/signup.service';
 import { AuthGuard } from '@nestjs/passport';
-import type { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthUser } from './dto/auth-user.dto';
 import { SignInService } from './services/signin.service';
 import { Public } from '@parishbooks/core';
 import { SignInResponseDto } from './dto/signin-response.dto';
 import { SignUpResponseDto } from './dto/signup-response.dto';
+import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { ErrorResponseDto } from '@parishbooks/core';
 import { SignInDto } from './dto/signin.dto';
 import { CookieService } from './services/cookie.service';
+import { TokenService } from './services/token.service';
+import { RefreshTokenInvalidException } from './exceptions';
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +22,7 @@ export class AuthController {
         private readonly signUpService: SignUpService,
         private readonly signInService: SignInService,
         private readonly cookieService: CookieService,
+        private readonly tokenService: TokenService,
     ) {}
 
     @Public()
@@ -29,12 +33,28 @@ export class AuthController {
     @ApiResponse({ status: 401, description: 'Invalid credentials', type: ErrorResponseDto })
     @ApiResponse({ status: 403, description: 'Email not verified or account banned', type: ErrorResponseDto })
     @UseGuards(AuthGuard('local'))
-    async signIn(@Req() request: Request & { user: AuthUser; body: SignInDto }, @Res({ passthrough: true }) response: Response): Promise<SignInResponseDto> {
+    async signIn(
+        @Body('rememberMe') rememberMe: boolean,
+        @Req() request: Request & { user: AuthUser },
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<SignInResponseDto> {
         const user = this.signInService.validateUser(request.user);
-        const rememberMe = request.body?.rememberMe;
-        const tokens = this.signInService.mintJwt(user, rememberMe);
+        const tokens = this.tokenService.mintTokenPair(user, rememberMe);
         this.cookieService.setAuthCookies(response, tokens, { rememberMe });
         return new SignInResponseDto({ ...tokens, redirectTo: '/dashboard' });
+    }
+
+    @Public()
+    @Post('refresh')
+    @ApiOperation({ summary: 'Refresh access token', description: 'Sets a fresh pb_access_token cookie' })
+    @ApiOkResponse({ type: RefreshResponseDto })
+    @ApiResponse({ status: 401, description: 'Refresh token invalid or expired', type: ErrorResponseDto })
+    async refreshAccessToken(@Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<RefreshResponseDto> {
+        const refreshToken = this.cookieService.getRefreshTokenFromRequest(request);
+        if (!refreshToken) throw new RefreshTokenInvalidException();
+        const { accessToken } = await this.tokenService.refreshAccessToken(refreshToken);
+        this.cookieService.setAccessTokenCookie(response, accessToken);
+        return new RefreshResponseDto({ success: true });
     }
 
     @Public()
