@@ -1,7 +1,8 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { Logger } from 'nestjs-pino';
 
+@Injectable()
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
     constructor(private readonly logger: Logger) {}
@@ -24,13 +25,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
             this.logger.warn({ path: request.url, method: request.method, status, message }, 'Request failed');
         }
 
-        response.status(status).json({
-            statusCode: status,
-            message,
-            error,
-            timestamp: new Date().toISOString(),
-            path: request.url,
-        });
+        const body: Record<string, unknown> = { statusCode: status, message, error, timestamp: new Date().toISOString(), path: request.url };
+        if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+            const extra = exceptionResponse as Record<string, unknown>;
+            if (typeof extra.code === 'string') body.code = extra.code;
+            if (typeof extra.redirectTo === 'string') body.redirectTo = extra.redirectTo;
+            if (typeof extra.email === 'string') body.email = extra.email;
+        }
+        response.status(status).json(body);
     }
 
     private resolveMessage(exceptionResponse: string | object | null, status: number): string | string[] {

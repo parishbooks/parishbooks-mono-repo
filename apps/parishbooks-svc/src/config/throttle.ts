@@ -1,6 +1,8 @@
-import { registerAs } from '@nestjs/config';
+import { ConfigType, registerAs } from '@nestjs/config';
 
-export default registerAs('throttle', () => ({
+export const throttleConfig = registerAs('throttle', () => ({
     ttl: Number(process.env.THROTTLE_TTL ?? '60000'),
     limit: Number(process.env.THROTTLE_LIMIT ?? '100'),
 }));
+
+export type ThrottleConfig = ConfigType<typeof throttleConfig>;

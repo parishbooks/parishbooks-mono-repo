@@ -1,11 +1,27 @@
-import { Column, Index } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { Organization } from './organization.entity';
+import { User } from './user.entity';
 
-// Subclasses must add @Entity(...) plus @Index(['organizationId', 'id']) —
-// see docs/specs/typeorm-database-schema.md §2. Every tenant-scoped query
-// must filter on organizationId (CLAUDE.md rule 1).
-@Index(['organizationId'])
-export abstract class TenantEntity extends BaseEntity {
-    @Column({ type: 'uuid' })
-    organizationId!: string;
+export enum TenantStatus {
+    ACTIVE = 'active',
+    INACTIVE = 'inactive',
+    PENDING = 'pending',
+    SUSPENDED = 'suspended',
+    DELETED = 'deleted',
+}
+
+@Entity('tenant')
+export class Tenant extends BaseEntity {
+    @Column({ type: 'text' })
+    name!: string;
+
+    @Column({ type: 'enum', enum: TenantStatus, default: TenantStatus.PENDING })
+    status!: TenantStatus;
+
+    @OneToMany(() => Organization, (organization) => organization.tenant)
+    organizations!: Organization[];
+
+    @OneToMany(() => User, (user) => user.tenant)
+    users!: User[];
 }

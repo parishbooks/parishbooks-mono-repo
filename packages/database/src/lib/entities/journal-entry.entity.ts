@@ -1,5 +1,5 @@
 import { Column, Entity, Index } from 'typeorm';
-import { TenantEntity } from './tenant.entity';
+import { OrganizationScopedEntity } from './organization-scoped.entity';
 
 export enum JournalEntrySourceType {
     DONATION = 'donation',
@@ -17,7 +17,7 @@ export enum JournalEntrySourceType {
 // AddJournalImmutabilityTriggers.
 @Entity('journal_entry')
 @Index(['organizationId', 'id'])
-export class JournalEntry extends TenantEntity {
+export class JournalEntry extends OrganizationScopedEntity {
     @Column({ type: 'date' })
     date!: string;
 

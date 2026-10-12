@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 import { spawnSync } from 'node:child_process';
-import { resolve } from 'node:path';
 import inquirer from 'inquirer';
+import { databaseScriptPaths } from './lib/paths';
+import { pruneCompiledMigrations } from './lib/prune-compiled-migrations';
 
 function toPascalCase(value: string): string {
     return value
@@ -28,15 +29,16 @@ async function main() {
         ).name;
 
     const migrationName = toPascalCase(name);
-    const workspaceRoot = resolve(import.meta.dir, '../../..');
-    const packageRoot = resolve(import.meta.dir, '..');
+    const { workspaceRoot, packageRoot } = databaseScriptPaths(import.meta);
 
-    const build = spawnSync('bun', ['nx', 'run', '@parishbooks/database:build'], {
+    const build = spawnSync('bun', ['nx', 'run', '@parishbooks/database:build', '--skipNxCache'], {
         cwd: workspaceRoot,
         stdio: 'inherit',
         env: process.env,
     });
     if (build.status !== 0) process.exit(build.status ?? 1);
+
+    pruneCompiledMigrations(packageRoot);
 
     // Generate against the compiled data source (Bun's decorator emit breaks TypeORM metadata).
     const result = spawnSync('bunx', ['typeorm', 'migration:generate', '-d', 'dist/data-source.js', `src/lib/migrations/${migrationName}`], {

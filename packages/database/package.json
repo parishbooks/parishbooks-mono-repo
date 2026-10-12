@@ -4,7 +4,8 @@
     "private": true,
     "scripts": {
         "db:generate": "bun scripts/db-generate.ts",
-        "db:migrate": "bun scripts/db-migrate.ts"
+        "db:migrate": "bun scripts/db-migrate.ts",
+        "db:reset": "bun scripts/db-reset.ts"
     },
     "main": "./dist/index.js",
     "module": "./dist/index.js",
@@ -28,6 +29,8 @@
         "reflect-metadata": "^0.2.0"
     },
     "devDependencies": {
-        "@types/pg": "^8.23.1"
+        "@types/node": "^22.0.0",
+        "@types/pg": "^8.23.1",
+        "pg": "^8.23.1"
     }
 }

@@ -1,9 +1,9 @@
 import { Column, Entity, Index } from 'typeorm';
-import { TenantEntity } from './tenant.entity';
+import { OrganizationScopedEntity } from './organization-scoped.entity';
 
 @Entity('family')
 @Index(['organizationId', 'id'])
-export class Family extends TenantEntity {
+export class Family extends OrganizationScopedEntity {
     @Column({ type: 'text' })
     name!: string;
 

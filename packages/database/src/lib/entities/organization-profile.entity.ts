@@ -1,5 +1,6 @@
-import { Column, Entity, Unique } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, Unique } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { Organization } from './organization.entity';
 
 export enum OrganizationCountry {
     IN = 'IN',
@@ -48,6 +49,10 @@ export enum CashfreeVendorStatus {
 export class OrganizationProfile extends BaseEntity {
     @Column({ type: 'uuid' })
     organizationId!: string;
+
+    @OneToOne(() => Organization, (organization) => organization.profile, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'organization_id' })
+    organization!: Organization;
 
     @Column({ type: 'text' })
     legalName!: string;

@@ -16,16 +16,10 @@
             "path": "./apps/parishbooks-ui"
         },
         {
-            "path": "./packages/iam"
-        },
-        {
             "path": "./packages/design-system"
         },
         {
             "path": "./packages/site-ui"
-        },
-        {
-            "path": "./packages/communications"
         },
         {
             "path": "./packages/core"

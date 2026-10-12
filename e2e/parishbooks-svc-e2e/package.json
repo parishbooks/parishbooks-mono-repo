@@ -6,7 +6,14 @@
         "implicitDependencies": [
             "@parishbooks/parishbooks-svc"
         ],
+        "tags": [
+            "type:e2e",
+            "scope:server"
+        ],
         "targets": {
+            "test": {
+                "executor": "nx:noop"
+            },
             "e2e": {
                 "executor": "nx:run-commands",
                 "outputs": [

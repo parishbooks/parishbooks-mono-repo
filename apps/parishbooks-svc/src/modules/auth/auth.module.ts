@@ -1,12 +1,47 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
+import { PassportModule } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { JWT_AUDIENCE, JWT_ISSUER, JWT_STRATEGY_NAME } from './constants/jwt.constant';
 import { AuthService } from './auth.service';
-import { AuthServiceHelper } from './helpers/auth-service.helper';
-import { HooksModule } from './hooks/hooks.module';
+import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { AuthRepository } from './repository/auth.repository';
+import { SignInService } from './services/signin.service';
+import { SignUpService } from './services/signup.service';
+import { AuthController } from './auth.controller';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '@parishbooks/core';
+import { PasswordService } from './services/password.service';
+import { CookieService } from './services/cookie.service';
+import { TokenService } from './services/token.service';
 
 @Module({
-    imports: [HooksModule],
+    imports: [
+        PassportModule.register({ defaultStrategy: JWT_STRATEGY_NAME }),
+        JwtModule.registerAsync({
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => {
+                return {
+                    secret: configService.getOrThrow<string>('auth.jwt.secret'),
+                    signOptions: { expiresIn: '1d', algorithm: 'HS384', issuer: JWT_ISSUER, audience: JWT_AUDIENCE },
+                    verifyOptions: { algorithms: ['HS384'], issuer: JWT_ISSUER, audience: JWT_AUDIENCE },
+                };
+            },
+        }),
+    ],
     controllers: [AuthController],
-    providers: [AuthServiceHelper, AuthService],
+    providers: [
+        AuthService,
+        LocalStrategy,
+        JwtStrategy,
+        AuthRepository,
+        SignInService,
+        SignUpService,
+        PasswordService,
+        CookieService,
+        TokenService,
+        { provide: APP_GUARD, useClass: JwtAuthGuard },
+    ],
 })
 export class AuthModule {}
