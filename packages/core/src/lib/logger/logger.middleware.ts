@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import type winston from 'winston';
+import { formatHttpAccessLine, httpElapsedMs, httpRequestPath, isHttpSuccessStatus, markHttpRequestStart } from './http-log.utils';
 
 export type HttpLoggingMiddlewareOptions = {
     ignorePaths?: string[];
@@ -15,10 +16,16 @@ export const createHttpLoggingMiddleware =
             return;
         }
 
-        const start = process.hrtime.bigint();
+        markHttpRequestStart(req);
         res.on('finish', () => {
-            const durationMs = Number(process.hrtime.bigint() - start) / 1_000_000;
-            logger.info('request completed', { method: req.method, url: req.url, statusCode: res.statusCode, durationMs: Math.round(durationMs * 100) / 100 });
+            const statusCode = res.statusCode;
+            if (!isHttpSuccessStatus(statusCode)) return;
+
+            const durationMs = httpElapsedMs(req);
+            if (durationMs === undefined) return;
+
+            const path = httpRequestPath(req.url);
+            logger.info(formatHttpAccessLine(req.method, path, statusCode, durationMs));
         });
         next();
     };

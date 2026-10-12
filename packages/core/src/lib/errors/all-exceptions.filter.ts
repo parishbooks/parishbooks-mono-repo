@@ -2,6 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Injec
 import type { Request, Response } from 'express';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import type { Logger } from 'winston';
+import { formatHttpAccessLine, httpElapsedMs, httpRequestPath } from '../logger/http-log.utils';
 
 @Injectable()
 @Catch()
@@ -17,11 +18,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const message = this.resolveMessage(exceptionResponse, status);
         const error = this.resolveError(exceptionResponse, status);
 
+        const path = httpRequestPath(request.url);
+        const durationMs = httpElapsedMs(request);
+        const accessLine = durationMs !== undefined ? formatHttpAccessLine(request.method, path, status, durationMs) : `${request.method} ${path} ${status}`;
+
         if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
-            const body = { err: exception, path: request.url, method: request.method };
-            this.logger.error(exception instanceof Error ? exception.message : 'Unhandled exception', body);
+            const detail = exception instanceof Error ? exception.message : 'Unhandled exception';
+            this.logger.error(`${accessLine} — ${detail}`, { err: exception });
         } else {
-            this.logger.warn('Request failed', { path: request.url, method: request.method, status, message });
+            const detail = Array.isArray(message) ? message.join(', ') : message;
+            this.logger.warn(`${accessLine} — ${detail}`);
         }
 
         const body: Record<string, unknown> = { statusCode: status, message, error, timestamp: new Date().toISOString(), path: request.url };
