@@ -19,6 +19,9 @@ import { RefreshTokenInvalidException } from './exceptions';
 import { SendEmailVerificationDto, SendEmailVerificationResponseDto } from './dto/send-email-verification.dto';
 import { VerifyEmailOtpDto } from './dto/verify-email-otp.dto';
 import { VerificationService } from './services/verification.service';
+import { PasswordService } from './services/password.service';
+import { SendPasswordResetDto, SendPasswordResetResponseDto } from './dto/send-password-reset.dto';
+import { ResetPasswordDto, ResetPasswordResponseDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +31,7 @@ export class AuthController {
         private readonly cookieService: CookieService,
         private readonly tokenService: TokenService,
         private readonly verificationService: VerificationService,
+        private readonly passwordService: PasswordService,
     ) {}
 
     @Public()
@@ -105,5 +109,33 @@ export class AuthController {
         const tokens = this.tokenService.mintTokenPair(authUser, rememberMe);
         this.cookieService.setAuthCookies(response, tokens, { rememberMe });
         return new SignInResponseDto({ ...tokens, redirectTo: '/dashboard' });
+    }
+
+    @Public()
+    @Throttle({ default: { limit: 3, ttl: 60_000 } })
+    @Post('password-reset/send')
+    @HttpCode(200)
+    @ApiOperation({ summary: 'Send password reset OTP' })
+    @ApiBody({ type: SendPasswordResetDto })
+    @ApiOkResponse({ type: SendPasswordResetResponseDto })
+    @ApiResponse({ status: 429, description: 'Rate limited', type: ErrorResponseDto })
+    async sendPasswordReset(@Body() body: SendPasswordResetDto): Promise<SendPasswordResetResponseDto> {
+        await this.verificationService.sendForgetPasswordOtp(body.email);
+        return new SendPasswordResetResponseDto();
+    }
+
+    @Public()
+    @Post('password-reset/confirm')
+    @HttpCode(200)
+    @ApiOperation({ summary: 'Reset password with OTP' })
+    @ApiBody({ type: ResetPasswordDto })
+    @ApiOkResponse({ type: ResetPasswordResponseDto })
+    @ApiResponse({ status: 400, description: 'Invalid OTP or weak password', type: ErrorResponseDto })
+    @ApiResponse({ status: 403, description: 'Account banned', type: ErrorResponseDto })
+    @ApiResponse({ status: 404, description: 'User not found', type: ErrorResponseDto })
+    @ApiResponse({ status: 429, description: 'Too many OTP attempts', type: ErrorResponseDto })
+    async confirmPasswordReset(@Body() body: ResetPasswordDto): Promise<ResetPasswordResponseDto> {
+        await this.passwordService.confirmPasswordReset(body.email, body.otp, body.password);
+        return new ResetPasswordResponseDto();
     }
 }

@@ -59,6 +59,14 @@ export class AuthE2eSupport {
         return agent.post(`${this.authBasePath}/email-verification/verify`).send({ email, otp, rememberMe });
     }
 
+    static sendPasswordReset(email: string) {
+        return request(E2eEnvironment.serverUrl).post(`${this.authBasePath}/password-reset/send`).send({ email });
+    }
+
+    static confirmPasswordReset(email: string, otp: string, password: string) {
+        return request(E2eEnvironment.serverUrl).post(`${this.authBasePath}/password-reset/confirm`).send({ email, otp, password });
+    }
+
     /** Sign-up → seed OTP → verify (sets auth cookies). */
     static async createVerifiedSession(options: CreateVerifiedSessionOptions = {}): Promise<VerifiedSession> {
         const email = this.uniqueEmail(options.label ?? 'session');

@@ -1,4 +1,5 @@
 export const EMAIL_VERIFICATION_OTP_TYPE = 'email-verification';
+export const FORGET_PASSWORD_OTP_TYPE = 'forget-password';
 
 export const OTP_LENGTH = 6;
 export const OTP_EXPIRES_IN_SECONDS = 300;

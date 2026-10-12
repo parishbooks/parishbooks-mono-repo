@@ -116,6 +116,28 @@ export type VerifyEmailOtpDto = {
     rememberMe?: boolean;
 };
 
+export type SendPasswordResetDto = {
+    email: string;
+};
+
+export type SendPasswordResetResponseDto = {
+    success: boolean;
+};
+
+export type ResetPasswordDto = {
+    email: string;
+    /**
+     * 6-digit reset code
+     */
+    otp: string;
+    password: string;
+};
+
+export type ResetPasswordResponseDto = {
+    success: boolean;
+    redirectTo: string;
+};
+
 export type HealthLiveData = {
     body?: never;
     path?: never;
@@ -504,3 +526,59 @@ export type VerifyEmailOtpResponses = {
 };
 
 export type VerifyEmailOtpResponse = VerifyEmailOtpResponses[keyof VerifyEmailOtpResponses];
+
+export type SendPasswordResetData = {
+    body: SendPasswordResetDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/password-reset/send';
+};
+
+export type SendPasswordResetErrors = {
+    /**
+     * Rate limited
+     */
+    429: ErrorResponseDto;
+};
+
+export type SendPasswordResetError = SendPasswordResetErrors[keyof SendPasswordResetErrors];
+
+export type SendPasswordResetResponses = {
+    200: SendPasswordResetResponseDto;
+};
+
+export type SendPasswordResetResponse = SendPasswordResetResponses[keyof SendPasswordResetResponses];
+
+export type ConfirmPasswordResetData = {
+    body: ResetPasswordDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/password-reset/confirm';
+};
+
+export type ConfirmPasswordResetErrors = {
+    /**
+     * Invalid OTP or weak password
+     */
+    400: ErrorResponseDto;
+    /**
+     * Account banned
+     */
+    403: ErrorResponseDto;
+    /**
+     * User not found
+     */
+    404: ErrorResponseDto;
+    /**
+     * Too many OTP attempts
+     */
+    429: ErrorResponseDto;
+};
+
+export type ConfirmPasswordResetError = ConfirmPasswordResetErrors[keyof ConfirmPasswordResetErrors];
+
+export type ConfirmPasswordResetResponses = {
+    200: ResetPasswordResponseDto;
+};
+
+export type ConfirmPasswordResetResponse = ConfirmPasswordResetResponses[keyof ConfirmPasswordResetResponses];

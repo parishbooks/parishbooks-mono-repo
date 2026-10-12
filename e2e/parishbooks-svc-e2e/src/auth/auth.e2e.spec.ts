@@ -106,6 +106,30 @@ describe('Auth API (e2e)', () => {
         });
     });
 
+    describe('POST /auth/password-reset', () => {
+        it('send returns success without leaking user existence', async () => {
+            const response = await AuthE2eSupport.sendPasswordReset(AuthE2eSupport.uniqueEmail('reset-send-missing')).expect(200);
+            expect(response.body).toEqual({ success: true });
+        });
+
+        it('confirm updates password and allows sign-in', async () => {
+            const email = AuthE2eSupport.uniqueEmail('reset-flow');
+            const newPassword = 'N3wStr0ng!Pass';
+            await AuthE2eSupport.signUpUser(AuthE2eSupport.agent(), email).expect(201);
+            const databaseUrl = process.env.DATABASE_URL;
+            if (!databaseUrl) throw new Error('DATABASE_URL is required');
+            const { seedEmailVerificationOtp, seedForgetPasswordOtp } = await import('../support/otp-e2e.helper');
+            await seedEmailVerificationOtp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
+            await AuthE2eSupport.verifyEmailOtp(AuthE2eSupport.agent(), email, AuthE2eSupport.e2eVerificationOtp).expect(200);
+
+            await seedForgetPasswordOtp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
+            const reset = await AuthE2eSupport.confirmPasswordReset(email, AuthE2eSupport.e2eVerificationOtp, newPassword).expect(200);
+            expect(reset.body).toEqual({ success: true, redirectTo: '/sign-in?reset=1' });
+
+            await request(E2eEnvironment.serverUrl).post(`${AuthE2eSupport.authBasePath}/sign-in`).send({ email, password: newPassword }).expect(200);
+        });
+    });
+
     describe('POST /auth/refresh', () => {
         it('returns 401 when the refresh cookie is missing', async () => {
             const response = await request(E2eEnvironment.serverUrl).post(`${AuthE2eSupport.authBasePath}/refresh`).expect(401);

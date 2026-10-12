@@ -32,6 +32,11 @@ export class AuthRepository {
         await user.update({ id: userId }, { emailVerified: true });
     }
 
+    async updateCredentialPassword(userId: string, passwordHash: string, em: EntityManager = this.dataSource.createEntityManager()) {
+        const account = em.getRepository(Account);
+        await account.update({ userId, providerId: AccountProviderId.CREDENTIAL }, { password: passwordHash });
+    }
+
     private async createTenant(name: string, em: EntityManager = this.dataSource.createEntityManager()) {
         const tenant = em.create(Tenant, { name });
         return await em.save(tenant);

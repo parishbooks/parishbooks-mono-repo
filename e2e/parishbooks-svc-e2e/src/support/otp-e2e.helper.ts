@@ -2,17 +2,20 @@ import { createHash } from 'node:crypto';
 import pg from 'pg';
 
 const EMAIL_VERIFICATION_OTP_TYPE = 'email-verification';
+const FORGET_PASSWORD_OTP_TYPE = 'forget-password';
 
 export const normalizeVerificationEmail = (email: string): string => email.trim().toLowerCase();
 
-export const toEmailVerificationOtpIdentifier = (email: string): string => `${EMAIL_VERIFICATION_OTP_TYPE}-otp-${normalizeVerificationEmail(email)}`;
+export const toOtpIdentifier = (type: string, email: string): string => `${type}-otp-${normalizeVerificationEmail(email)}`;
+
+export const toEmailVerificationOtpIdentifier = (email: string): string => toOtpIdentifier(EMAIL_VERIFICATION_OTP_TYPE, email);
+
+export const toForgetPasswordOtpIdentifier = (email: string): string => toOtpIdentifier(FORGET_PASSWORD_OTP_TYPE, email);
 
 /** Keep in sync with apps/parishbooks-svc auth otp-crypto.helper hashOtp. */
 export const hashOtpForE2e = (otp: string): string => createHash('sha256').update(otp, 'utf8').digest('base64url');
 
-/** Inserts a known OTP for email verification (e2e only). */
-export async function seedEmailVerificationOtp(email: string, otp: string, databaseUrl: string): Promise<void> {
-    const identifier = toEmailVerificationOtpIdentifier(email);
+async function seedOtpByIdentifier(identifier: string, otp: string, databaseUrl: string): Promise<void> {
     const value = `${hashOtpForE2e(otp)}:0`;
     const expiresAt = new Date(Date.now() + 300_000);
 
@@ -28,4 +31,14 @@ export async function seedEmailVerificationOtp(email: string, otp: string, datab
     } finally {
         await client.end();
     }
+}
+
+/** Inserts a known OTP for email verification (e2e only). */
+export async function seedEmailVerificationOtp(email: string, otp: string, databaseUrl: string): Promise<void> {
+    await seedOtpByIdentifier(toEmailVerificationOtpIdentifier(email), otp, databaseUrl);
+}
+
+/** Inserts a known OTP for password reset (e2e only). */
+export async function seedForgetPasswordOtp(email: string, otp: string, databaseUrl: string): Promise<void> {
+    await seedOtpByIdentifier(toForgetPasswordOtpIdentifier(email), otp, databaseUrl);
 }

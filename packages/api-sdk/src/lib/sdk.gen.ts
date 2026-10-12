@@ -3,6 +3,9 @@
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
 import type {
+    ConfirmPasswordResetData,
+    ConfirmPasswordResetErrors,
+    ConfirmPasswordResetResponses,
     HealthCheckData,
     HealthCheckErrors,
     HealthCheckResponses,
@@ -18,6 +21,9 @@ import type {
     SendEmailVerificationData,
     SendEmailVerificationErrors,
     SendEmailVerificationResponses,
+    SendPasswordResetData,
+    SendPasswordResetErrors,
+    SendPasswordResetResponses,
     SignInData,
     SignInErrors,
     SignInResponses,
@@ -178,6 +184,38 @@ export class ApiSdk extends HeyApiClient {
     ): RequestResult<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError> {
         return (options.client ?? this.client).post<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError>({
             url: '/api/v1/auth/email-verification/verify',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            },
+        });
+    }
+
+    /**
+     * Send password reset OTP
+     */
+    public sendPasswordReset<ThrowOnError extends boolean = false>(
+        options: Options<SendPasswordResetData, ThrowOnError>,
+    ): RequestResult<SendPasswordResetResponses, SendPasswordResetErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<SendPasswordResetResponses, SendPasswordResetErrors, ThrowOnError>({
+            url: '/api/v1/auth/password-reset/send',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            },
+        });
+    }
+
+    /**
+     * Reset password with OTP
+     */
+    public confirmPasswordReset<ThrowOnError extends boolean = false>(
+        options: Options<ConfirmPasswordResetData, ThrowOnError>,
+    ): RequestResult<ConfirmPasswordResetResponses, ConfirmPasswordResetErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<ConfirmPasswordResetResponses, ConfirmPasswordResetErrors, ThrowOnError>({
+            url: '/api/v1/auth/password-reset/confirm',
             ...options,
             headers: {
                 'Content-Type': 'application/json',
