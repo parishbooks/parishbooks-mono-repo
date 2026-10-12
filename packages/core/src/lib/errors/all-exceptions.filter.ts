@@ -18,11 +18,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const error = this.resolveError(exceptionResponse, status);
 
         if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
-            this.logger.error(exception instanceof Error ? exception.message : 'Unhandled exception', {
-                err: exception,
-                path: request.url,
-                method: request.method,
-            });
+            const body = { err: exception, path: request.url, method: request.method };
+            this.logger.error(exception instanceof Error ? exception.message : 'Unhandled exception', body);
         } else {
             this.logger.warn('Request failed', { path: request.url, method: request.method, status, message });
         }

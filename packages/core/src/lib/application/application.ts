@@ -7,7 +7,7 @@ import helmet from 'helmet';
 import { WINSTON_MODULE_NEST_PROVIDER, WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import type { Logger } from 'winston';
 import { defineHelmet } from '../helmet/helmet.config';
-import { createHttpLoggingMiddleware } from '../logger/logger.config';
+import { createHttpLoggingMiddleware } from '../logger/logger.middleware';
 import { setupSwagger, type DefineSwaggerProps } from '../swagger/swagger.config';
 
 export type ApplicationInitProps = {
