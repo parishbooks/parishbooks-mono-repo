@@ -3,7 +3,8 @@
     "compilerOptions": {
         "types": ["node"],
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": false,
+        "emitDecoratorMetadata": true,
+        "useDefineForClassFields": false,
         "target": "es2021",
         "composite": false,
         "declaration": false,

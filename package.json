@@ -4,6 +4,8 @@
     "license": "MIT",
     "scripts": {
         "dev": "nx run-many -t serve -p tag:type:app --parallel",
+        "dev:svc": "bun nx run @parishbooks/parishbooks-svc:serve:development",
+        "dev:web": "bun nx run @parishbooks/parishbooks-ui:serve",
         "generate": "bun tools/generate/index.ts",
         "reset-workspace": "bunx nx reset",
         "lint": "bun nx run-many -t lint",

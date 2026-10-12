@@ -1,3 +1,5 @@
+import 'dotenv/config';
+import 'reflect-metadata';
 import { Application } from '@parishbooks/core';
 import { AppModule } from './modules/app.module';
 

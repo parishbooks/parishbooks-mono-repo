@@ -79,7 +79,9 @@ export class Application {
         try {
             await Application.init(props);
         } catch (error) {
-            NestLogger.error(error instanceof Error ? error.message : error, error instanceof Error ? error.stack : undefined, 'Bootstrap');
+            const message = error instanceof Error ? error.message : String(error);
+            const detail = message.trim().length > 0 ? message : error;
+            NestLogger.error(detail, error instanceof Error ? error.stack : undefined, 'Bootstrap');
             process.exit(1);
         }
     }
