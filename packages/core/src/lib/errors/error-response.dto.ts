@@ -1,27 +1,31 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ErrorResponseDto {
-    @ApiProperty({ example: 400 })
+    @ApiProperty({ type: () => Number, example: 400 })
     statusCode: number;
 
-    @ApiProperty({ oneOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }], example: 'Bad Request' })
+    @ApiProperty({ type: () => String, example: 'Bad Request', description: 'Human-readable message, or a list of validation errors' })
     message: string | string[];
 
-    @ApiPropertyOptional({ example: 'Bad Request' })
+    @ApiPropertyOptional({ type: () => String, example: 'Bad Request' })
     error?: string;
 
-    @ApiPropertyOptional({ example: 'EMAIL_NOT_VERIFIED', description: 'Stable machine-readable error code' })
+    @ApiPropertyOptional({ type: () => String, example: 'EMAIL_NOT_VERIFIED', description: 'Stable machine-readable error code' })
     code?: string;
 
-    @ApiPropertyOptional({ example: '/verify-email?email=user@example.com', description: 'UI path when the client should redirect' })
+    @ApiPropertyOptional({
+        type: () => String,
+        example: '/verify-email?email=user@example.com',
+        description: 'UI path when the client should redirect',
+    })
     redirectTo?: string;
 
-    @ApiPropertyOptional({ example: 'user@example.com', description: 'Context for verification or recovery flows' })
+    @ApiPropertyOptional({ type: () => String, example: 'user@example.com', description: 'Context for verification or recovery flows' })
     email?: string;
 
-    @ApiProperty({ example: '2026-10-05T04:00:00.000Z' })
+    @ApiProperty({ type: () => String, example: '2026-10-05T04:00:00.000Z' })
     timestamp: string;
 
-    @ApiProperty({ example: '/api/v1/auth/sign-in' })
+    @ApiProperty({ type: () => String, example: '/api/v1/auth/sign-in' })
     path: string;
 }
