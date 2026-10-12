@@ -8,7 +8,6 @@ export type DefineLoggerProps = {
     ignorePaths?: string[];
     level?: string;
     appName?: string;
-    /** When true, duplicate log records to the global OpenTelemetry LoggerProvider (requires telemetry preload). */
     otelLogs?: boolean;
 };
 
@@ -32,6 +31,5 @@ export const defineLogger = ({ isProd, level, appName = 'ParishBooks', otelLogs 
 
     const otelEnabled = otelLogs && process.env.OTEL_SDK_DISABLED !== 'true' && process.env.OTEL_LOGS_EXPORTER !== 'none';
     if (otelEnabled) transports.push(new OpenTelemetryTransportV3());
-
     return { level: logLevel, transports };
 };

@@ -7,6 +7,7 @@ import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { shouldIgnoreIncomingHttpTrace } from './otel-http-ignore';
 
 let sdk: NodeSDK | undefined;
 
@@ -47,11 +48,10 @@ export const startNodeTelemetry = (): NodeSDK | undefined => {
             getNodeAutoInstrumentations({
                 '@opentelemetry/instrumentation-fs': { enabled: false },
                 '@opentelemetry/instrumentation-dns': { enabled: false },
+                '@opentelemetry/instrumentation-winston': { disableLogSending: true },
                 '@opentelemetry/instrumentation-http': {
                     enabled: true,
-                    ignoreIncomingRequestHook: (req) => {
-                        return req.url?.includes('/health') || req.url?.includes('/metrics') || false;
-                    },
+                    ignoreIncomingRequestHook: (req) => shouldIgnoreIncomingHttpTrace(req.url),
                 },
             }),
         ],

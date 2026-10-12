@@ -42,7 +42,7 @@ export class Application {
             cookieParser: useCookieParser = true,
             helmet: useHelmet = true,
             swagger,
-            httpLogIgnorePaths = ['/health'],
+            httpLogIgnorePaths = ['/health', '/metrics', '/api/docs'],
         } = props;
 
         const app = await NestFactory.create<NestExpressApplication>(module, { bufferLogs });
