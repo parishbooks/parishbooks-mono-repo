@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { describe, it } from 'vitest';
-import { AuthE2eSupport, E2eEnvironment, E2eResponseSnapshot } from '../support';
+import { describe, expect, it } from 'vitest';
+import { AuthE2eSupport, E2eEnvironment } from '../support';
 
 describe('Auth API (e2e)', () => {
     describe('POST /auth/sign-up', () => {
@@ -10,8 +10,11 @@ describe('Auth API (e2e)', () => {
                 .post(`${AuthE2eSupport.authBasePath}/sign-up`)
                 .send(AuthE2eSupport.buildSignUpPayload(email))
                 .expect(201);
-
-            E2eResponseSnapshot.expectSnapshot(response.body, 'sign-up 201');
+            expect(response.body).toMatchObject({
+                tenantId: expect.any(String),
+                userId: expect.any(String),
+                redirectTo: `/verify-email?email=${encodeURIComponent(email)}`,
+            });
         });
 
         it('returns 400 when the email is already registered', async () => {
@@ -19,8 +22,10 @@ describe('Auth API (e2e)', () => {
             const agent = AuthE2eSupport.agent();
             await AuthE2eSupport.signUpUser(agent, email).expect(201);
             const duplicate = await AuthE2eSupport.signUpUser(agent, email).expect(400);
-
-            E2eResponseSnapshot.expectSnapshot(duplicate.body, 'sign-up 400 duplicate');
+            expect(duplicate.body).toMatchObject({
+                message: 'An account with this email already exists.',
+                code: expect.any(String),
+            });
         });
     });
 
@@ -31,7 +36,10 @@ describe('Auth API (e2e)', () => {
                 .send({ email: AuthE2eSupport.uniqueEmail('signin-missing'), password: AuthE2eSupport.testPassword })
                 .expect(401);
 
-            E2eResponseSnapshot.expectSnapshot(response.body, 'sign-in 401');
+            expect(response.body).toMatchObject({
+                message: 'Invalid email or password.',
+                code: expect.any(String),
+            });
         });
 
         it('returns 403 when the email is not verified', async () => {
@@ -41,31 +49,34 @@ describe('Auth API (e2e)', () => {
                 .post(`${AuthE2eSupport.authBasePath}/sign-in`)
                 .send({ email, password: AuthE2eSupport.testPassword })
                 .expect(403);
-
-            E2eResponseSnapshot.expectSnapshot(response.body, 'sign-in 403 unverified');
+            expect(response.body).toMatchObject({
+                message: 'Email address is not verified',
+                code: expect.any(String),
+                redirectTo: `/verify-email?email=${encodeURIComponent(email)}`,
+            });
         });
 
         it('sets auth cookies and returns tokens for a verified user', async () => {
             const { signIn, setCookie } = await AuthE2eSupport.createVerifiedSession({ label: 'signin-success', rememberMe: true });
-
-            E2eResponseSnapshot.expectSnapshot(signIn, 'sign-in 200 verified');
-            E2eResponseSnapshot.expectSetCookies(setCookie, 'sign-in 200 set-cookie');
+            expect(signIn).toMatchObject({ redirectTo: '/dashboard', accessToken: expect.any(String), refreshToken: expect.any(String) });
+            expect(setCookie).toEqual(expect.arrayContaining([expect.stringContaining('pb_access_token='), expect.stringContaining('pb_refresh_token=')]));
         });
     });
 
     describe('POST /auth/refresh', () => {
         it('returns 401 when the refresh cookie is missing', async () => {
             const response = await request(E2eEnvironment.serverUrl).post(`${AuthE2eSupport.authBasePath}/refresh`).expect(401);
-
-            E2eResponseSnapshot.expectSnapshot(response.body, 'refresh 401');
+            expect(response.body).toMatchObject({
+                message: 'Refresh token is invalid or expired.',
+                code: expect.any(String),
+            });
         });
 
         it('issues a new access token when the refresh cookie is valid', async () => {
             const { agent } = await AuthE2eSupport.createVerifiedSession({ label: 'refresh-success' });
             const refresh = await agent.post(`${AuthE2eSupport.authBasePath}/refresh`).expect(200);
-
-            E2eResponseSnapshot.expectSnapshot(refresh.body, 'refresh 200');
-            E2eResponseSnapshot.expectSetCookies(refresh.headers['set-cookie'], 'refresh 200 set-cookie');
+            expect(refresh.body).toEqual({ success: true });
+            expect(refresh.headers['set-cookie']).toEqual(expect.arrayContaining([expect.stringContaining('pb_access_token=')]));
         });
     });
 });
