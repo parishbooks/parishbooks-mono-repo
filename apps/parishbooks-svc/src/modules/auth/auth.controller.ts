@@ -1,5 +1,6 @@
 import { Body, Controller, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { SignUpDto } from './dto/signup.dto';
 import { SignUpService } from './services/signup.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -15,6 +16,9 @@ import { SignInDto } from './dto/signin.dto';
 import { CookieService } from './services/cookie.service';
 import { TokenService } from './services/token.service';
 import { RefreshTokenInvalidException } from './exceptions';
+import { SendEmailVerificationDto, SendEmailVerificationResponseDto } from './dto/send-email-verification.dto';
+import { VerifyEmailOtpDto } from './dto/verify-email-otp.dto';
+import { VerificationService } from './services/verification.service';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +27,7 @@ export class AuthController {
         private readonly signInService: SignInService,
         private readonly cookieService: CookieService,
         private readonly tokenService: TokenService,
+        private readonly verificationService: VerificationService,
     ) {}
 
     @Public()
@@ -69,5 +74,36 @@ export class AuthController {
     @ApiResponse({ status: 400, description: 'User already exists', type: ErrorResponseDto })
     async signUp(@Body() signUpDto: SignUpDto): Promise<SignUpResponseDto> {
         return this.signUpService.signUp(signUpDto);
+    }
+
+    @Public()
+    @Throttle({ default: { limit: 3, ttl: 60_000 } })
+    @Post('email-verification/send')
+    @HttpCode(200)
+    @ApiOperation({ summary: 'Send or resend email verification OTP' })
+    @ApiBody({ type: SendEmailVerificationDto })
+    @ApiOkResponse({ type: SendEmailVerificationResponseDto })
+    @ApiResponse({ status: 429, description: 'Rate limited', type: ErrorResponseDto })
+    async sendEmailVerification(@Body() body: SendEmailVerificationDto): Promise<SendEmailVerificationResponseDto> {
+        await this.verificationService.sendEmailVerificationOtp(body.email);
+        return new SendEmailVerificationResponseDto();
+    }
+
+    @Public()
+    @Post('email-verification/verify')
+    @HttpCode(200)
+    @ApiOperation({ summary: 'Verify email with OTP and sign in' })
+    @ApiBody({ type: VerifyEmailOtpDto })
+    @ApiOkResponse({ type: SignInResponseDto })
+    @ApiResponse({ status: 400, description: 'Invalid or expired OTP', type: ErrorResponseDto })
+    @ApiResponse({ status: 404, description: 'User not found', type: ErrorResponseDto })
+    @ApiResponse({ status: 429, description: 'Too many OTP attempts', type: ErrorResponseDto })
+    async verifyEmailOtp(@Body() body: VerifyEmailOtpDto, @Res({ passthrough: true }) response: Response): Promise<SignInResponseDto> {
+        const user = await this.verificationService.verifyEmailOtp(body.email, body.otp);
+        const authUser = this.signInService.validateUser(new AuthUser({ ...user, roles: [] }));
+        const rememberMe = body.rememberMe;
+        const tokens = this.tokenService.mintTokenPair(authUser, rememberMe);
+        this.cookieService.setAuthCookies(response, tokens, { rememberMe });
+        return new SignInResponseDto({ ...tokens, redirectTo: '/dashboard' });
     }
 }

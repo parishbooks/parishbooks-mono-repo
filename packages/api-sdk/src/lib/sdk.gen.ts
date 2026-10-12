@@ -15,12 +15,18 @@ import type {
     RefreshAccessTokenData,
     RefreshAccessTokenErrors,
     RefreshAccessTokenResponses,
+    SendEmailVerificationData,
+    SendEmailVerificationErrors,
+    SendEmailVerificationResponses,
     SignInData,
     SignInErrors,
     SignInResponses,
     SignUpData,
     SignUpErrors,
     SignUpResponses,
+    VerifyEmailOtpData,
+    VerifyEmailOtpErrors,
+    VerifyEmailOtpResponses,
 } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<
@@ -140,6 +146,38 @@ export class ApiSdk extends HeyApiClient {
     ): RequestResult<SignUpResponses, SignUpErrors, ThrowOnError> {
         return (options.client ?? this.client).post<SignUpResponses, SignUpErrors, ThrowOnError>({
             url: '/api/v1/auth/sign-up',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            },
+        });
+    }
+
+    /**
+     * Send or resend email verification OTP
+     */
+    public sendEmailVerification<ThrowOnError extends boolean = false>(
+        options: Options<SendEmailVerificationData, ThrowOnError>,
+    ): RequestResult<SendEmailVerificationResponses, SendEmailVerificationErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<SendEmailVerificationResponses, SendEmailVerificationErrors, ThrowOnError>({
+            url: '/api/v1/auth/email-verification/send',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            },
+        });
+    }
+
+    /**
+     * Verify email with OTP and sign in
+     */
+    public verifyEmailOtp<ThrowOnError extends boolean = false>(
+        options: Options<VerifyEmailOtpData, ThrowOnError>,
+    ): RequestResult<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<VerifyEmailOtpResponses, VerifyEmailOtpErrors, ThrowOnError>({
+            url: '/api/v1/auth/email-verification/verify',
             ...options,
             headers: {
                 'Content-Type': 'application/json',

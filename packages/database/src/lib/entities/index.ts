@@ -16,3 +16,4 @@ export * from './journal-line.entity';
 export * from './donation.entity';
 export * from './receipt.entity';
 export * from './processed-webhook-event.entity';
+export * from './verification.entity';

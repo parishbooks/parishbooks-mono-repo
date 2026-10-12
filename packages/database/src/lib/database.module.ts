@@ -1,18 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { join } from 'node:path';
-import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import type { DatabaseModuleAsyncOptions, DatabaseModuleOptions } from './database.types';
-import { Account } from './entities/account.entity';
-import { Organization } from './entities/organization.entity';
-import { OrganizationMember } from './entities/organization-member.entity';
-import { OrganizationProfile } from './entities/organization-profile.entity';
-import { Tenant } from './entities/tenant.entity';
-import { User } from './entities/user.entity';
-
-const ENTITIES = [Tenant, Organization, User, Account, OrganizationMember, OrganizationProfile];
-
-const MIGRATIONS = [join(__dirname, 'migrations', '*.{ts,js}')];
+import { typeOrmEntities, typeOrmMigrations, typeOrmNamingStrategy } from './typeorm.config';
 
 @Module({})
 export class DatabaseModule {
@@ -39,13 +28,13 @@ export class DatabaseModule {
         return {
             type: 'postgres' as const,
             url: config.url,
-            entities: ENTITIES,
-            migrations: MIGRATIONS,
+            entities: typeOrmEntities,
+            migrations: typeOrmMigrations,
             autoLoadEntities: false,
             synchronize: false,
             logging: config.logging,
             ssl: config.ssl,
-            namingStrategy: new SnakeNamingStrategy(),
+            namingStrategy: typeOrmNamingStrategy,
         };
     }
 }

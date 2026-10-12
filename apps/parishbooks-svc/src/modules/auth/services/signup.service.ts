@@ -6,6 +6,7 @@ import { DataSource, EntityManager } from 'typeorm';
 import { PasswordService } from './password.service';
 import { SignUpResponseDto } from '../dto/signup-response.dto';
 import { UserAlreadyExistsException } from '../exceptions';
+import { VerificationService } from './verification.service';
 
 @Injectable()
 export class SignUpService {
@@ -14,6 +15,7 @@ export class SignUpService {
     constructor(
         private readonly authRepository: AuthRepository,
         private readonly passwordService: PasswordService,
+        private readonly verificationService: VerificationService,
         @InjectDataSource() private readonly dataSource: DataSource,
     ) {}
 
@@ -27,11 +29,13 @@ export class SignUpService {
     async signUp(dto: CreateUserAccountDto) {
         this.logger.log(`Signing up user`);
         const hashedPassword = await this.passwordService.hash(dto.password);
-        return await this.dataSource.transaction(async (em) => {
+        const response = await this.dataSource.transaction(async (em) => {
             await this.ensureUniqueUser(dto.email, em);
             const result = await this.authRepository.createUserAccount({ ...dto, password: hashedPassword }, em);
             const redirect = `/verify-email?email=${encodeURIComponent(result.user.email)}`;
-            return new SignUpResponseDto({ tenantId: result.tenant.id, userId: result.user.id, redirectTo: redirect });
+            return { response: new SignUpResponseDto({ tenantId: result.tenant.id, userId: result.user.id, redirectTo: redirect }), email: result.user.email };
         });
+        void this.verificationService.sendEmailVerificationOtp(response.email);
+        return response.response;
     }
 }

@@ -27,6 +27,11 @@ export class AuthRepository {
         return await user.findOne({ where: { id } });
     }
 
+    async markEmailVerified(userId: string, em: EntityManager = this.dataSource.createEntityManager()) {
+        const user = em.getRepository(User);
+        await user.update({ id: userId }, { emailVerified: true });
+    }
+
     private async createTenant(name: string, em: EntityManager = this.dataSource.createEntityManager()) {
         const tenant = em.create(Tenant, { name });
         return await em.save(tenant);

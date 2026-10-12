@@ -93,6 +93,29 @@ export type SignUpResponseDto = {
     userId: string;
 };
 
+export type SendEmailVerificationDto = {
+    /**
+     * Email address to verify
+     */
+    email: string;
+};
+
+export type SendEmailVerificationResponseDto = {
+    success: boolean;
+};
+
+export type VerifyEmailOtpDto = {
+    email: string;
+    /**
+     * 6-digit verification code
+     */
+    otp: string;
+    /**
+     * Keep the session active longer when true
+     */
+    rememberMe?: boolean;
+};
+
 export type HealthLiveData = {
     body?: never;
     path?: never;
@@ -429,3 +452,55 @@ export type SignUpResponses = {
 };
 
 export type SignUpResponse = SignUpResponses[keyof SignUpResponses];
+
+export type SendEmailVerificationData = {
+    body: SendEmailVerificationDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/email-verification/send';
+};
+
+export type SendEmailVerificationErrors = {
+    /**
+     * Rate limited
+     */
+    429: ErrorResponseDto;
+};
+
+export type SendEmailVerificationError = SendEmailVerificationErrors[keyof SendEmailVerificationErrors];
+
+export type SendEmailVerificationResponses = {
+    200: SendEmailVerificationResponseDto;
+};
+
+export type SendEmailVerificationResponse = SendEmailVerificationResponses[keyof SendEmailVerificationResponses];
+
+export type VerifyEmailOtpData = {
+    body: VerifyEmailOtpDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/email-verification/verify';
+};
+
+export type VerifyEmailOtpErrors = {
+    /**
+     * Invalid or expired OTP
+     */
+    400: ErrorResponseDto;
+    /**
+     * User not found
+     */
+    404: ErrorResponseDto;
+    /**
+     * Too many OTP attempts
+     */
+    429: ErrorResponseDto;
+};
+
+export type VerifyEmailOtpError = VerifyEmailOtpErrors[keyof VerifyEmailOtpErrors];
+
+export type VerifyEmailOtpResponses = {
+    200: SignInResponseDto;
+};
+
+export type VerifyEmailOtpResponse = VerifyEmailOtpResponses[keyof VerifyEmailOtpResponses];

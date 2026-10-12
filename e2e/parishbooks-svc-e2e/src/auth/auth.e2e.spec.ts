@@ -63,6 +63,49 @@ describe('Auth API (e2e)', () => {
         });
     });
 
+    describe('POST /auth/email-verification', () => {
+        it('send returns success without leaking user existence', async () => {
+            const response = await request(E2eEnvironment.serverUrl)
+                .post(`${AuthE2eSupport.authBasePath}/email-verification/send`)
+                .send({ email: AuthE2eSupport.uniqueEmail('verify-send-missing') })
+                .expect(200);
+            expect(response.body).toEqual({ success: true });
+        });
+
+        it('verify sets cookies and marks email verified', async () => {
+            const email = AuthE2eSupport.uniqueEmail('verify-flow');
+            const agent = AuthE2eSupport.agent();
+            await AuthE2eSupport.signUpUser(agent, email).expect(201);
+            const databaseUrl = process.env.DATABASE_URL;
+            if (!databaseUrl) throw new Error('DATABASE_URL is required');
+            const { seedEmailVerificationOtp } = await import('../support/otp-e2e.helper');
+            await seedEmailVerificationOtp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
+
+            const verify = await AuthE2eSupport.verifyEmailOtp(agent, email, AuthE2eSupport.e2eVerificationOtp).expect(200);
+            expect(verify.body).toMatchObject({
+                redirectTo: '/dashboard',
+                accessToken: expect.any(String),
+                refreshToken: expect.any(String),
+            });
+            expect(verify.headers['set-cookie']).toEqual(expect.arrayContaining([expect.stringContaining('pb_access_token=')]));
+
+            await agent.post(`${AuthE2eSupport.authBasePath}/sign-in`).send({ email, password: AuthE2eSupport.testPassword }).expect(200);
+        });
+
+        it('returns 400 for an invalid OTP', async () => {
+            const email = AuthE2eSupport.uniqueEmail('verify-invalid');
+            const agent = AuthE2eSupport.agent();
+            await AuthE2eSupport.signUpUser(agent, email).expect(201);
+            const databaseUrl = process.env.DATABASE_URL;
+            if (!databaseUrl) throw new Error('DATABASE_URL is required');
+            const { seedEmailVerificationOtp } = await import('../support/otp-e2e.helper');
+            await seedEmailVerificationOtp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
+
+            const response = await AuthE2eSupport.verifyEmailOtp(agent, email, '000000').expect(400);
+            expect(response.body).toMatchObject({ code: expect.stringMatching(/OTP_/) });
+        });
+    });
+
     describe('POST /auth/refresh', () => {
         it('returns 401 when the refresh cookie is missing', async () => {
             const response = await request(E2eEnvironment.serverUrl).post(`${AuthE2eSupport.authBasePath}/refresh`).expect(401);
