@@ -14,6 +14,7 @@ import { AuthController } from './auth.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '@parishbooks/core';
 import { PasswordService } from './services/password.service';
+import { CookieService } from './services/cookie.service';
 
 @Module({
     imports: [
@@ -39,6 +40,7 @@ import { PasswordService } from './services/password.service';
         SignInService,
         SignUpService,
         PasswordService,
+        CookieService,
         { provide: APP_GUARD, useClass: JwtAuthGuard },
     ],
 })

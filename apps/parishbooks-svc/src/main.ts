@@ -10,5 +10,10 @@ void Application.bootstrap({
         version: '1',
         title: 'ParishBooks API',
         description: 'ParishBooks service OpenAPI document for generated clients (hey-api).',
+        cookieAuth: [
+            { name: 'pb_session_token', cookieName: 'pb_session_token' },
+            { name: 'pb_refresh_token', cookieName: 'pb_refresh_token' },
+            { name: 'pb_access_token', cookieName: 'pb_access_token' },
+        ],
     },
 });

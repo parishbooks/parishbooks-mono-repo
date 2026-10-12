@@ -35,9 +35,10 @@ export class SignInService {
         return user;
     }
 
-    mintJwt(user: AuthUser) {
-        const accessToken = this.jwtService.sign({ ...user });
-        const refreshToken = this.jwtService.sign({ ...user }, { expiresIn: '7d' });
+    mintJwt({ id, ...user }: AuthUser, rememberMe?: boolean) {
+        const refreshExpiresIn = rememberMe ? '30d' : '7d';
+        const accessToken = this.jwtService.sign({ sub: id, ...user });
+        const refreshToken = this.jwtService.sign({ sub: id, ...user }, { expiresIn: refreshExpiresIn });
         return { accessToken, refreshToken };
     }
 }
