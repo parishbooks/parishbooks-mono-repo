@@ -25,15 +25,21 @@ export const startNodeTelemetry = (): NodeSDK | undefined => {
             'service.version': process.env.npm_package_version ?? process.env.OTEL_SERVICE_VERSION ?? '0.0.0',
             'deployment.environment.name': process.env.NODE_ENV ?? 'development',
         }),
-        traceExporter: new OTLPTraceExporter(),
+        traceExporter: new OTLPTraceExporter({ url: process.env.OTEL_TRACES_ENDPOINT ?? 'http://localhost:4318/v1/traces' }),
         metricReader: new PeriodicExportingMetricReader({
-            exporter: new OTLPMetricExporter(),
+            exporter: new OTLPMetricExporter({ url: process.env.OTEL_METRICS_ENDPOINT ?? 'http://localhost:4318/v1/metrics' }),
             exportIntervalMillis: metricExportIntervalMillis(),
         }),
         instrumentations: [
             getNodeAutoInstrumentations({
                 '@opentelemetry/instrumentation-fs': { enabled: false },
                 '@opentelemetry/instrumentation-dns': { enabled: false },
+                '@opentelemetry/instrumentation-http': {
+                    enabled: true,
+                    ignoreIncomingRequestHook: (req) => {
+                        return req.url?.includes('/health') || req.url?.includes('/metrics') || false;
+                    },
+                },
             }),
         ],
     });
