@@ -18,6 +18,7 @@ export class AuthService {
         if (!user) throw new UnauthorizedException();
         this.signInService.validateUser(new AuthUser({ ...user, roles: [] }));
         this.clsService.set('userId', payload.sub);
+        this.clsService.set('tenantId', user.tenantId);
         return payload;
     }
 }

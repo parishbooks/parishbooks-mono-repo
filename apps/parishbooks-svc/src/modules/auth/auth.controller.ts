@@ -26,7 +26,8 @@ export class AuthController {
     ) {}
 
     @Public()
-    @Post('signin')
+    @Post('sign-in')
+    @HttpCode(200)
     @ApiBody({ type: SignInDto })
     @ApiOperation({ summary: 'Sign in a user' })
     @ApiOkResponse({ type: SignInResponseDto })
@@ -34,11 +35,12 @@ export class AuthController {
     @ApiResponse({ status: 403, description: 'Email not verified or account banned', type: ErrorResponseDto })
     @UseGuards(AuthGuard('local'))
     async signIn(
-        @Body('rememberMe') rememberMe: boolean,
+        @Body() signInDto: SignInDto,
         @Req() request: Request & { user: AuthUser },
         @Res({ passthrough: true }) response: Response,
     ): Promise<SignInResponseDto> {
         const user = this.signInService.validateUser(request.user);
+        const rememberMe = signInDto.rememberMe;
         const tokens = this.tokenService.mintTokenPair(user, rememberMe);
         this.cookieService.setAuthCookies(response, tokens, { rememberMe });
         return new SignInResponseDto({ ...tokens, redirectTo: '/dashboard' });
@@ -46,6 +48,7 @@ export class AuthController {
 
     @Public()
     @Post('refresh')
+    @HttpCode(200)
     @ApiOperation({ summary: 'Refresh access token', description: 'Sets a fresh pb_access_token cookie' })
     @ApiOkResponse({ type: RefreshResponseDto })
     @ApiResponse({ status: 401, description: 'Refresh token invalid or expired', type: ErrorResponseDto })
@@ -58,7 +61,7 @@ export class AuthController {
     }
 
     @Public()
-    @Post('signup')
+    @Post('sign-up')
     @HttpCode(201)
     @ApiOperation({ summary: 'Sign up a new user' })
     @ApiBody({ type: SignUpDto })

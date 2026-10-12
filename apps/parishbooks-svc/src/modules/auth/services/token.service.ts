@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthUser } from '../dto/auth-user.dto';
 import { JWT_TOKEN_TYPE_ACCESS, JWT_TOKEN_TYPE_REFRESH } from '../constants/jwt.constant';
@@ -44,7 +44,8 @@ export class TokenService {
             const authUser = this.toAuthUser(user);
             this.signInService.validateUser(authUser);
             return { accessToken: this.mintAccessToken(authUser) };
-        } catch {
+        } catch (error) {
+            if (error instanceof HttpException) throw error;
             throw new RefreshTokenInvalidException();
         }
     }
