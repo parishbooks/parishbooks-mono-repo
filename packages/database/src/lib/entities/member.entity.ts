@@ -1,6 +1,6 @@
 import { Check, Column, Entity, Index, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { MemberRole, MemberStatus, MemberType } from '../database.enums';
-import { UuidEntity } from './base.entity';
+import { BaseEntity } from './base.entity';
 import { Organization } from './organization.entity';
 import { User } from './user.entity';
 
@@ -10,7 +10,7 @@ import { User } from './user.entity';
 @Index('member_org_active_idx', ['orgId'], { where: `"status" = 'active'` })
 @Check(`("type" = 'member' AND hired_by IS NULL AND starts_at IS NULL AND ends_at IS NULL) OR ("type" = 'staff')`)
 @Check(`starts_at IS NULL OR ends_at IS NULL OR ends_at > starts_at`)
-export class Member extends UuidEntity {
+export class Member extends BaseEntity {
     @Column({ type: 'uuid', name: 'org_id' })
     orgId!: string;
 

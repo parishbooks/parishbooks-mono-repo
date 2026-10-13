@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { InvitationStatus, MemberRole, MemberType } from '../database.enums';
-import { UuidEntity } from './base.entity';
+import { BaseEntity } from './base.entity';
 import { Organization } from './organization.entity';
 import { User } from './user.entity';
 
@@ -8,7 +8,7 @@ import { User } from './user.entity';
 @Index(['orgId'])
 @Index('invitation_org_email_pending_uq', ['orgId', 'email'], { unique: true, where: `"status" = 'pending'` })
 @Unique(['tokenHash'])
-export class Invitation extends UuidEntity {
+export class Invitation extends BaseEntity {
     @Column({ type: 'uuid', name: 'org_id' })
     orgId!: string;
 

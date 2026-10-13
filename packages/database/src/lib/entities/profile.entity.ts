@@ -1,12 +1,14 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, Unique } from 'typeorm';
+import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 
 @Entity('profile')
-export class Profile {
-    @PrimaryColumn({ type: 'uuid', name: 'user_id' })
+@Unique(['userId'])
+export class Profile extends BaseEntity {
+    @Column({ type: 'uuid', name: 'user_id' })
     userId!: string;
 
-    @OneToOne(() => User, { onDelete: 'CASCADE' })
+    @OneToOne(() => User, (user) => user.profile, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user!: User;
 
@@ -21,7 +23,4 @@ export class Profile {
 
     @Column({ type: 'text', nullable: true })
     timezone?: string;
-
-    @UpdateDateColumn({ type: 'timestamptz' })
-    updatedAt!: Date;
 }

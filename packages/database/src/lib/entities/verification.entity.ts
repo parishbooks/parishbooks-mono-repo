@@ -1,9 +1,9 @@
 import { Column, Entity, Index } from 'typeorm';
-import { UuidEntity } from './base.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity('verification')
 @Index(['identifier'])
-export class Verification extends UuidEntity {
+export class Verification extends BaseEntity {
     @Column({ type: 'text' })
     identifier!: string;
 

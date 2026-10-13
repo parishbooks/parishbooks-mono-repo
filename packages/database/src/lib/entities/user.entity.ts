@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne, Unique } from 'typeorm';
 import { UserStatus } from '../database.enums';
+import { BaseEntity } from './base.entity';
 import { Client } from './client.entity';
 import { Member } from './member.entity';
 import { Profile } from './profile.entity';
@@ -7,13 +8,7 @@ import { Profile } from './profile.entity';
 @Entity('user')
 @Unique(['email'])
 @Unique(['authProviderId'])
-export class User {
-    @PrimaryGeneratedColumn('uuid')
-    id!: string;
-
-    @CreateDateColumn({ type: 'timestamptz' })
-    createdAt!: Date;
-
+export class User extends BaseEntity {
     @Column({ type: 'citext' })
     email!: string;
 
@@ -25,9 +20,6 @@ export class User {
 
     @Column({ type: 'timestamptz', nullable: true, name: 'last_login_at' })
     lastLoginAt?: Date;
-
-    @DeleteDateColumn({ type: 'timestamptz', nullable: true })
-    deletedAt?: Date;
 
     @OneToOne(() => Profile, (profile) => profile.user)
     profile?: Profile;

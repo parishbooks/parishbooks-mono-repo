@@ -1,12 +1,12 @@
 import { Column, Entity, OneToMany, Unique } from 'typeorm';
 import { BillingInterval } from '../database.enums';
-import { UuidEntity } from './base.entity';
+import { BaseEntity } from './base.entity';
 import { Subscription } from './subscription.entity';
 
 @Entity('plan')
 @Unique(['code'])
 @Unique(['billingPriceId'])
-export class Plan extends UuidEntity {
+export class Plan extends BaseEntity {
     @Column({ type: 'text' })
     code!: string;
 

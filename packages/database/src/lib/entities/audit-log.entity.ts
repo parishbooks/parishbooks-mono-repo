@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import { BaseEntity } from './base.entity';
 import { Client } from './client.entity';
 import { Organization } from './organization.entity';
 import { User } from './user.entity';
@@ -7,10 +8,7 @@ import { User } from './user.entity';
 @Index(['orgId', 'createdAt'])
 @Index(['clientId'])
 @Index(['actorId'])
-export class AuditLog {
-    @PrimaryGeneratedColumn({ type: 'bigint' })
-    id!: string;
-
+export class AuditLog extends BaseEntity {
     @Column({ type: 'uuid', nullable: true, name: 'client_id' })
     clientId?: string;
 
@@ -37,7 +35,4 @@ export class AuditLog {
 
     @Column({ type: 'jsonb', nullable: true })
     target?: Record<string, unknown>;
-
-    @CreateDateColumn({ type: 'timestamptz' })
-    createdAt!: Date;
 }

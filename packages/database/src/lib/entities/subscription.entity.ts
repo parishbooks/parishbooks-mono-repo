@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { SubscriptionStatus } from '../database.enums';
-import { UuidEntity } from './base.entity';
+import { BaseEntity } from './base.entity';
 import { Client } from './client.entity';
 import { Plan } from './plan.entity';
 
@@ -12,7 +12,7 @@ import { Plan } from './plan.entity';
     where: `"status" IN ('trialing','active','past_due','paused')`,
 })
 @Unique(['billingSubscriptionId'])
-export class Subscription extends UuidEntity {
+export class Subscription extends BaseEntity {
     @Column({ type: 'uuid', name: 'client_id' })
     clientId!: string;
 
