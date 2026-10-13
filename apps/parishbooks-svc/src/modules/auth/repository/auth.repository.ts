@@ -55,6 +55,8 @@ export class AuthRepository {
     async createUserAccount(dto: CreateUserAccountDto, em: EntityManager = this.dataSource.createEntityManager()) {
         const tenant = await this.createTenant(dto.email, em);
         const user = await this.createUser({ name: `${dto.firstName} ${dto.lastName}`, email: dto.email }, tenant, em);
+        tenant.ownerId = user.id;
+        await em.save(tenant);
         const account = await this.createAccount(user, dto.password, em);
         return { tenant, user, account };
     }

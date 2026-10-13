@@ -15,6 +15,10 @@ describe('Auth API (e2e)', () => {
                 userId: expect.any(String),
                 redirectTo: `/verify-email?email=${encodeURIComponent(email)}`,
             });
+            const databaseUrl = process.env.DATABASE_URL;
+            if (!databaseUrl) throw new Error('DATABASE_URL is required');
+            const { expectTenantOwnerId } = await import('../support/tenant-owner-e2e.helper');
+            await expectTenantOwnerId(databaseUrl, response.body.tenantId, response.body.userId);
         });
 
         it('returns 400 when the email is already registered', async () => {
