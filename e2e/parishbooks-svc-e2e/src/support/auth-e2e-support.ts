@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { E2eEnvironment } from './e2e-environment';
-import { seedEmailVerificationOtp } from './otp-e2e.helper';
+import { seedEmailVerificationOtpAfterSignUp } from './otp-e2e.helper';
 
 export type TestAgent = ReturnType<typeof request.agent>;
 
@@ -74,7 +74,7 @@ export class AuthE2eSupport {
         if (!databaseUrl) throw new Error('DATABASE_URL is required for auth e2e tests');
 
         const signUp = await this.signUpUser(agent, email).expect(201);
-        await seedEmailVerificationOtp(email, this.e2eVerificationOtp, databaseUrl);
+        await seedEmailVerificationOtpAfterSignUp(email, this.e2eVerificationOtp, databaseUrl);
 
         const verify = await this.verifyEmailOtp(agent, email, this.e2eVerificationOtp, options.rememberMe).expect(200);
 

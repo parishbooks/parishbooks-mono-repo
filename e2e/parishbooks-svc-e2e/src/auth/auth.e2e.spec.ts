@@ -40,8 +40,8 @@ describe('Auth API (e2e)', () => {
             const db = await loadSignUpDbState(signUp.body.userId, databaseUrl);
             expect(db.user.email).toBe(normalizedEmail);
 
-            const { seedEmailVerificationOtp } = await import('../support/otp-e2e.helper');
-            await seedEmailVerificationOtp(normalizedEmail, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
+            const { seedEmailVerificationOtpAfterSignUp } = await import('../support/otp-e2e.helper');
+            await seedEmailVerificationOtpAfterSignUp(mixedCaseEmail, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
             await AuthE2eSupport.verifyEmailOtp(agent, mixedCaseEmail, AuthE2eSupport.e2eVerificationOtp).expect(200);
 
             await agent.post(`${AuthE2eSupport.authBasePath}/sign-in`).send({ email: mixedCaseEmail, password: AuthE2eSupport.testPassword }).expect(200);
@@ -108,8 +108,8 @@ describe('Auth API (e2e)', () => {
             await AuthE2eSupport.signUpUser(agent, email).expect(201);
             const databaseUrl = process.env.DATABASE_URL;
             if (!databaseUrl) throw new Error('DATABASE_URL is required');
-            const { seedEmailVerificationOtp } = await import('../support/otp-e2e.helper');
-            await seedEmailVerificationOtp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
+            const { seedEmailVerificationOtpAfterSignUp } = await import('../support/otp-e2e.helper');
+            await seedEmailVerificationOtpAfterSignUp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
 
             const verify = await AuthE2eSupport.verifyEmailOtp(agent, email, AuthE2eSupport.e2eVerificationOtp).expect(200);
             expect(verify.body).toMatchObject({
@@ -128,8 +128,8 @@ describe('Auth API (e2e)', () => {
             await AuthE2eSupport.signUpUser(agent, email).expect(201);
             const databaseUrl = process.env.DATABASE_URL;
             if (!databaseUrl) throw new Error('DATABASE_URL is required');
-            const { seedEmailVerificationOtp } = await import('../support/otp-e2e.helper');
-            await seedEmailVerificationOtp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
+            const { seedEmailVerificationOtpAfterSignUp } = await import('../support/otp-e2e.helper');
+            await seedEmailVerificationOtpAfterSignUp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
 
             const response = await AuthE2eSupport.verifyEmailOtp(agent, email, '000000').expect(400);
             expect(response.body).toMatchObject({ code: expect.stringMatching(/OTP_/) });
@@ -148,8 +148,8 @@ describe('Auth API (e2e)', () => {
             await AuthE2eSupport.signUpUser(AuthE2eSupport.agent(), email).expect(201);
             const databaseUrl = process.env.DATABASE_URL;
             if (!databaseUrl) throw new Error('DATABASE_URL is required');
-            const { seedEmailVerificationOtp, seedForgetPasswordOtp } = await import('../support/otp-e2e.helper');
-            await seedEmailVerificationOtp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
+            const { seedEmailVerificationOtpAfterSignUp, seedForgetPasswordOtp } = await import('../support/otp-e2e.helper');
+            await seedEmailVerificationOtpAfterSignUp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
             await AuthE2eSupport.verifyEmailOtp(AuthE2eSupport.agent(), email, AuthE2eSupport.e2eVerificationOtp).expect(200);
 
             await seedForgetPasswordOtp(email, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
