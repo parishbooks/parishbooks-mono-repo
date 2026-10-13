@@ -8,6 +8,8 @@ import { User } from './user.entity';
 @Unique(['orgId', 'userId'])
 @Index(['userId'])
 @Index('member_org_active_idx', ['orgId'], { where: `"status" = 'active'` })
+@Index(['invitedById'])
+@Index(['hiredById'])
 @Check(`("type" = 'member' AND hired_by IS NULL AND starts_at IS NULL AND ends_at IS NULL) OR ("type" = 'staff')`)
 @Check(`starts_at IS NULL OR ends_at IS NULL OR ends_at > starts_at`)
 export class Member extends BaseEntity {

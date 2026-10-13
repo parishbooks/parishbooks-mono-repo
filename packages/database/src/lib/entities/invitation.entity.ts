@@ -6,6 +6,8 @@ import { User } from './user.entity';
 
 @Entity('invitation')
 @Index(['orgId'])
+@Index(['invitedById'])
+@Index(['acceptedById'])
 @Index('invitation_org_email_pending_uq', ['orgId', 'email'], { unique: true, where: `"status" = 'pending'` })
 @Unique(['tokenHash'])
 export class Invitation extends BaseEntity {

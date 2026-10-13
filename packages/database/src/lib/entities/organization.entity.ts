@@ -8,6 +8,7 @@ import { User } from './user.entity';
 @Entity('organization')
 @Unique(['slug'])
 @Index(['clientId'])
+@Index(['createdById'])
 export class Organization extends BaseEntity {
     @Column({ type: 'uuid', name: 'client_id' })
     clientId!: string;
