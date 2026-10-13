@@ -9,6 +9,7 @@ export type SignUpPayload = {
     password: string;
     firstName: string;
     lastName: string;
+    phone?: string;
 };
 
 export type VerifiedSession = {
@@ -42,12 +43,16 @@ export class AuthE2eSupport {
         return `${label}-${token}@e2e.parishbooks.test`;
     }
 
-    static buildSignUpPayload(email: string): SignUpPayload {
-        return { email, password: this.testPassword, firstName: 'E2E', lastName: 'User' };
+    static buildSignUpPayload(email: string, overrides?: Partial<SignUpPayload>): SignUpPayload {
+        return { email, password: this.testPassword, firstName: 'E2E', lastName: 'User', ...overrides };
     }
 
-    static signUpUser(agent: TestAgent, email: string) {
-        return agent.post(`${this.authBasePath}/sign-up`).send(this.buildSignUpPayload(email));
+    static signUpUser(agent: TestAgent, email: string, overrides?: Partial<SignUpPayload>) {
+        return agent.post(`${this.authBasePath}/sign-up`).send(this.buildSignUpPayload(email, overrides));
+    }
+
+    static sendEmailVerification(email: string) {
+        return request(E2eEnvironment.serverUrl).post(`${this.authBasePath}/email-verification/send`).send({ email });
     }
 
     static agent(serverUrl = E2eEnvironment.serverUrl): TestAgent {

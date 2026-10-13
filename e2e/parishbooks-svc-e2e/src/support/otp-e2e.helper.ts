@@ -33,9 +33,16 @@ async function waitForVerificationRow(identifier: string, databaseUrl: string, t
     throw new Error(`Timed out waiting for verification row: ${identifier}`);
 }
 
-async function seedOtpByIdentifier(identifier: string, otp: string, databaseUrl: string): Promise<void> {
-    const value = `${hashOtpForE2e(otp)}:0`;
-    const expiresAt = new Date(Date.now() + 300_000);
+async function seedOtpByIdentifier(
+    identifier: string,
+    otp: string,
+    databaseUrl: string,
+    options?: { expiresAt?: Date; attempts?: number; updatedAt?: Date },
+): Promise<void> {
+    const attempts = options?.attempts ?? 0;
+    const value = `${hashOtpForE2e(otp)}:${attempts}`;
+    const expiresAt = options?.expiresAt ?? new Date(Date.now() + 300_000);
+    const updatedAt = options?.updatedAt ?? new Date();
 
     const client = new pg.Client({ connectionString: databaseUrl });
     await client.connect();
@@ -43,8 +50,8 @@ async function seedOtpByIdentifier(identifier: string, otp: string, databaseUrl:
         await client.query(`DELETE FROM "verification" WHERE identifier = $1`, [identifier]);
         await client.query(
             `INSERT INTO "verification" ("identifier", "value", "expires_at", "created_at", "updated_at")
-             VALUES ($1, $2, $3, NOW(), NOW())`,
-            [identifier, value, expiresAt],
+             VALUES ($1, $2, $3, $4, $4)`,
+            [identifier, value, expiresAt, updatedAt],
         );
     } finally {
         await client.end();
@@ -66,4 +73,43 @@ export async function seedEmailVerificationOtpAfterSignUp(email: string, otp: st
 /** Inserts a known OTP for password reset (e2e only). */
 export async function seedForgetPasswordOtp(email: string, otp: string, databaseUrl: string): Promise<void> {
     await seedOtpByIdentifier(toForgetPasswordOtpIdentifier(email), otp, databaseUrl);
+}
+
+export async function seedExpiredEmailVerificationOtp(email: string, otp: string, databaseUrl: string): Promise<void> {
+    await seedOtpByIdentifier(toEmailVerificationOtpIdentifier(email), otp, databaseUrl, {
+        expiresAt: new Date(Date.now() - 60_000),
+    });
+}
+
+export async function seedExpiredForgetPasswordOtp(email: string, otp: string, databaseUrl: string): Promise<void> {
+    await seedOtpByIdentifier(toForgetPasswordOtpIdentifier(email), otp, databaseUrl, {
+        expiresAt: new Date(Date.now() - 60_000),
+    });
+}
+
+/** Patches timestamps on the existing email-verification OTP row (after async sign-up has settled). */
+export async function patchEmailVerificationOtpTimestamps(email: string, databaseUrl: string, patch: { expiresAt?: Date; updatedAt?: Date }): Promise<void> {
+    const identifier = toEmailVerificationOtpIdentifier(email);
+    const client = new pg.Client({ connectionString: databaseUrl });
+    await client.connect();
+    try {
+        if (patch.expiresAt) await client.query(`UPDATE "verification" SET "expires_at" = $1 WHERE "identifier" = $2`, [patch.expiresAt, identifier]);
+        if (patch.updatedAt) await client.query(`UPDATE "verification" SET "updated_at" = $1 WHERE "identifier" = $2`, [patch.updatedAt, identifier]);
+    } finally {
+        await client.end();
+    }
+}
+
+/** Sets failed-attempt count on the row left by async sign-up (call after {@link seedEmailVerificationOtpAfterSignUp}). */
+export async function patchEmailVerificationOtpAttempts(email: string, otp: string, attempts: number, databaseUrl: string): Promise<void> {
+    const identifier = toEmailVerificationOtpIdentifier(email);
+    const value = `${hashOtpForE2e(otp)}:${attempts}`;
+    const client = new pg.Client({ connectionString: databaseUrl });
+    await client.connect();
+    try {
+        const result = await client.query(`UPDATE "verification" SET "value" = $1 WHERE "identifier" = $2`, [value, identifier]);
+        if ((result.rowCount ?? 0) === 0) throw new Error(`verification row not found: ${identifier}`);
+    } finally {
+        await client.end();
+    }
 }
