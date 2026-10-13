@@ -9,7 +9,7 @@
 - Sign-in validates password via interim `verification` row `credential:{userId}`.
 - Email OTP uses separate verification identifiers; success sets `user.status` → `active`.
 - `tenantId` removed from sign-up response, JWT CLS, and related e2e.
-- **Entity base:** Single `BaseEntity` (`id`, `createdAt`, `updatedAt`, `deletedAt`); all TypeORM entities extend it (including `user`, `profile`, `audit_log`, `verification`).
+- **Entity base:** `BaseEntity` (`id`, `createdAt`, `updatedAt`, `deletedAt`) for mutable rows; `audit_log` is append-only (`id`, `createdAt` only, no soft delete).
 - **Legacy migrations removed** from repo; database must be migrated from entities (see P0).
 
 ---
@@ -28,10 +28,10 @@
 
 ## P1 — ERD semantics & data integrity
 
-- [ ] **`user.status` semantics:** Document and enforce meaning of `active` / `suspended` / `deleted`. Today `suspended` = unverified at sign-up; ERD also uses `suspended` for admin action — split or document conflation.
+- [ ] **`user.status` semantics:** Document and enforce meaning of `active` / `suspended`. Today `suspended` = unverified at sign-up; ERD also uses `suspended` for admin action — split or document conflation. User removal is `deleted_at` only (no `deleted` status).
 - [ ] **`auth_provider_id`:** Set when integrating Supabase (or other provider); align `user.id` with provider id if required by spec.
 - [ ] **`last_login_at`:** Update on successful sign-in and email-verify sign-in.
-- [ ] **Soft-deleted users:** Ensure sign-in / sign-up / password-reset respect `deleted_at` and `UserStatus.DELETED` consistently (TypeORM `@DeleteDateColumn` on all entities + explicit status checks where needed).
+- [ ] **Soft-deleted users:** Ensure sign-in / sign-up / password-reset respect `deleted_at` (TypeORM `@DeleteDateColumn` on `BaseEntity`; auth lookups exclude soft-deleted rows; uniqueness checks use `withDeleted` where email must stay reserved).
 - [ ] **Admin suspend / ban:** Replace removed `banned*` columns with `UserStatus.SUSPENDED` (or dedicated flow); wire `toAuthUser` / `validateUser` and API errors accordingly.
 - [ ] **Update ER_DESIGN.md (optional):** Align written spec with `BaseEntity` conventions and profile/audit_log PK choices, or document “TypeORM layer” vs “Postgres target” explicitly.
 

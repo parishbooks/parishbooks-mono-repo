@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UserStatus } from '@parishbooks/database';
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from './password.service';
 import { toAuthUser } from '../helpers/auth-user.mapper';
@@ -14,7 +13,7 @@ export class SignInService {
 
     async signIn(email: string, password: string) {
         const user = await this.authRepository.getUserByEmail(email);
-        if (!user || user.status === UserStatus.DELETED) throw new InvalidCredentialsException();
+        if (!user) throw new InvalidCredentialsException();
         const passwordHash = await this.authRepository.getCredentialHash(user.id);
         if (!passwordHash) throw new InvalidCredentialsException();
         const isPasswordValid = await this.passwordService.compare(password, passwordHash);

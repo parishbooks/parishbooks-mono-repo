@@ -11,7 +11,7 @@ export class AuthRepository {
 
     async checkUserExists(email: string, em: EntityManager = this.dataSource.createEntityManager()) {
         const user = em.getRepository(User);
-        const userExists = await user.findOne({ where: { email } });
+        const userExists = await user.findOne({ where: { email }, withDeleted: true });
         return userExists !== null;
     }
 

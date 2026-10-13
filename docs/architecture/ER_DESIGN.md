@@ -35,7 +35,7 @@ user 1 --- 0..N audit_log             (actor)
 
 | Enum                | Values                                                   |
 | ------------------- | -------------------------------------------------------- |
-| user_status         | active, suspended, deleted                               |
+| user_status         | active, suspended                                        |
 | member_type         | member, staff                                            |
 | member_role         | owner, admin, member, viewer                             |
 | member_status       | active, suspended, removed                               |
