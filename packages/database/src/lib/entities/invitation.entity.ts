@@ -45,6 +45,6 @@ export class Invitation extends BaseEntity {
     @JoinColumn({ name: 'accepted_by' })
     acceptedBy?: User;
 
-    @Column({ type: 'timestamptz', name: 'expires_at' })
+    @Column({ type: 'timestamptz', name: 'expires_at', default: () => "now() + interval '2 days'" })
     expiresAt!: Date;
 }

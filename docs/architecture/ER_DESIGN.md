@@ -167,7 +167,7 @@ Active access means `status = 'active'` AND (`ends_at IS NULL` OR `ends_at > now
 | status      | invitation_status | NOT NULL default 'pending'                         |
 | invited_by  | uuid              | NOT NULL, FK -> user(id)                           |
 | accepted_by | uuid              | FK -> user(id)                                     |
-| expires_at  | timestamptz       | NOT NULL default now() + interval '7 days'         |
+| expires_at  | timestamptz       | NOT NULL default now() + interval '2 days'         |
 
 Partial unique index: `UNIQUE (org_id, email) WHERE status = 'pending'`.
 On acceptance: create the `member` row with the invitation's `type` and `role`, set `status = 'accepted'`, set `accepted_by`, all in one transaction.
