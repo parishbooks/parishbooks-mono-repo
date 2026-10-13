@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { User } from '@parishbooks/database';
+import { User, UserStatus } from '@parishbooks/database';
 import { AuthRepository } from '../repository/auth.repository';
 import { VerificationRepository } from '../repository/verification.repository';
 import { FORGET_PASSWORD_OTP_TYPE, OTP_SEND_COOLDOWN_SECONDS } from '../constants/verification.constants';
@@ -24,7 +24,7 @@ export class VerificationService {
         const normalized = normalizeVerificationEmail(email);
         if (!this.isValidEmail(normalized)) return;
         const user = await this.authRepository.getUserByEmail(normalized);
-        if (!user || user.emailVerified) return;
+        if (!user || user.status === UserStatus.ACTIVE) return;
 
         const identifier = toEmailVerificationOtpIdentifier(normalized);
         await this.issueOtp(normalized, 'email-verification', identifier, (target, code) =>
@@ -41,7 +41,7 @@ export class VerificationService {
         await verifyOtpChallenge(this.verificationRepository, identifier, otp);
 
         await this.authRepository.markEmailVerified(user.id);
-        user.emailVerified = true;
+        user.status = UserStatus.ACTIVE;
         return user;
     }
 

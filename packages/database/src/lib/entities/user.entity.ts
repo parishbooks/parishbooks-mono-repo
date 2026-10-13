@@ -1,57 +1,40 @@
-import { BeforeInsert, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
-import { Account } from './account.entity';
-import { BaseEntity } from './base.entity';
-import { OrganizationMember } from './organization-member.entity';
-import { Tenant } from './tenant.entity';
-
-export function usernameFromEmailLocalPart(email: string): string {
-    const local = email.trim().split('@')[0]?.trim() ?? '';
-    const normalized = local.toLowerCase();
-    return normalized.length > 0 ? normalized : 'user';
-}
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { UserStatus } from '../database.enums';
+import { Client } from './client.entity';
+import { Member } from './member.entity';
+import { Profile } from './profile.entity';
 
 @Entity('user')
-@Index(['tenantId', 'id'])
-@Unique(['tenantId', 'email'])
-@Unique(['tenantId', 'username'])
-export class User extends BaseEntity {
-    @Column({ type: 'uuid' })
-    tenantId!: string;
+@Unique(['email'])
+@Unique(['authProviderId'])
+export class User {
+    @PrimaryGeneratedColumn('uuid')
+    id!: string;
 
-    @ManyToOne(() => Tenant, (tenant) => tenant.users, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'tenant_id' })
-    tenant!: Tenant;
+    @CreateDateColumn({ type: 'timestamptz' })
+    createdAt!: Date;
 
-    @Column({ type: 'text' })
+    @Column({ type: 'citext' })
     email!: string;
 
-    @Column({ type: 'text' })
-    username!: string;
+    @Column({ type: 'text', nullable: true, name: 'auth_provider_id' })
+    authProviderId?: string;
 
-    @Column({ type: 'text', nullable: true })
-    name?: string;
+    @Column({ type: 'enum', enum: UserStatus, enumName: 'user_status', default: UserStatus.ACTIVE })
+    status!: UserStatus;
 
-    @Column({ type: 'boolean', default: false })
-    emailVerified!: boolean;
+    @Column({ type: 'timestamptz', nullable: true, name: 'last_login_at' })
+    lastLoginAt?: Date;
 
-    @OneToMany(() => Account, (account) => account.user)
-    accounts!: Account[];
+    @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+    deletedAt?: Date;
 
-    @OneToMany(() => OrganizationMember, (membership) => membership.user)
-    organizationMemberships!: OrganizationMember[];
+    @OneToOne(() => Profile, (profile) => profile.user)
+    profile?: Profile;
 
-    @Column({ type: 'boolean', default: false })
-    banned!: boolean;
+    @OneToOne(() => Client, (client) => client.user)
+    client?: Client;
 
-    @Column({ type: 'timestamptz', nullable: true })
-    bannedAt?: Date;
-
-    @Column({ type: 'text', nullable: true })
-    bannedReason?: string;
-
-    @BeforeInsert()
-    assignUsernameFromEmail(): void {
-        if (this.username?.trim()) return;
-        this.username = usernameFromEmailLocalPart(this.email);
-    }
+    @OneToMany(() => Member, (membership) => membership.user)
+    memberships!: Member[];
 }

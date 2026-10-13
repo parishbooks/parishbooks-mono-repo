@@ -6,6 +6,7 @@ import { RefreshTokenInvalidException } from '../exceptions';
 import { AuthRepository } from '../repository/auth.repository';
 import { SignInService } from './signin.service';
 import { User } from '@parishbooks/database';
+import { toAuthUser } from '../helpers/auth-user.mapper';
 
 type RefreshJwtPayload = {
     sub: string;
@@ -51,14 +52,6 @@ export class TokenService {
     }
 
     private toAuthUser(user: User): AuthUser {
-        return new AuthUser({
-            id: user.id,
-            email: user.email,
-            tenantId: user.tenantId,
-            emailVerified: user.emailVerified,
-            username: user.username,
-            banned: user.banned,
-            roles: [],
-        });
+        return toAuthUser(user);
     }
 }

@@ -4,7 +4,7 @@ import { AuthRepository } from '../repository/auth.repository';
 import { VerificationRepository } from '../repository/verification.repository';
 import { verifyOtpChallenge } from '../helpers/otp-challenge.helper';
 import { normalizeVerificationEmail, toForgetPasswordOtpIdentifier } from '../helpers/otp-identifier.helper';
-import { UserBannedException, UserNotFoundException } from '../exceptions';
+import { UserNotFoundException } from '../exceptions';
 
 @Injectable()
 export class PasswordService {
@@ -27,7 +27,6 @@ export class PasswordService {
         const normalized = normalizeVerificationEmail(email);
         const user = await this.authRepository.getUserByEmail(normalized);
         if (!user) throw new UserNotFoundException();
-        if (user.banned) throw new UserBannedException();
         const identifier = toForgetPasswordOtpIdentifier(normalized);
         await verifyOtpChallenge(this.verificationRepository, identifier, otp);
         const passwordHash = await this.hash(newPassword);

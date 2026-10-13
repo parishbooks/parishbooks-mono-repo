@@ -1,38 +1,56 @@
-import { Column, Entity, Index, Unique } from 'typeorm';
-import { OrganizationScopedEntity } from './organization-scoped.entity';
+import { Check, Column, Entity, Index, JoinColumn, ManyToOne, Unique } from 'typeorm';
+import { MemberRole, MemberStatus, MemberType } from '../database.enums';
+import { UuidEntity } from './base.entity';
+import { Organization } from './organization.entity';
+import { User } from './user.entity';
 
-// Minimal donor-identity slice for Phase 1 receipting — see
-// docs/architecture/phase1-giving-ledger-schema-design.md. Does not carry
-// membershipStatus/wardId/prayerCellId/dob; those are CRM-phase columns
-// (docs/specs/crm-family-units.md) added when that phase starts.
-//
-// Unique on (organizationId, betterAuthUserId) — a nullable column, so
-// Postgres allows any number of NULLs (members without congregant-app
-// login) but rejects a second Member row for the same authenticated
-// congregant in the same org, which would otherwise fragment their
-// donation/receipt history across two Member ids.
 @Entity('member')
-@Index(['organizationId', 'id'])
-@Unique(['organizationId', 'betterAuthUserId'])
-export class Member extends OrganizationScopedEntity {
-    @Column({ type: 'uuid', nullable: true })
-    familyId?: string;
+@Unique(['orgId', 'userId'])
+@Index(['userId'])
+@Index('member_org_active_idx', ['orgId'], { where: `"status" = 'active'` })
+@Check(`("type" = 'member' AND hired_by IS NULL AND starts_at IS NULL AND ends_at IS NULL) OR ("type" = 'staff')`)
+@Check(`starts_at IS NULL OR ends_at IS NULL OR ends_at > starts_at`)
+export class Member extends UuidEntity {
+    @Column({ type: 'uuid', name: 'org_id' })
+    orgId!: string;
 
-    @Column({ type: 'text' })
-    firstName!: string;
+    @ManyToOne(() => Organization, (organization) => organization.members, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'org_id' })
+    organization!: Organization;
 
-    @Column({ type: 'text' })
-    lastName!: string;
+    @Column({ type: 'uuid', name: 'user_id' })
+    userId!: string;
 
-    @Column({ type: 'text', nullable: true })
-    email?: string;
+    @ManyToOne(() => User, (user) => user.memberships, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' })
+    user!: User;
 
-    @Column({ type: 'text', nullable: true })
-    phone?: string;
+    @Column({ type: 'enum', enum: MemberType, enumName: 'member_type', default: MemberType.MEMBER })
+    type!: MemberType;
 
-    @Column({ type: 'text', nullable: true })
-    panNumber?: string;
+    @Column({ type: 'enum', enum: MemberRole, enumName: 'member_role', default: MemberRole.MEMBER })
+    role!: MemberRole;
 
-    @Column({ type: 'uuid', nullable: true })
-    betterAuthUserId?: string;
+    @Column({ type: 'enum', enum: MemberStatus, enumName: 'member_status', default: MemberStatus.ACTIVE })
+    status!: MemberStatus;
+
+    @Column({ type: 'uuid', nullable: true, name: 'invited_by' })
+    invitedById?: string;
+
+    @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'invited_by' })
+    invitedBy?: User;
+
+    @Column({ type: 'uuid', nullable: true, name: 'hired_by' })
+    hiredById?: string;
+
+    @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'hired_by' })
+    hiredBy?: User;
+
+    @Column({ type: 'timestamptz', nullable: true, name: 'starts_at' })
+    startsAt?: Date;
+
+    @Column({ type: 'timestamptz', nullable: true, name: 'ends_at' })
+    endsAt?: Date;
 }

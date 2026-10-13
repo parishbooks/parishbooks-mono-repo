@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { UserStatus } from '@parishbooks/database';
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from './password.service';
-import { AccountProviderId, User } from '@parishbooks/database';
-import { AuthUser } from '../dto/auth-user.dto';
+import { toAuthUser } from '../helpers/auth-user.mapper';
 import { EmailNotVerifiedException, InvalidCredentialsException, UserBannedException } from '../exceptions';
 
 @Injectable()
@@ -12,22 +12,17 @@ export class SignInService {
         private readonly passwordService: PasswordService,
     ) {}
 
-    private getCredentialAccount(user: User) {
-        const credentialAccount = user.accounts.find((account) => account.providerId === AccountProviderId.CREDENTIAL);
-        if (!credentialAccount) throw new InvalidCredentialsException();
-        return credentialAccount;
-    }
-
-    async signIn(email: string, password: string): Promise<AuthUser> {
+    async signIn(email: string, password: string) {
         const user = await this.authRepository.getUserByEmail(email);
-        if (!user) throw new InvalidCredentialsException();
-        const account = this.getCredentialAccount(user);
-        const isPasswordValid = await this.passwordService.compare(password, account.password);
+        if (!user || user.status === UserStatus.DELETED) throw new InvalidCredentialsException();
+        const passwordHash = await this.authRepository.getCredentialHash(user.id);
+        if (!passwordHash) throw new InvalidCredentialsException();
+        const isPasswordValid = await this.passwordService.compare(password, passwordHash);
         if (!isPasswordValid) throw new InvalidCredentialsException();
-        return new AuthUser({ ...user, roles: [] });
+        return toAuthUser(user);
     }
 
-    validateUser(user: AuthUser) {
+    validateUser(user: ReturnType<typeof toAuthUser>) {
         if (user.banned) throw new UserBannedException();
         if (!user.emailVerified) throw new EmailNotVerifiedException(`/verify-email?email=${encodeURIComponent(user.email)}`);
         return user;

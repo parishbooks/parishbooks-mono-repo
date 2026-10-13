@@ -15,7 +15,6 @@ export type VerifiedSession = {
     agent: TestAgent;
     email: string;
     password: string;
-    tenantId: string;
     userId: string;
     signIn: {
         redirectTo: string;
@@ -83,7 +82,6 @@ export class AuthE2eSupport {
             agent,
             email,
             password: this.testPassword,
-            tenantId: signUp.body.tenantId,
             userId: signUp.body.userId,
             signIn: verify.body,
             setCookie: this.normalizeSetCookie(verify.headers['set-cookie']),

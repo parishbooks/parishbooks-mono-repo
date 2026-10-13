@@ -89,7 +89,6 @@ export type SignUpResponseDto = {
      * UI path to open after sign-up (e.g. email verification)
      */
     redirectTo: string;
-    tenantId: string;
     userId: string;
 };
 

@@ -31,9 +31,9 @@ export class SignUpService {
         const hashedPassword = await this.passwordService.hash(dto.password);
         const response = await this.dataSource.transaction(async (em) => {
             await this.ensureUniqueUser(dto.email, em);
-            const result = await this.authRepository.createUserAccount({ ...dto, password: hashedPassword }, em);
-            const redirect = `/verify-email?email=${encodeURIComponent(result.user.email)}`;
-            return { response: new SignUpResponseDto({ tenantId: result.tenant.id, userId: result.user.id, redirectTo: redirect }), email: result.user.email };
+            const user = await this.authRepository.createUserAccount({ ...dto, password: hashedPassword }, em);
+            const redirect = `/verify-email?email=${encodeURIComponent(user.email)}`;
+            return { response: new SignUpResponseDto({ userId: user.id, redirectTo: redirect }), email: user.email };
         });
         void this.verificationService.sendEmailVerificationOtp(response.email);
         return response.response;

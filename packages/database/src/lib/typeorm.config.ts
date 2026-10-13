@@ -1,21 +1,14 @@
 import { join } from 'node:path';
 import type { EntitySchema } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { Account } from './entities/account.entity';
-import { Donation } from './entities/donation.entity';
-import { Family } from './entities/family.entity';
-import { Fund } from './entities/fund.entity';
-import { JournalEntry } from './entities/journal-entry.entity';
-import { JournalLine } from './entities/journal-line.entity';
-import { LedgerAccount } from './entities/ledger-account.entity';
+import { AuditLog } from './entities/audit-log.entity';
+import { Client } from './entities/client.entity';
+import { Invitation } from './entities/invitation.entity';
 import { Member } from './entities/member.entity';
 import { Organization } from './entities/organization.entity';
-import { OrganizationMember } from './entities/organization-member.entity';
-import { OrganizationOnboardingSubmission } from './entities/organization-onboarding-submission.entity';
-import { OrganizationProfile } from './entities/organization-profile.entity';
-import { ProcessedWebhookEvent } from './entities/processed-webhook-event.entity';
-import { Receipt } from './entities/receipt.entity';
-import { Tenant } from './entities/tenant.entity';
+import { Plan } from './entities/plan.entity';
+import { Profile } from './entities/profile.entity';
+import { Subscription } from './entities/subscription.entity';
 import { User } from './entities/user.entity';
 import { Verification } from './entities/verification.entity';
 
@@ -23,25 +16,7 @@ type EntityClass = abstract new (...args: never[]) => object;
 type EntityClassOrSchema = EntityClass | EntitySchema;
 
 /** Every `@Entity()` registered for Nest and TypeORM CLI — keep in sync when adding entities. */
-export const typeOrmEntities: EntityClassOrSchema[] = [
-    Tenant,
-    Organization,
-    User,
-    Account,
-    OrganizationMember,
-    OrganizationProfile,
-    OrganizationOnboardingSubmission,
-    Family,
-    Member,
-    Fund,
-    LedgerAccount,
-    JournalEntry,
-    JournalLine,
-    Donation,
-    Receipt,
-    ProcessedWebhookEvent,
-    Verification,
-];
+export const typeOrmEntities: EntityClassOrSchema[] = [User, Profile, Client, Plan, Subscription, Organization, Member, Invitation, AuditLog, Verification];
 
 /** Resolved from `dist/lib` at runtime (this file compiles beside `migrations/`). */
 export const typeOrmMigrations = [join(__dirname, 'migrations', '*.{ts,js}')];

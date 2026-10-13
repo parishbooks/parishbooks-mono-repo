@@ -1,29 +1,40 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, OneToOne, Unique } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { OrganizationMember } from './organization-member.entity';
-import { OrganizationProfile } from './organization-profile.entity';
-import { Tenant } from './tenant.entity';
+import { Client } from './client.entity';
+import { Invitation } from './invitation.entity';
+import { Member } from './member.entity';
+import { User } from './user.entity';
 
 @Entity('organization')
-@Index(['tenantId', 'id'])
-@Unique(['tenantId', 'slug'])
+@Unique(['slug'])
+@Index(['clientId'])
 export class Organization extends BaseEntity {
-    @Column({ type: 'uuid' })
-    tenantId!: string;
+    @Column({ type: 'uuid', name: 'client_id' })
+    clientId!: string;
 
-    @ManyToOne(() => Tenant, (tenant) => tenant.organizations, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'tenant_id' })
-    tenant!: Tenant;
+    @ManyToOne(() => Client, (client) => client.organizations, { onDelete: 'RESTRICT' })
+    @JoinColumn({ name: 'client_id' })
+    client!: Client;
 
     @Column({ type: 'text' })
     name!: string;
 
-    @Column({ type: 'text' })
+    @Column({ type: 'citext' })
     slug!: string;
 
-    @OneToOne(() => OrganizationProfile, (profile) => profile.organization)
-    profile?: OrganizationProfile;
+    @Column({ type: 'jsonb', default: {} })
+    settings!: Record<string, unknown>;
 
-    @OneToMany(() => OrganizationMember, (member) => member.organization)
-    members!: OrganizationMember[];
+    @Column({ type: 'uuid', nullable: true, name: 'created_by' })
+    createdById?: string;
+
+    @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'created_by' })
+    createdBy?: User;
+
+    @OneToMany(() => Member, (member) => member.organization)
+    members!: Member[];
+
+    @OneToMany(() => Invitation, (invitation) => invitation.organization)
+    invitations!: Invitation[];
 }
