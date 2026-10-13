@@ -2,6 +2,7 @@ import { Client, Profile, User, UserStatus } from '@parishbooks/database';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, EntityManager } from 'typeorm';
 import { Injectable } from '@nestjs/common';
+import { UserNotFoundException } from '../exceptions';
 import { CreateUserAccountDto } from '../interfaces';
 import { OtpHelper } from '../helpers/otp.helper';
 
@@ -36,7 +37,8 @@ export class AuthRepository {
 
     async updateCredentialPassword(userId: string, passwordHash: string, em: EntityManager = this.dataSource.createEntityManager()) {
         const profile = em.getRepository(Profile);
-        await profile.update({ userId }, { password: passwordHash });
+        const result = await profile.update({ userId }, { password: passwordHash });
+        if (!result.affected) throw new UserNotFoundException();
     }
 
     async createUserAccount(dto: CreateUserAccountDto, em: EntityManager = this.dataSource.createEntityManager()) {

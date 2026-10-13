@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthUser } from '../dto/auth-user.dto';
 import { JWT_TOKEN_TYPE_ACCESS, JWT_TOKEN_TYPE_REFRESH } from '../constants/jwt.constant';
 import { RefreshTokenInvalidException } from '../exceptions';
+import type { AuthCookieTokens } from './cookie.service';
 import { AuthRepository } from '../repository/auth.repository';
 import { SignInService } from './signin.service';
 import { AuthUserHelper } from '../helpers/auth-user.helper';
@@ -26,8 +27,15 @@ export class TokenService {
         return { accessToken, refreshToken };
     }
 
-    mintAccessToken({ id, ...user }: AuthUser): string {
-        return this.jwtService.sign({ sub: id, typ: JWT_TOKEN_TYPE_ACCESS, ...user });
+    mintAccessToken(user: AuthUser): string {
+        return this.jwtService.sign({
+            sub: user.id,
+            typ: JWT_TOKEN_TYPE_ACCESS,
+            email: user.email,
+            emailVerified: user.emailVerified,
+            username: user.username,
+            banned: user.banned,
+        });
     }
 
     mintRefreshToken(userId: string, rememberMe?: boolean): string {
@@ -35,7 +43,7 @@ export class TokenService {
         return this.jwtService.sign({ sub: userId, typ: JWT_TOKEN_TYPE_REFRESH }, { expiresIn });
     }
 
-    async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }> {
+    async refreshAccessToken(refreshToken: string): Promise<AuthCookieTokens> {
         try {
             const payload = this.jwtService.verify<RefreshJwtPayload>(refreshToken);
             if (payload.typ !== JWT_TOKEN_TYPE_REFRESH || !payload.sub) throw new RefreshTokenInvalidException();
@@ -43,7 +51,10 @@ export class TokenService {
             if (!user) throw new RefreshTokenInvalidException();
             const authUser = AuthUserHelper.toAuthUser(user);
             this.signInService.validateUser(authUser);
-            return { accessToken: this.mintAccessToken(authUser) };
+            return {
+                accessToken: this.mintAccessToken(authUser),
+                refreshToken: this.mintRefreshToken(user.id),
+            };
         } catch (error) {
             if (error instanceof HttpException) throw error;
             throw new RefreshTokenInvalidException();

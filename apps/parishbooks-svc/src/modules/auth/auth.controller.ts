@@ -65,8 +65,8 @@ export class AuthController {
     async refreshAccessToken(@Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<RefreshResponseDto> {
         const refreshToken = this.cookieService.getRefreshTokenFromRequest(request);
         if (!refreshToken) throw new RefreshTokenInvalidException();
-        const { accessToken } = await this.tokenService.refreshAccessToken(refreshToken);
-        this.cookieService.setAccessTokenCookie(response, accessToken);
+        const tokens = await this.tokenService.refreshAccessToken(refreshToken);
+        this.cookieService.setAuthCookies(response, tokens);
         return new RefreshResponseDto({ success: true });
     }
 

@@ -16,7 +16,7 @@ export class AuthService {
     async validateJwtPayload(payload: JwtPayload): Promise<JwtPayload> {
         const user = await this.authRepository.getUserById(payload.sub);
         if (!user) throw new UnauthorizedException();
-        this.signInService.validateUser(AuthUserHelper.toAuthUser(user, payload.roles ?? []));
+        this.signInService.validateUser(AuthUserHelper.toAuthUser(user));
         this.clsService.set('userId', payload.sub);
         return payload;
     }

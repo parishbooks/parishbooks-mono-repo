@@ -7,6 +7,7 @@ import {
     OTP_MAX_ATTEMPTS,
 } from '../constants/verification.constants';
 import { OtpExpiredException, OtpInvalidException, OtpRateLimitedException } from '../exceptions';
+import type { EntityManager } from 'typeorm';
 import type { VerificationRepository } from '../repository/verification.repository';
 
 export class OtpHelper {
@@ -65,41 +66,44 @@ export class OtpHelper {
         return n.toString().padStart(length, '0');
     }
 
-    static async issueOtpChallenge(verificationRepository: VerificationRepository, identifier: string): Promise<string> {
+    static async issueOtpChallenge(verificationRepository: VerificationRepository, identifier: string, em?: EntityManager): Promise<string> {
         const otp = OtpHelper.generateNumericOtp(OTP_LENGTH);
         const expiresAt = new Date(Date.now() + OTP_EXPIRES_IN_SECONDS * 1000);
         const value = OtpHelper.formatVerificationValue(OtpHelper.hashOtp(otp), 0);
-        await verificationRepository.upsertByIdentifier({ identifier, value, expiresAt });
+        await verificationRepository.upsertByIdentifier({ identifier, value, expiresAt }, em);
         return otp;
     }
 
-    static async verifyOtpChallenge(verificationRepository: VerificationRepository, identifier: string, otp: string): Promise<void> {
-        const row = await verificationRepository.findByIdentifier(identifier);
+    static async verifyOtpChallenge(verificationRepository: VerificationRepository, identifier: string, otp: string, em?: EntityManager): Promise<void> {
+        const row = await verificationRepository.findByIdentifier(identifier, em);
         if (!row || row.expiresAt.getTime() <= Date.now()) {
-            if (row) await verificationRepository.deleteByIdentifier(identifier);
+            if (row) await verificationRepository.deleteByIdentifier(identifier, em);
             throw new OtpExpiredException();
         }
 
         const { storedOtp, attempts } = OtpHelper.splitVerificationValue(row.value);
         if (attempts >= OTP_MAX_ATTEMPTS) {
-            await verificationRepository.deleteByIdentifier(identifier);
+            await verificationRepository.deleteByIdentifier(identifier, em);
             throw new OtpRateLimitedException();
         }
 
         if (!OtpHelper.verifyOtpHash(otp, storedOtp)) {
             const nextAttempts = attempts + 1;
             if (nextAttempts >= OTP_MAX_ATTEMPTS) {
-                await verificationRepository.deleteByIdentifier(identifier);
+                await verificationRepository.deleteByIdentifier(identifier, em);
                 throw new OtpRateLimitedException();
             }
-            await verificationRepository.upsertByIdentifier({
-                identifier,
-                value: OtpHelper.formatVerificationValue(storedOtp, nextAttempts),
-                expiresAt: row.expiresAt,
-            });
+            await verificationRepository.upsertByIdentifier(
+                {
+                    identifier,
+                    value: OtpHelper.formatVerificationValue(storedOtp, nextAttempts),
+                    expiresAt: row.expiresAt,
+                },
+                em,
+            );
             throw new OtpInvalidException();
         }
 
-        await verificationRepository.deleteByIdentifier(identifier);
+        await verificationRepository.deleteByIdentifier(identifier, em);
     }
 }

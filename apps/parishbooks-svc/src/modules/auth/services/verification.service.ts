@@ -1,83 +1,76 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { User, UserStatus } from '@parishbooks/database';
+import { DataSource } from 'typeorm';
 import { AuthRepository } from '../repository/auth.repository';
 import { VerificationRepository } from '../repository/verification.repository';
-import { FORGET_PASSWORD_OTP_TYPE, OTP_SEND_COOLDOWN_SECONDS } from '../constants/verification.constants';
+import { OTP_SEND_COOLDOWN_SECONDS } from '../constants/verification.constants';
 import { OtpHelper } from '../helpers/otp.helper';
 import { EMAIL_SENDER, type EmailSenderPort } from '../ports/email-sender.port';
-import { OtpRateLimitedException, UserNotFoundException } from '../exceptions';
+import { OtpRateLimitedException, UserBannedException, UserNotFoundException } from '../exceptions';
 
 @Injectable()
 export class VerificationService {
     private readonly logger = new Logger(VerificationService.name);
-    private readonly lastSendAtByCooldownKey = new Map<string, number>();
 
     constructor(
         private readonly authRepository: AuthRepository,
         private readonly verificationRepository: VerificationRepository,
         @Inject(EMAIL_SENDER) private readonly emailSender: EmailSenderPort,
+        @InjectDataSource() private readonly dataSource: DataSource,
     ) {}
 
-    /** Always resolves; skips send when user is missing or already verified. */
+    /** Always resolves; skips send when user is missing, suspended, or already verified. */
     async sendEmailVerificationOtp(email: string): Promise<void> {
         const normalized = OtpHelper.normalizeVerificationEmail(email);
         if (!this.isValidEmail(normalized)) return;
         const user = await this.authRepository.getUserByEmail(normalized);
-        if (!user || user.status === UserStatus.ACTIVE) return;
+        if (!user || user.status !== UserStatus.PENDING) return;
 
         const identifier = OtpHelper.toEmailVerificationOtpIdentifier(normalized);
-        await this.issueOtp(normalized, 'email-verification', identifier, (target, code) =>
-            this.emailSender.sendEmailVerificationOtp({ email: target, otp: code }),
-        );
+        await this.issueOtp(normalized, identifier, (target, code) => this.emailSender.sendEmailVerificationOtp({ email: target, otp: code }));
     }
 
     async verifyEmailOtp(email: string, otp: string): Promise<User> {
         const normalized = OtpHelper.normalizeVerificationEmail(email);
         const user = await this.authRepository.getUserByEmail(normalized);
         if (!user) throw new UserNotFoundException();
+        if (user.status === UserStatus.SUSPENDED) throw new UserBannedException();
 
         const identifier = OtpHelper.toEmailVerificationOtpIdentifier(normalized);
-        await OtpHelper.verifyOtpChallenge(this.verificationRepository, identifier, otp);
-
-        await this.authRepository.markEmailVerified(user.id);
+        await this.dataSource.transaction(async (em) => {
+            await OtpHelper.verifyOtpChallenge(this.verificationRepository, identifier, otp, em);
+            if (user.status === UserStatus.PENDING) await this.authRepository.markEmailVerified(user.id, em);
+        });
         user.status = UserStatus.ACTIVE;
         return user;
     }
 
-    /** Always resolves; skips send when no credential user exists. */
+    /** Always resolves; skips send when no user exists or account is suspended. */
     async sendForgetPasswordOtp(email: string): Promise<void> {
         const normalized = OtpHelper.normalizeVerificationEmail(email);
         if (!this.isValidEmail(normalized)) return;
         const user = await this.authRepository.getUserByEmail(normalized);
-        if (!user) return;
+        if (!user || user.status === UserStatus.SUSPENDED) return;
 
         const identifier = OtpHelper.toForgetPasswordOtpIdentifier(normalized);
-        await this.issueOtp(normalized, FORGET_PASSWORD_OTP_TYPE, identifier, (target, code) =>
-            this.emailSender.sendPasswordResetOtp({ email: target, otp: code }),
-        );
+        await this.issueOtp(normalized, identifier, (target, code) => this.emailSender.sendPasswordResetOtp({ email: target, otp: code }));
     }
 
-    private async issueOtp(
-        normalizedEmail: string,
-        cooldownScope: string,
-        identifier: string,
-        send: (email: string, otp: string) => Promise<void>,
-    ): Promise<void> {
-        this.enforceSendCooldown(cooldownScope, normalizedEmail);
+    private async issueOtp(normalizedEmail: string, identifier: string, send: (email: string, otp: string) => Promise<void>): Promise<void> {
+        await this.enforceSendCooldown(identifier);
         const otp = await OtpHelper.issueOtpChallenge(this.verificationRepository, identifier);
-        this.lastSendAtByCooldownKey.set(`${cooldownScope}:${normalizedEmail}`, Date.now());
         setImmediate(() => {
             void send(normalizedEmail, otp).catch((err: unknown) => {
-                this.logger.error(`Failed to send OTP (${cooldownScope}) to ${normalizedEmail}`, err);
+                this.logger.error(`Failed to send OTP to ${normalizedEmail}`, err);
             });
         });
     }
 
-    private enforceSendCooldown(cooldownScope: string, normalizedEmail: string) {
-        const key = `${cooldownScope}:${normalizedEmail}`;
-        const last = this.lastSendAtByCooldownKey.get(key);
-        if (last === undefined) return;
-        const elapsedSec = (Date.now() - last) / 1000;
+    private async enforceSendCooldown(identifier: string) {
+        const existing = await this.verificationRepository.findByIdentifier(identifier);
+        if (!existing) return;
+        const elapsedSec = (Date.now() - existing.updatedAt.getTime()) / 1000;
         if (elapsedSec < OTP_SEND_COOLDOWN_SECONDS) throw new OtpRateLimitedException('Please wait before requesting another code.');
     }
 

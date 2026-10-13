@@ -17,7 +17,7 @@ export class AuthUserHelper {
             emailVerified: user.status === UserStatus.ACTIVE,
             username: AuthUserHelper.usernameFromUser(user),
             roles,
-            banned: false,
+            banned: user.status === UserStatus.SUSPENDED,
         });
     }
 }
