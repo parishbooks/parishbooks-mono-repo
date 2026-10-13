@@ -12,7 +12,7 @@ export class Client extends BaseEntity {
     @Column({ type: 'uuid', name: 'user_id' })
     userId!: string;
 
-    @OneToOne(() => User, { onDelete: 'CASCADE' })
+    @OneToOne(() => User, (user) => user.client, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user!: User;
 
