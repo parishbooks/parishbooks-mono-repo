@@ -6,7 +6,7 @@
 **Already aligned (no action unless regressing):**
 
 - Sign-up creates `user` + `profile` + `client` in one transaction.
-- Sign-in validates password via interim `verification` row `credential:{userId}`.
+- Sign-in validates password via `profile.password` (interim local auth until provider owns credentials).
 - Email OTP uses separate verification identifiers; success sets `user.status` → `active`.
 - `tenantId` removed from sign-up response, JWT CLS, and related e2e.
 - **Entity base:** `BaseEntity` (`id`, `createdAt`, `updatedAt`, `deletedAt`) for mutable rows; `audit_log` is append-only (`id`, `createdAt` only, no soft delete).
@@ -28,7 +28,7 @@
 
 ## P1 — ERD semantics & data integrity
 
-- [ ] **`user.status` semantics:** Document and enforce meaning of `active` / `suspended`. Today `suspended` = unverified at sign-up; ERD also uses `suspended` for admin action — split or document conflation. User removal is `deleted_at` only (no `deleted` status).
+- [ ] **`user.status` semantics:** `pending` = awaiting email verification; `suspended` = admin action; `active` = verified and usable. User removal is `deleted_at` only (no `deleted` status in app enum).
 - [ ] **`auth_provider_id`:** Set when integrating Supabase (or other provider); align `user.id` with provider id if required by spec.
 - [ ] **`last_login_at`:** Update on successful sign-in and email-verify sign-in.
 - [ ] **Soft-deleted users:** Ensure sign-in / sign-up / password-reset respect `deleted_at` (TypeORM `@DeleteDateColumn` on `BaseEntity`; auth lookups exclude soft-deleted rows; uniqueness checks use `withDeleted` where email must stay reserved).

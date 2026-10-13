@@ -78,7 +78,7 @@ export class Init1791863147149 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "member" ADD "ends_at" TIMESTAMP WITH TIME ZONE`);
         await queryRunner.query(`ALTER TABLE "user" ADD "auth_provider_id" text`);
         await queryRunner.query(`ALTER TABLE "user" ADD CONSTRAINT "UQ_ed14f086d8dc7ded49deedfd830" UNIQUE ("auth_provider_id")`);
-        await queryRunner.query(`CREATE TYPE "public"."user_status" AS ENUM('active', 'suspended', 'deleted')`);
+        await queryRunner.query(`CREATE TYPE "public"."user_status" AS ENUM('active', 'pending', 'suspended', 'deleted')`);
         await queryRunner.query(`ALTER TABLE "user" ADD "status" "public"."user_status" NOT NULL DEFAULT 'active'`);
         await queryRunner.query(`ALTER TABLE "user" ADD "last_login_at" TIMESTAMP WITH TIME ZONE`);
         await queryRunner.query(`ALTER TABLE "organization" ADD "client_id" uuid NOT NULL`);

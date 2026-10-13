@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthRepository } from '../repository/auth.repository';
 import { VerificationRepository } from '../repository/verification.repository';
-import { verifyOtpChallenge } from '../helpers/otp-challenge.helper';
-import { normalizeVerificationEmail, toForgetPasswordOtpIdentifier } from '../helpers/otp-identifier.helper';
+import { OtpHelper } from '../helpers/otp.helper';
 import { UserNotFoundException } from '../exceptions';
 
 @Injectable()
@@ -24,11 +23,11 @@ export class PasswordService {
     }
 
     async confirmPasswordReset(email: string, otp: string, newPassword: string): Promise<void> {
-        const normalized = normalizeVerificationEmail(email);
+        const normalized = OtpHelper.normalizeVerificationEmail(email);
         const user = await this.authRepository.getUserByEmail(normalized);
         if (!user) throw new UserNotFoundException();
-        const identifier = toForgetPasswordOtpIdentifier(normalized);
-        await verifyOtpChallenge(this.verificationRepository, identifier, otp);
+        const identifier = OtpHelper.toForgetPasswordOtpIdentifier(normalized);
+        await OtpHelper.verifyOtpChallenge(this.verificationRepository, identifier, otp);
         const passwordHash = await this.hash(newPassword);
         await this.authRepository.updateCredentialPassword(user.id, passwordHash);
     }

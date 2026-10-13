@@ -6,6 +6,7 @@ import { SignUpService } from './services/signup.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { AuthUser } from './dto/auth-user.dto';
+import { AuthUserHelper } from './helpers/auth-user.helper';
 import { SignInService } from './services/signin.service';
 import { Public } from '@parishbooks/core';
 import { SignInResponseDto } from './dto/signin-response.dto';
@@ -104,7 +105,7 @@ export class AuthController {
     @ApiResponse({ status: 429, description: 'Too many OTP attempts', type: ErrorResponseDto })
     async verifyEmailOtp(@Body() body: VerifyEmailOtpDto, @Res({ passthrough: true }) response: Response): Promise<SignInResponseDto> {
         const user = await this.verificationService.verifyEmailOtp(body.email, body.otp);
-        const authUser = this.signInService.validateUser(new AuthUser({ ...user, roles: [] }));
+        const authUser = this.signInService.validateUser(AuthUserHelper.toAuthUser(user));
         const rememberMe = body.rememberMe;
         const tokens = this.tokenService.mintTokenPair(authUser, rememberMe);
         this.cookieService.setAuthCookies(response, tokens, { rememberMe });

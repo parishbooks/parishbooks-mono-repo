@@ -82,6 +82,10 @@ export type SignUpDto = {
      * User last name
      */
     lastName: string;
+    /**
+     * Optional phone number stored on profile
+     */
+    phone?: string;
 };
 
 export type SignUpResponseDto = {

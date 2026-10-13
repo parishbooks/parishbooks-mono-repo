@@ -23,4 +23,8 @@ export class Profile extends BaseEntity {
 
     @Column({ type: 'text', nullable: true })
     timezone?: string;
+
+    /** Bcrypt hash for email/password sign-in; null when the user only uses an external auth provider. */
+    @Column({ type: 'text', nullable: true })
+    password?: string;
 }

@@ -12,7 +12,7 @@ export const toEmailVerificationOtpIdentifier = (email: string): string => toOtp
 
 export const toForgetPasswordOtpIdentifier = (email: string): string => toOtpIdentifier(FORGET_PASSWORD_OTP_TYPE, email);
 
-/** Keep in sync with apps/parishbooks-svc auth otp-crypto.helper hashOtp. */
+/** Keep in sync with apps/parishbooks-svc auth OtpHelper.hashOtp. */
 export const hashOtpForE2e = (otp: string): string => createHash('sha256').update(otp, 'utf8').digest('base64url');
 
 async function seedOtpByIdentifier(identifier: string, otp: string, databaseUrl: string): Promise<void> {

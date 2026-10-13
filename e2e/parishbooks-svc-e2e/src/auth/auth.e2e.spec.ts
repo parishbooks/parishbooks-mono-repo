@@ -6,6 +6,8 @@ describe('Auth API (e2e)', () => {
     describe('POST /auth/sign-up', () => {
         it('creates a new account', async () => {
             const email = AuthE2eSupport.uniqueEmail('signup');
+            const databaseUrl = process.env.DATABASE_URL;
+            if (!databaseUrl) throw new Error('DATABASE_URL is required');
             const response = await request(E2eEnvironment.serverUrl)
                 .post(`${AuthE2eSupport.authBasePath}/sign-up`)
                 .send(AuthE2eSupport.buildSignUpPayload(email))
@@ -14,6 +16,35 @@ describe('Auth API (e2e)', () => {
                 userId: expect.any(String),
                 redirectTo: `/verify-email?email=${encodeURIComponent(email)}`,
             });
+
+            const { loadSignUpDbState } = await import('../support/signup-db.helper');
+            const db = await loadSignUpDbState(response.body.userId, databaseUrl);
+            expect(db.user).toEqual({ email, status: 'pending' });
+            expect(db.profile).toMatchObject({ userId: response.body.userId, fullName: 'E2E User', phone: null, hasPassword: true });
+            expect(db.client).toEqual({ userId: response.body.userId });
+            expect(db.memberCount).toBe(0);
+            expect(db.organizationCountForUser).toBe(0);
+        });
+
+        it('normalizes email and allows sign-in with mixed case after verify', async () => {
+            const mixedCaseEmail = `Signup-Norm-${crypto.randomUUID().slice(0, 8)}@E2E.Parishbooks.Test`;
+            const normalizedEmail = mixedCaseEmail.trim().toLowerCase();
+            const agent = AuthE2eSupport.agent();
+            const databaseUrl = process.env.DATABASE_URL;
+            if (!databaseUrl) throw new Error('DATABASE_URL is required');
+
+            const signUp = await agent.post(`${AuthE2eSupport.authBasePath}/sign-up`).send(AuthE2eSupport.buildSignUpPayload(mixedCaseEmail)).expect(201);
+            expect(signUp.body.redirectTo).toBe(`/verify-email?email=${encodeURIComponent(normalizedEmail)}`);
+
+            const { loadSignUpDbState } = await import('../support/signup-db.helper');
+            const db = await loadSignUpDbState(signUp.body.userId, databaseUrl);
+            expect(db.user.email).toBe(normalizedEmail);
+
+            const { seedEmailVerificationOtp } = await import('../support/otp-e2e.helper');
+            await seedEmailVerificationOtp(normalizedEmail, AuthE2eSupport.e2eVerificationOtp, databaseUrl);
+            await AuthE2eSupport.verifyEmailOtp(agent, mixedCaseEmail, AuthE2eSupport.e2eVerificationOtp).expect(200);
+
+            await agent.post(`${AuthE2eSupport.authBasePath}/sign-in`).send({ email: mixedCaseEmail, password: AuthE2eSupport.testPassword }).expect(200);
         });
 
         it('returns 400 when the email is already registered', async () => {

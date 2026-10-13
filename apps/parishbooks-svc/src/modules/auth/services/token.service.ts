@@ -5,8 +5,7 @@ import { JWT_TOKEN_TYPE_ACCESS, JWT_TOKEN_TYPE_REFRESH } from '../constants/jwt.
 import { RefreshTokenInvalidException } from '../exceptions';
 import { AuthRepository } from '../repository/auth.repository';
 import { SignInService } from './signin.service';
-import { User } from '@parishbooks/database';
-import { toAuthUser } from '../helpers/auth-user.mapper';
+import { AuthUserHelper } from '../helpers/auth-user.helper';
 
 type RefreshJwtPayload = {
     sub: string;
@@ -42,16 +41,12 @@ export class TokenService {
             if (payload.typ !== JWT_TOKEN_TYPE_REFRESH || !payload.sub) throw new RefreshTokenInvalidException();
             const user = await this.authRepository.getUserById(payload.sub);
             if (!user) throw new RefreshTokenInvalidException();
-            const authUser = this.toAuthUser(user);
+            const authUser = AuthUserHelper.toAuthUser(user);
             this.signInService.validateUser(authUser);
             return { accessToken: this.mintAccessToken(authUser) };
         } catch (error) {
             if (error instanceof HttpException) throw error;
             throw new RefreshTokenInvalidException();
         }
-    }
-
-    private toAuthUser(user: User): AuthUser {
-        return toAuthUser(user);
     }
 }

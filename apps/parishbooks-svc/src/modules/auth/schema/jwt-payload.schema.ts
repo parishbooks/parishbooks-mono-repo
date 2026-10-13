@@ -7,4 +7,5 @@ export const JwtPayloadSchema = z.object({
     iat: z.number().describe('The issued at time of the JWT.'),
     exp: z.number().describe('The expiration time of the JWT.'),
     typ: z.string().optional().describe('The type of the JWT.'),
+    roles: z.array(z.string()).optional().describe('The roles of the authenticated user.'),
 });
