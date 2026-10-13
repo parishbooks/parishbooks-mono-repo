@@ -9,12 +9,18 @@
 - Sign-in validates password via interim `verification` row `credential:{userId}`.
 - Email OTP uses separate verification identifiers; success sets `user.status` → `active`.
 - `tenantId` removed from sign-up response, JWT CLS, and related e2e.
+- **Entity base:** Single `BaseEntity` (`id`, `createdAt`, `updatedAt`, `deletedAt`); all TypeORM entities extend it (including `user`, `profile`, `audit_log`, `verification`).
+- **Legacy migrations removed** from repo; database must be migrated from entities (see P0).
 
 ---
 
 ## P0 — Blockers (runtime / security)
 
-- [ ] **Database migration:** Add migration(s) matching current entities (`user_status`, `profile`, `client`, `plan`, `subscription`, `organization`, `member`, `invitation`, `audit_log`, `citext`, enums). Drop or migrate off legacy `tenant`, `account`, old `user` columns. Run locally before e2e.
+- [ ] **Initial ER migration:** Generate and apply a **new** migration set from current entities (legacy `1791561742543-*` files are deleted). Include `citext`, Postgres enums, partial unique indexes, and `CHECK` constraints where TypeORM emitted them. Run locally before e2e.
+- [ ] **Reconcile entity vs ER_DESIGN in migration/docs** (intentional TypeORM choices until spec is updated):
+    - `profile`: entity uses uuid `id` + unique `user_id` FK (ER §4: `user_id` as PK).
+    - `audit_log`: entity uses uuid `id` via `BaseEntity` (ER §4: `bigint` identity).
+    - `user` / `verification`: entity includes `updated_at` and soft-delete columns via `BaseEntity` (ER table lists vary).
 - [ ] **`AuthUser` mapping bug:** Replace `new AuthUser({ ...user, roles: [] })` with `toAuthUser(user)` in `auth.controller.ts` (email-verification verify) and `auth.service.ts` (`validateJwtPayload`). Spreading `User` leaves `emailVerified` undefined and breaks post-verify sign-in and JWT guards.
 - [ ] **Email normalization:** Normalize email (trim + lowercase) on sign-up, sign-in, and all repository lookups (`checkUserExists`, `getUserByEmail`, `createUserAccount`) to match OTP/password-reset paths.
 
@@ -25,18 +31,19 @@
 - [ ] **`user.status` semantics:** Document and enforce meaning of `active` / `suspended` / `deleted`. Today `suspended` = unverified at sign-up; ERD also uses `suspended` for admin action — split or document conflation.
 - [ ] **`auth_provider_id`:** Set when integrating Supabase (or other provider); align `user.id` with provider id if required by spec.
 - [ ] **`last_login_at`:** Update on successful sign-in and email-verify sign-in.
-- [ ] **Soft-deleted users:** Ensure sign-in / sign-up / password-reset respect `deleted_at` and `UserStatus.DELETED` consistently (TypeORM soft-delete + explicit status checks).
+- [ ] **Soft-deleted users:** Ensure sign-in / sign-up / password-reset respect `deleted_at` and `UserStatus.DELETED` consistently (TypeORM `@DeleteDateColumn` on all entities + explicit status checks where needed).
 - [ ] **Admin suspend / ban:** Replace removed `banned*` columns with `UserStatus.SUSPENDED` (or dedicated flow); wire `toAuthUser` / `validateUser` and API errors accordingly.
+- [ ] **Update ER_DESIGN.md (optional):** Align written spec with `BaseEntity` conventions and profile/audit_log PK choices, or document “TypeORM layer” vs “Postgres target” explicitly.
 
 ---
 
 ## P2 — Auth architecture (interim → target)
 
 - [ ] **Credentials:** Move off `verification` credential rows to auth provider (ERD: no password on `user`). Remove `credential:{userId}` helper when provider owns passwords.
-- [ ] **`verification` table:** Keep for OTP/challenges only, or rename/document as non-ERD app table.
+- [ ] **`verification` table:** Keep for OTP/challenges only, or rename/document as non-ERD app table (still extends `BaseEntity`).
 - [ ] **Sign-up variants:** Owner path creates `client` (current). Add invite-only member sign-up that creates `user` + `profile` **without** `client` when accepting invitations.
 - [ ] **Profile fields:** Map optional sign-up `phone` (schema) → `profile.phone`; consider splitting `full_name` vs display name in API if needed.
-- [ ] **User entity relations:** Resolve duplicate profile loading — either ORM `relations: { profile: true }` on `User` or manual load in `auth.repository`, not both; avoid circular entity imports.
+- [ ] **User ↔ profile loading:** `User` has ORM relations; `auth.repository` still loads profile manually — pick one approach and use `relations: { profile: true }` if keeping decorators (watch circular imports).
 
 ---
 
@@ -51,7 +58,7 @@
 
 ## P4 — Tests & docs
 
-- [ ] **E2e:** Run auth suite after migration; update redirect expectations when routing changes.
+- [ ] **E2e:** Run auth suite after initial migration; update redirect expectations when routing changes.
 - [ ] **OpenAPI / api-sdk:** Regenerate after DTO changes (`SignUpResponseDto`, `AuthUser`, etc.).
 - [ ] **Deprecate stale docs:** Mark or update [tenant-organization-architecture-todo](../superpowers/plans/2026-10-12-tenant-organization-architecture-todo.md) where it assumes `tenant` / `owner_id`.
 
